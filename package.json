@@ -1,0 +1,56 @@
+{
+  "name": "buzzchat",
+  "version": "1.2.0",
+  "description": "Browser extension for automating Whatnot live chat with auto-welcome, timer messages, FAQ auto-replies, and giveaway automation. Works on Chrome and Firefox.",
+  "main": "src/background/background.js",
+  "scripts": {
+    "serve": "node test/serve.js",
+    "build": "node scripts/build.js",
+    "build:prod": "node scripts/build.js --minify",
+    "build:chrome": "node scripts/build.js chrome",
+    "build:firefox": "node scripts/build.js firefox",
+    "build:zip": "node scripts/build.js --zip",
+    "icons": "node scripts/generate-icons.js",
+    "zip": "zip -r whatnot-chat-bot.zip manifest.json assets src README.md",
+    "lint": "eslint src/**/*.js",
+    "test": "npx playwright test",
+    "test:popup": "npx playwright test popup",
+    "test:content": "npx playwright test content",
+    "test:e2e": "npx playwright test e2e",
+    "test:stress": "npx playwright test stress",
+    "test:headed": "npx playwright test --headed",
+    "test:real": "npx playwright test real-whatnot --headed --timeout=60000",
+    "test:debug": "npx playwright test --debug",
+    "test:report": "npx playwright show-report"
+  },
+  "keywords": [
+    "whatnot",
+    "chrome-extension",
+    "live-selling",
+    "chat-bot",
+    "automation",
+    "reselling"
+  ],
+  "author": "Jake Liu",
+  "license": "MIT",
+  "homepage": "https://github.com/JakeLiuMe/buzzchat#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "archiver": "^6.0.1",
+    "clean-css": "^5.3.3",
+    "eslint": "^8.56.0",
+    "playwright": "^1.57.0",
+    "sharp": "^0.33.2",
+    "terser": "^5.31.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JakeLiuMe/buzzchat"
+  },
+  "bugs": {
+    "url": "https://github.com/JakeLiuMe/buzzchat/issues"
+  }
+}

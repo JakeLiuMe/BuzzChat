@@ -1,0 +1,245 @@
+/* Whatnot Chat Bot - Content Script Styles */
+
+/* Status Indicator */
+#whatnot-bot-indicator {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 10000;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+#whatnot-bot-indicator > div {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#whatnot-bot-indicator > div:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Toast Notifications */
+.whatnot-bot-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  background: #1f2937;
+  color: white;
+  border-radius: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  z-index: 10001;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  animation: whatnotBotSlideIn 0.3s ease;
+}
+
+.whatnot-bot-toast.hiding {
+  animation: whatnotBotSlideOut 0.3s ease;
+}
+
+@keyframes whatnotBotSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes whatnotBotSlideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Bot Panel (optional floating panel) */
+.whatnot-bot-panel {
+  position: fixed;
+  bottom: 70px;
+  right: 20px;
+  width: 300px;
+  max-height: 400px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  display: none;
+}
+
+.whatnot-bot-panel.visible {
+  display: block;
+  animation: whatnotBotFadeIn 0.2s ease;
+}
+
+@keyframes whatnotBotFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.whatnot-bot-panel-header {
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #7c3aed, #9333ea);
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.whatnot-bot-panel-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.whatnot-bot-panel-close:hover {
+  opacity: 1;
+}
+
+.whatnot-bot-panel-content {
+  padding: 16px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Quick Action Buttons */
+.whatnot-bot-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.whatnot-bot-quick-btn {
+  padding: 6px 12px;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.whatnot-bot-quick-btn:hover {
+  background: #e5e7eb;
+}
+
+.whatnot-bot-quick-btn.active {
+  background: #7c3aed;
+  color: white;
+}
+
+/* Stats Section */
+.whatnot-bot-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.whatnot-bot-stat {
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.whatnot-bot-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #7c3aed;
+}
+
+.whatnot-bot-stat-label {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+/* Giveaway Entries Display */
+.whatnot-bot-entries {
+  max-height: 150px;
+  overflow-y: auto;
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.whatnot-bot-entry {
+  padding: 6px 10px;
+  background: white;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: #374151;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.whatnot-bot-entry:last-child {
+  margin-bottom: 0;
+}
+
+.whatnot-bot-entry-time {
+  font-size: 10px;
+  color: #9ca3af;
+}
+
+/* Scrollbar Styling */
+.whatnot-bot-panel-content::-webkit-scrollbar,
+.whatnot-bot-entries::-webkit-scrollbar {
+  width: 4px;
+}
+
+.whatnot-bot-panel-content::-webkit-scrollbar-track,
+.whatnot-bot-entries::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
+
+.whatnot-bot-panel-content::-webkit-scrollbar-thumb,
+.whatnot-bot-entries::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+.whatnot-bot-panel-content::-webkit-scrollbar-thumb:hover,
+.whatnot-bot-entries::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Pulse Animation for Active Status */
+@keyframes whatnotBotPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0);
+  }
+}
+
+.whatnot-bot-status-active {
+  animation: whatnotBotPulse 2s ease-in-out infinite;
+}

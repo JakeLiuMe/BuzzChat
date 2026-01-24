@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "BuzzChat",
+  "version": "1.2.0",
+  "description": "Automate your live selling shows with auto-welcome messages, timed promotions, and FAQ auto-replies. Save hours every stream!",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "buzzchat@buzzchat.app",
+      "strict_min_version": "109.0"
+    }
+  },
+  "permissions": [
+    "storage",
+    "alarms",
+    "nativeMessaging"
+  ],
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://extensionpay.com; object-src 'none'; frame-ancestors 'none'"
+  },
+  "host_permissions": [
+    "https://www.whatnot.com/*",
+    "https://whatnot.com/*",
+    "https://extensionpay.com/pay/*",
+    "https://extensionpay.com/manage/*"
+  ],
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "src/background/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.whatnot.com/*",
+        "https://whatnot.com/*"
+      ],
+      "js": ["src/lib/security.js", "src/lib/selectors.js", "src/lib/analytics.js", "src/scripts/content.js"],
+      "css": ["src/styles/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/*"],
+      "matches": ["https://www.whatnot.com/*", "https://whatnot.com/*"]
+    }
+  ]
+}

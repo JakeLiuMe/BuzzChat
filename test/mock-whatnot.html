@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Whatnot Live Stream - Test Page</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a1a;
+      color: white;
+      height: 100vh;
+      display: flex;
+    }
+
+    .video-area {
+      flex: 1;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .live-badge {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: #ef4444;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 12px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .video-placeholder {
+      color: #666;
+      text-align: center;
+    }
+
+    .video-placeholder h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .chat-area {
+      width: 350px;
+      background: #262626;
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid #333;
+    }
+
+    .chat-header {
+      padding: 16px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-header h3 {
+      font-size: 16px;
+    }
+
+    .viewer-count {
+      color: #888;
+      font-size: 14px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .chat-message {
+      display: flex;
+      gap: 10px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chat-message .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed, #9333ea);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .chat-message .content {
+      flex: 1;
+    }
+
+    .chat-message .username {
+      font-weight: 600;
+      color: #a78bfa;
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+
+    .chat-message .username.bot {
+      color: #10b981;
+    }
+
+    .chat-message .text {
+      color: #e5e5e5;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .chat-input-area {
+      padding: 16px;
+      border-top: 1px solid #333;
+    }
+
+    .chat-input-wrapper {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 12px 16px;
+      background: #333;
+      border: 1px solid #444;
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .chat-input:focus {
+      border-color: #7c3aed;
+    }
+
+    .chat-input::placeholder {
+      color: #666;
+    }
+
+    .send-btn {
+      padding: 12px 20px;
+      background: #7c3aed;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .send-btn:hover {
+      background: #6d28d9;
+    }
+
+    /* Test Controls */
+    .test-controls {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: #333;
+      padding: 20px;
+      border-radius: 12px;
+      z-index: 1000;
+      max-width: 300px;
+    }
+
+    .test-controls h4 {
+      margin-bottom: 12px;
+      color: #a78bfa;
+    }
+
+    .test-controls button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 8px;
+      background: #444;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.2s;
+    }
+
+    .test-controls button:hover {
+      background: #555;
+    }
+
+    .test-controls button.primary {
+      background: #7c3aed;
+    }
+
+    .test-controls button.primary:hover {
+      background: #6d28d9;
+    }
+
+    .test-controls small {
+      display: block;
+      color: #888;
+      font-size: 11px;
+      margin-top: 8px;
+    }
+
+    /* Console log area */
+    .console-area {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 400px;
+      max-height: 300px;
+      background: rgba(0,0,0,0.9);
+      border-radius: 8px;
+      overflow: hidden;
+      font-family: monospace;
+      font-size: 11px;
+      z-index: 1000;
+    }
+
+    .console-header {
+      padding: 8px 12px;
+      background: #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .console-header span {
+      color: #10b981;
+    }
+
+    .console-header button {
+      background: none;
+      border: none;
+      color: #888;
+      cursor: pointer;
+    }
+
+    .console-logs {
+      padding: 12px;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .console-log {
+      color: #888;
+      margin-bottom: 4px;
+      word-break: break-all;
+    }
+
+    .console-log.info { color: #60a5fa; }
+    .console-log.success { color: #10b981; }
+    .console-log.warn { color: #f59e0b; }
+    .console-log.error { color: #ef4444; }
+  </style>
+</head>
+<body>
+  <!-- Video Area -->
+  <div class="video-area">
+    <div class="live-badge">LIVE</div>
+    <div class="video-placeholder">
+      <h2>Mock Whatnot Stream</h2>
+      <p>Test page for Whatnot Chat Bot extension</p>
+    </div>
+  </div>
+
+  <!-- Chat Area -->
+  <div class="chat-area">
+    <div class="chat-header">
+      <h3>Live Chat</h3>
+      <span class="viewer-count" id="viewerCount">127 watching</span>
+    </div>
+
+    <div class="chat-messages" id="chatMessages" data-testid="chat-messages">
+      <!-- Messages will be added here -->
+    </div>
+
+    <div class="chat-input-area">
+      <div class="chat-input-wrapper">
+        <textarea
+          class="chat-input"
+          id="chatInput"
+          placeholder="Send a message..."
+          rows="1"
+          data-testid="chat-input"
+        ></textarea>
+        <button class="send-btn" id="sendBtn" data-testid="send-button">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Test Controls -->
+  <div class="test-controls">
+    <h4>Test Controls</h4>
+    <button onclick="simulateNewViewer()">Simulate New Viewer Join</button>
+    <button onclick="simulateQuestion('shipping')">Ask "Do you ship?"</button>
+    <button onclick="simulateQuestion('payment')">Ask "What payment?"</button>
+    <button onclick="simulateGiveawayEntry()">Type "GIVEAWAY"</button>
+    <button onclick="simulateMultipleViewers()" class="primary">Simulate 5 Viewers</button>
+    <button onclick="clearChat()">Clear Chat</button>
+    <small>These buttons simulate viewer activity to test the bot's responses.</small>
+  </div>
+
+  <!-- Console Area -->
+  <div class="console-area">
+    <div class="console-header">
+      <span>Bot Console</span>
+      <button onclick="clearConsole()">Clear</button>
+    </div>
+    <div class="console-logs" id="consoleLogs"></div>
+  </div>
+
+  <script>
+    // Mock usernames
+    const mockUsernames = [
+      'VintageQueen', 'SneakerHead99', 'CardCollector', 'ThriftKing',
+      'ResellPro', 'DealHunter', 'ShopTillDrop', 'BargainBoss',
+      'FlipMaster', 'TreasureFinder', 'StyleSeeker', 'ValueVault'
+    ];
+
+    const questions = {
+      shipping: [
+        "Do you ship to Canada?",
+        "How much is shipping?",
+        "When will you ship this?",
+        "Do you offer free shipping?",
+        "Can you deliver to the UK?"
+      ],
+      payment: [
+        "What payment methods do you accept?",
+        "Can I pay with PayPal?",
+        "Do you take credit cards?",
+        "Is there a payment plan?"
+      ]
+    };
+
+    let viewerCount = 127;
+    let messageId = 0;
+
+    // Add message to chat
+    function addMessage(username, text, isBot = false) {
+      const chatMessages = document.getElementById('chatMessages');
+      const initials = username.slice(0, 2).toUpperCase();
+
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'chat-message';
+      messageDiv.setAttribute('data-testid', 'chat-message');
+      messageDiv.innerHTML = `
+        <div class="avatar">${initials}</div>
+        <div class="content">
+          <div class="username ${isBot ? 'bot' : ''}" data-testid="username">${username}${isBot ? ' (Bot)' : ''}</div>
+          <div class="text" data-testid="message-text">${text}</div>
+        </div>
+      `;
+
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      logToConsole(`New message: ${username}: ${text}`, isBot ? 'success' : 'info');
+    }
+
+    // Simulate a new viewer joining
+    function simulateNewViewer() {
+      const username = mockUsernames[Math.floor(Math.random() * mockUsernames.length)] + Math.floor(Math.random() * 100);
+      viewerCount++;
+      document.getElementById('viewerCount').textContent = `${viewerCount} watching`;
+
+      addMessage(username, "Just joined! Hey everyone! 👋");
+      logToConsole(`New viewer joined: ${username}`, 'info');
+    }
+
+    // Simulate a question
+    function simulateQuestion(type) {
+      const username = mockUsernames[Math.floor(Math.random() * mockUsernames.length)] + Math.floor(Math.random() * 100);
+      const questionList = questions[type] || questions.shipping;
+      const question = questionList[Math.floor(Math.random() * questionList.length)];
+
+      addMessage(username, question);
+    }
+
+    // Simulate giveaway entry
+    function simulateGiveawayEntry() {
+      const username = mockUsernames[Math.floor(Math.random() * mockUsernames.length)] + Math.floor(Math.random() * 100);
+      addMessage(username, "GIVEAWAY");
+    }
+
+    // Simulate multiple viewers
+    function simulateMultipleViewers() {
+      logToConsole('Simulating 5 new viewers...', 'info');
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => simulateNewViewer(), i * 1500);
+      }
+    }
+
+    // Clear chat
+    function clearChat() {
+      document.getElementById('chatMessages').innerHTML = '';
+      logToConsole('Chat cleared', 'warn');
+    }
+
+    // Handle manual message send
+    document.getElementById('sendBtn').addEventListener('click', sendMessage);
+    document.getElementById('chatInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    function sendMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (text) {
+        addMessage('You (Host)', text);
+        input.value = '';
+      }
+    }
+
+    // Console logging
+    function logToConsole(message, type = 'info') {
+      const logs = document.getElementById('consoleLogs');
+      const time = new Date().toLocaleTimeString();
+      const logDiv = document.createElement('div');
+      logDiv.className = `console-log ${type}`;
+      logDiv.textContent = `[${time}] ${message}`;
+      logs.appendChild(logDiv);
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    function clearConsole() {
+      document.getElementById('consoleLogs').innerHTML = '';
+    }
+
+    // Intercept console.log to show bot logs
+    const originalLog = console.log;
+    console.log = function(...args) {
+      originalLog.apply(console, args);
+      const message = args.join(' ');
+      if (message.includes('[Whatnot Bot]')) {
+        logToConsole(message.replace('[Whatnot Bot] ', ''), 'success');
+      }
+    };
+
+    // Initial message
+    logToConsole('Test page loaded. Waiting for extension...', 'info');
+    logToConsole('Click extension icon to enable the bot.', 'info');
+
+    // Add some initial chat messages
+    setTimeout(() => addMessage('WelcomeBot', 'Welcome to the stream! 🎉'), 500);
+    setTimeout(() => addMessage('EarlyBird42', 'First! Excited for today\'s show!'), 1000);
+  </script>
+</body>
+</html>

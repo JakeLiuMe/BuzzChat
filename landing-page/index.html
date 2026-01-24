@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuzzChat - Automate Your Live Shows</title>
+  <meta name="description" content="Boost engagement on your live selling shows with automated welcome messages, timer promotions, and FAQ auto-replies. Save hours every stream!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-hover: #6d28d9;
+      --success: #10b981;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-600: #4b5563;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--gray-800);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      z-index: 100;
+    }
+
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 70px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--gray-900);
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), #9333ea);
+      border-radius: 8px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--gray-600);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+      font-size: 16px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--gray-100);
+      color: var(--gray-800);
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-200);
+    }
+
+    .btn-lg {
+      padding: 16px 32px;
+      font-size: 18px;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 140px 0 80px;
+      background: linear-gradient(180deg, white, var(--gray-50));
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 56px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 24px;
+      line-height: 1.1;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--primary), #9333ea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 20px;
+      color: var(--gray-600);
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 60px;
+    }
+
+    .hero-image {
+      max-width: 900px;
+      margin: 0 auto;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      background: white;
+      padding: 20px;
+    }
+
+    .hero-image img {
+      width: 100%;
+      border-radius: 8px;
+    }
+
+    /* Features */
+    .features {
+      padding: 100px 0;
+      background: white;
+    }
+
+    .features h2 {
+      text-align: center;
+      font-size: 40px;
+      font-weight: 700;
+      margin-bottom: 60px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 40px;
+    }
+
+    .feature-card {
+      padding: 32px;
+      border-radius: 16px;
+      background: var(--gray-50);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--primary), #9333ea);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    .feature-card h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .feature-card p {
+      color: var(--gray-600);
+      font-size: 15px;
+    }
+
+    /* Pricing */
+    .pricing {
+      padding: 100px 0;
+      background: var(--gray-50);
+    }
+
+    .pricing h2 {
+      text-align: center;
+      font-size: 40px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .pricing-subtitle {
+      text-align: center;
+      color: var(--gray-600);
+      font-size: 18px;
+      margin-bottom: 60px;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 32px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .pricing-card {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      position: relative;
+    }
+
+    .pricing-card.featured {
+      border: 2px solid var(--primary);
+      transform: scale(1.05);
+    }
+
+    .featured-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--primary);
+      color: white;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .pricing-card h3 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .price {
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 8px;
+    }
+
+    .price span {
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--gray-600);
+    }
+
+    .price-subtitle {
+      color: var(--gray-600);
+      margin-bottom: 32px;
+    }
+
+    .pricing-features {
+      list-style: none;
+      margin-bottom: 32px;
+    }
+
+    .pricing-features li {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pricing-features li:last-child {
+      border-bottom: none;
+    }
+
+    .check {
+      color: var(--success);
+      font-weight: bold;
+    }
+
+    .pricing-card .btn {
+      width: 100%;
+    }
+
+    /* Testimonials */
+    .testimonials {
+      padding: 100px 0;
+      background: white;
+    }
+
+    .testimonials h2 {
+      text-align: center;
+      font-size: 40px;
+      font-weight: 700;
+      margin-bottom: 60px;
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 32px;
+    }
+
+    .testimonial-card {
+      padding: 32px;
+      background: var(--gray-50);
+      border-radius: 16px;
+    }
+
+    .testimonial-text {
+      font-size: 16px;
+      line-height: 1.7;
+      margin-bottom: 24px;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .testimonial-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+    }
+
+    .testimonial-name {
+      font-weight: 600;
+    }
+
+    .testimonial-title {
+      color: var(--gray-600);
+      font-size: 14px;
+    }
+
+    /* CTA */
+    .cta {
+      padding: 100px 0;
+      background: linear-gradient(135deg, var(--primary), #9333ea);
+      text-align: center;
+      color: white;
+    }
+
+    .cta h2 {
+      font-size: 40px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .cta p {
+      font-size: 18px;
+      opacity: 0.9;
+      margin-bottom: 40px;
+    }
+
+    .cta .btn-secondary {
+      background: white;
+      color: var(--primary);
+    }
+
+    .cta .btn-secondary:hover {
+      background: var(--gray-100);
+    }
+
+    /* Footer */
+    footer {
+      padding: 60px 0;
+      background: var(--gray-900);
+      color: white;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 60px;
+    }
+
+    .footer-brand p {
+      color: var(--gray-400);
+      margin-top: 16px;
+      font-size: 14px;
+    }
+
+    .footer-links h4 {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+    }
+
+    .footer-links ul {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 12px;
+    }
+
+    .footer-links a {
+      color: var(--gray-400);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    .footer-bottom {
+      margin-top: 60px;
+      padding-top: 30px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+      color: var(--gray-400);
+      font-size: 14px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hero h1 {
+        font-size: 36px;
+      }
+
+      .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .pricing-card.featured {
+        transform: none;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav>
+    <div class="container">
+      <a href="/" class="logo">
+        <div class="logo-icon"></div>
+        BuzzChat
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#testimonials">Reviews</a></li>
+      </ul>
+      <a href="#" class="btn btn-primary">Install Free</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <h1>Automate Your <span>Live Selling</span> Shows</h1>
+      <p>Boost engagement with auto-welcome messages, timed promotions, and FAQ auto-replies. Focus on selling while the bot handles your chat.</p>
+      <div class="hero-buttons">
+        <a href="#" class="btn btn-primary btn-lg">Install Free Extension</a>
+        <a href="#features" class="btn btn-secondary btn-lg">See Features</a>
+      </div>
+      <div class="hero-image">
+        <!-- Placeholder for screenshot -->
+        <div style="background: linear-gradient(135deg, #f3f4f6, #e5e7eb); height: 400px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #9ca3af;">
+          Extension Screenshot
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <div class="container">
+      <h2>Everything You Need to Run Better Live Shows</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">&#128075;</div>
+          <h3>Auto-Welcome Messages</h3>
+          <p>Automatically greet every new viewer with a personalized welcome message. Make them feel special from the moment they join.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#9200;</div>
+          <h3>Timer Promotions</h3>
+          <p>Set up recurring messages that post every X minutes. Perfect for shipping deals, discount codes, and reminders.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#128172;</div>
+          <h3>FAQ Auto-Replies</h3>
+          <p>Automatically answer common questions about shipping, payments, returns, and more. Save time and keep viewers informed.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#127881;</div>
+          <h3>Giveaway Automation</h3>
+          <p>Run giveaways with ease. Announce, track entries, and pick winners randomly. Boost engagement and reward your community.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#128203;</div>
+          <h3>Message Templates</h3>
+          <p>Save your frequently used messages as templates. Send them instantly with one click when you need them.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#128200;</div>
+          <h3>Analytics Dashboard</h3>
+          <p>Track your bot's performance. See how many messages were sent, engagement rates, and giveaway statistics.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <h2>Simple, Transparent Pricing</h2>
+      <p class="pricing-subtitle">Start free, upgrade when you're ready</p>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <h3>Free</h3>
+          <div class="price">$0</div>
+          <p class="price-subtitle">Forever free</p>
+          <ul class="pricing-features">
+            <li><span class="check">&#10003;</span> 3 auto-messages per show</li>
+            <li><span class="check">&#10003;</span> Basic welcome messages</li>
+            <li><span class="check">&#10003;</span> 1 timer message</li>
+            <li><span class="check">&#10003;</span> 1 FAQ rule</li>
+          </ul>
+          <a href="#" class="btn btn-secondary">Get Started</a>
+        </div>
+        <div class="pricing-card featured">
+          <div class="featured-badge">Most Popular</div>
+          <h3>Pro</h3>
+          <div class="price">$12<span>/month</span></div>
+          <p class="price-subtitle">For serious sellers</p>
+          <ul class="pricing-features">
+            <li><span class="check">&#10003;</span> Unlimited auto-messages</li>
+            <li><span class="check">&#10003;</span> Unlimited templates</li>
+            <li><span class="check">&#10003;</span> Advanced FAQ rules</li>
+            <li><span class="check">&#10003;</span> Priority support</li>
+            <li><span class="check">&#10003;</span> Analytics dashboard</li>
+            <li><span class="check">&#10003;</span> Remote selector updates</li>
+          </ul>
+          <a href="#" class="btn btn-primary">Start Pro Trial</a>
+        </div>
+        <div class="pricing-card">
+          <h3>Business</h3>
+          <div class="price">$25<span>/month</span></div>
+          <p class="price-subtitle">For power sellers</p>
+          <ul class="pricing-features">
+            <li><span class="check">&#10003;</span> Everything in Pro</li>
+            <li><span class="check">&#10003;</span> Multiple accounts</li>
+            <li><span class="check">&#10003;</span> White-label options</li>
+            <li><span class="check">&#10003;</span> Advanced analytics</li>
+            <li><span class="check">&#10003;</span> API access</li>
+            <li><span class="check">&#10003;</span> Custom integrations</li>
+          </ul>
+          <a href="#" class="btn btn-secondary">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials" id="testimonials">
+    <div class="container">
+      <h2>Loved by Live Sellers</h2>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <p class="testimonial-text">"This bot has been a game-changer for my live shows. I used to struggle with managing chat while showcasing items. Now I can focus on selling while the bot keeps everyone engaged."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">SM</div>
+            <div>
+              <div class="testimonial-name">Sarah M.</div>
+              <div class="testimonial-title">Vintage Clothing Seller</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <p class="testimonial-text">"The giveaway feature alone is worth the price. I've seen a 40% increase in viewer retention since I started using it. Viewers love the interactive experience."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">JR</div>
+            <div>
+              <div class="testimonial-name">Jake R.</div>
+              <div class="testimonial-title">Sports Cards Dealer</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <p class="testimonial-text">"I answer the same shipping questions 100 times per show. The FAQ auto-reply saves me so much time and keeps my chat from getting clogged with repetitive questions."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">MT</div>
+            <div>
+              <div class="testimonial-name">Michelle T.</div>
+              <div class="testimonial-title">Sneaker Reseller</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="container">
+      <h2>Ready to Level Up Your Live Shows?</h2>
+      <p>Join thousands of live sellers who are saving time and boosting engagement.</p>
+      <a href="#" class="btn btn-secondary btn-lg">Install Free Extension</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="logo">
+            <div class="logo-icon"></div>
+            BuzzChat
+          </a>
+          <p>Automate your live selling shows with smart chat automation. Focus on selling, let the bot handle the rest.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="https://github.com/JakeLiuMe/buzzchat/releases" target="_blank" rel="noopener">Changelog</a></li>
+            <li><a href="https://github.com/JakeLiuMe/buzzchat/issues" target="_blank" rel="noopener">Roadmap</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="https://github.com/JakeLiuMe/buzzchat#troubleshooting" target="_blank" rel="noopener">Help Center</a></li>
+            <li><a href="https://github.com/JakeLiuMe/buzzchat#readme" target="_blank" rel="noopener">Documentation</a></li>
+            <li><a href="https://github.com/JakeLiuMe/buzzchat/issues" target="_blank" rel="noopener">Contact</a></li>
+            <li><a href="https://github.com/JakeLiuMe/buzzchat" target="_blank" rel="noopener">GitHub</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="https://github.com/JakeLiuMe/buzzchat/blob/main/docs/PRIVACY.md" target="_blank" rel="noopener">Privacy Policy</a></li>
+            <li><a href="https://github.com/JakeLiuMe/buzzchat/blob/main/docs/TERMS.md" target="_blank" rel="noopener">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 BuzzChat. All rights reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

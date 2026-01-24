@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuzzChat</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <!-- Skip Link for Accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <h1>BuzzChat</h1>
+        <!-- Account Selector (Business tier only) -->
+        <div class="account-selector" id="accountSelectorContainer" style="display: none;">
+          <select id="accountSelect" aria-label="Select configuration">
+            <!-- Populated dynamically -->
+          </select>
+          <button id="newAccountBtn" class="icon-btn" title="New setup">+</button>
+          <button id="manageAccountsBtn" class="icon-btn" title="Manage setups">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="save-indicator" id="saveIndicator" aria-live="polite">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          Saved
+        </div>
+        <button id="helpBtn" class="help-btn" title="Help & Support" aria-label="Help and Support">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </button>
+        <div class="status-badge" id="statusBadge">
+          <span class="status-dot"></span>
+          <span class="status-text">Inactive</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tier Info -->
+    <div class="tier-banner" id="tierBanner">
+      <span class="tier-label">Free Plan</span>
+      <span class="tier-usage">25 messages this show</span>
+      <button class="upgrade-btn" id="upgradeBtn">Upgrade to Pro</button>
+    </div>
+
+    <!-- Master Toggle -->
+    <div class="master-toggle">
+      <label class="toggle-label">
+        <span>Bot Active</span>
+        <input type="checkbox" id="masterToggle" aria-label="Enable chat bot" role="switch">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <!-- Tabs -->
+    <nav class="tabs" role="tablist" aria-label="Main navigation">
+      <button class="tab-btn active" data-tab="home" role="tab" aria-selected="true" aria-controls="home-panel">
+        <svg class="tab-icon" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+        <span>Home</span>
+      </button>
+      <button class="tab-btn" data-tab="messages" role="tab" aria-selected="false" aria-controls="messages-panel">
+        <svg class="tab-icon" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+        <span>Messages</span>
+      </button>
+      <button class="tab-btn" data-tab="faq" role="tab" aria-selected="false" aria-controls="faq-panel">
+        <svg class="tab-icon" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>FAQ</span>
+      </button>
+      <button class="tab-btn" data-tab="commands" role="tab" aria-selected="false" aria-controls="commands-panel">
+        <svg class="tab-icon" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <span>Cmds</span>
+      </button>
+      <button class="tab-btn" data-tab="moderation" role="tab" aria-selected="false" aria-controls="moderation-panel">
+        <svg class="tab-icon" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <span>Mod</span>
+      </button>
+      <button class="tab-btn" data-tab="giveaway" role="tab" aria-selected="false" aria-controls="giveaway-panel">
+        <svg class="tab-icon" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+        </svg>
+        <span>Giveaway</span>
+      </button>
+      <button class="tab-btn" data-tab="analytics" role="tab" aria-selected="false" aria-controls="analytics-panel">
+        <svg class="tab-icon" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        <span>Analytics</span>
+      </button>
+    </nav>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="main-content">
+      <!-- Home Tab (Welcome settings) -->
+      <section class="tab-panel active" id="home-panel" role="tabpanel" aria-labelledby="home-tab">
+        <div class="feature-toggle">
+          <label class="toggle-label">
+            <span>Auto-Welcome New Viewers</span>
+            <input type="checkbox" id="welcomeToggle" aria-label="Enable welcome messages" role="switch">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="welcomeMessage">Welcome Message</label>
+          <textarea id="welcomeMessage" rows="3" placeholder="Hey {username}! Welcome to the stream! Drop a comment to enter our giveaway!"></textarea>
+          <small class="help-text">Use {username} to include the viewer's name</small>
+        </div>
+
+        <div class="form-group">
+          <label for="welcomeDelay">Delay Between Welcomes (seconds)</label>
+          <input type="number" id="welcomeDelay" value="5" min="1" max="60">
+          <small class="help-text">Avoid spam by spacing out welcome messages</small>
+        </div>
+      </section>
+
+      <!-- Messages Tab (Timer + Templates combined) -->
+      <section class="tab-panel" id="messages-panel" role="tabpanel" aria-labelledby="messages-tab">
+        <!-- Timer Section -->
+        <div class="messages-section">
+          <div class="feature-toggle">
+            <label class="toggle-label">
+              <span>Timer Messages</span>
+              <input type="checkbox" id="timerToggle" aria-label="Enable timer messages" role="switch">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="timer-messages" id="timerMessages">
+            <!-- Timer messages will be added here -->
+          </div>
+
+          <button class="btn btn-secondary add-timer-btn" id="addTimerBtn">
+            + Add Timer Message
+          </button>
+        </div>
+
+        <!-- Divider -->
+        <hr class="section-divider">
+
+        <!-- Templates Section -->
+        <div class="messages-section">
+          <h3 class="section-title">Quick Templates</h3>
+          <div class="templates-list" id="templatesList">
+            <!-- Templates will be added here -->
+          </div>
+
+          <button class="btn btn-secondary add-template-btn" id="addTemplateBtn">
+            + Add Template
+          </button>
+        </div>
+
+        <!-- Timer Message Template (hidden) -->
+        <template id="timerMessageTemplate">
+          <div class="timer-message-item">
+            <div class="form-group">
+              <label>Message</label>
+              <textarea class="timer-text" rows="2" placeholder="Shipping deal ends in 5 minutes! Don't miss out!"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Interval (minutes)</label>
+                <input type="number" class="timer-interval" value="5" min="1" max="60">
+              </div>
+              <button class="btn btn-danger btn-sm remove-timer-btn" aria-label="Remove timer message">Remove</button>
+            </div>
+          </div>
+        </template>
+
+        <!-- Template Template (hidden) -->
+        <template id="templateTemplate">
+          <div class="template-item">
+            <div class="form-group">
+              <label>Template Name</label>
+              <input type="text" class="template-name" placeholder="Shipping Info">
+            </div>
+            <div class="form-group">
+              <label>Message</label>
+              <textarea class="template-text" rows="2" placeholder="We ship worldwide! Free shipping on orders over $50!"></textarea>
+            </div>
+            <div class="form-row">
+              <button class="btn btn-primary btn-sm send-template-btn">Send Now</button>
+              <button class="btn btn-danger btn-sm remove-template-btn" aria-label="Remove template">Remove</button>
+            </div>
+          </div>
+        </template>
+      </section>
+
+      <!-- FAQ Tab -->
+      <section class="tab-panel" id="faq-panel" role="tabpanel" aria-labelledby="faq-tab">
+        <div class="feature-toggle">
+          <label class="toggle-label">
+            <span>Auto-Reply to FAQs</span>
+            <input type="checkbox" id="faqToggle" aria-label="Enable FAQ auto-replies" role="switch">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="faq-items" id="faqItems">
+          <!-- FAQ items will be added here -->
+        </div>
+
+        <button class="btn btn-secondary add-faq-btn" id="addFaqBtn">
+          + Add FAQ Rule
+        </button>
+
+        <!-- FAQ Template (hidden) -->
+        <template id="faqTemplate">
+          <div class="faq-item">
+            <div class="form-group">
+              <label>Trigger Keywords (comma-separated)</label>
+              <input type="text" class="faq-triggers" placeholder="shipping, ship, deliver">
+            </div>
+            <div class="form-group">
+              <label>Auto-Reply</label>
+              <textarea class="faq-reply" rows="2" placeholder="We ship worldwide! US orders ship within 2 business days."></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group checkbox-group">
+                <label>
+                  <input type="checkbox" class="faq-case-sensitive">
+                  Case sensitive
+                </label>
+              </div>
+              <button class="btn btn-danger btn-sm remove-faq-btn" aria-label="Remove FAQ rule">Remove</button>
+            </div>
+          </div>
+        </template>
+      </section>
+
+      <!-- Commands Tab -->
+      <section class="tab-panel" id="commands-panel" role="tabpanel" aria-labelledby="commands-tab">
+        <div class="feature-toggle">
+          <label class="toggle-label">
+            <span>Enable Custom Commands</span>
+            <input type="checkbox" id="commandsToggle" aria-label="Enable custom commands" role="switch">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="commands-info">
+          <small class="help-text">Create commands like <code>!shipping</code> that auto-reply when viewers type them in chat.</small>
+        </div>
+
+        <div class="commands-list" id="commandsList">
+          <!-- Commands will be added here -->
+        </div>
+
+        <button class="btn btn-secondary add-command-btn" id="addCommandBtn">
+          + Add Command
+        </button>
+
+        <hr class="section-divider">
+
+        <div class="commands-actions">
+          <button class="btn btn-secondary btn-sm" id="exportCommandsBtn">Export</button>
+          <button class="btn btn-secondary btn-sm" id="importCommandsBtn">Import</button>
+          <input type="file" id="importCommandsFile" accept=".json" style="display: none;">
+        </div>
+
+        <!-- Command Template (hidden) -->
+        <template id="commandTemplate">
+          <div class="command-item">
+            <div class="command-header">
+              <div class="command-trigger-display">
+                <span class="command-prefix">!</span>
+                <input type="text" class="command-trigger" placeholder="shipping" maxlength="20">
+              </div>
+              <div class="command-stats">
+                <span class="command-usage-count" title="Times used">0 uses</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Response</label>
+              <textarea class="command-response" rows="2" placeholder="We ship within 2-3 business days! 📦" maxlength="500"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Cooldown (seconds)</label>
+                <input type="number" class="command-cooldown" value="30" min="0" max="300">
+              </div>
+              <button class="btn btn-danger btn-sm remove-command-btn" aria-label="Remove command">Remove</button>
+            </div>
+          </div>
+        </template>
+      </section>
+
+      <!-- Moderation Tab -->
+      <section class="tab-panel" id="moderation-panel" role="tabpanel" aria-labelledby="moderation-tab">
+        <div class="feature-toggle">
+          <label class="toggle-label">
+            <span>Enable Moderation</span>
+            <input type="checkbox" id="moderationToggle" aria-label="Enable moderation" role="switch">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="blockedWords">Blocked Words (comma-separated)</label>
+          <textarea id="blockedWords" rows="3" placeholder="spam, scam, fake"></textarea>
+          <small class="help-text">Messages containing these words will be ignored by the bot</small>
+        </div>
+
+        <div class="feature-toggle">
+          <label class="toggle-label">
+            <span>Block Repeated Messages</span>
+            <input type="checkbox" id="blockRepeatedToggle" aria-label="Block repeated messages" role="switch">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="maxRepeatCount">Max Repeats Before Block</label>
+          <input type="number" id="maxRepeatCount" value="3" min="2" max="10">
+          <small class="help-text">How many times a user can send the same message within a minute</small>
+        </div>
+      </section>
+
+      <!-- Giveaway Tab -->
+      <section class="tab-panel" id="giveaway-panel" role="tabpanel" aria-labelledby="giveaway-tab">
+        <div class="feature-toggle">
+          <label class="toggle-label">
+            <span>Track Giveaway Entries</span>
+            <input type="checkbox" id="giveawayToggle" aria-label="Enable giveaway tracking" role="switch">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="giveawayKeywords">Entry Keywords (comma-separated)</label>
+          <input type="text" id="giveawayKeywords" value="entered, entry, enter" placeholder="entered, entry, enter">
+          <small class="help-text">Keywords that count as giveaway entries</small>
+        </div>
+
+        <div class="feature-toggle">
+          <label class="toggle-label">
+            <span>Unique Entries Only</span>
+            <input type="checkbox" id="giveawayUniqueToggle" checked aria-label="Count unique entries only" role="switch">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <!-- Live Entry Counter -->
+        <div class="giveaway-stats">
+          <div class="stat-card giveaway-counter">
+            <div class="stat-value" id="giveawayEntryCount">0</div>
+            <div class="stat-label">Entries</div>
+          </div>
+        </div>
+
+        <!-- Entry List -->
+        <div class="giveaway-entries-section">
+          <h4>Recent Entries</h4>
+          <div class="giveaway-entries-list" id="giveawayEntriesList">
+            <p class="empty-entries">No entries yet. Entries will appear here when viewers type your keywords.</p>
+          </div>
+        </div>
+
+        <div class="giveaway-actions">
+          <button class="btn btn-secondary" id="refreshGiveawayBtn">Refresh</button>
+          <button class="btn btn-danger" id="resetGiveawayBtn">Reset Entries</button>
+        </div>
+
+        <!-- Winner Selection -->
+        <hr class="section-divider">
+        <h3 class="section-title">Pick a Winner</h3>
+        <div class="winner-selection">
+          <div class="winner-options">
+            <div class="form-group">
+              <label for="winnerCount">Number of Winners</label>
+              <select id="winnerCount">
+                <option value="1">1 Winner</option>
+                <option value="2">2 Winners</option>
+                <option value="3">3 Winners</option>
+                <option value="5">5 Winners</option>
+                <option value="10">10 Winners</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary spin-wheel-btn" id="spinWheelBtn">
+            <svg class="wheel-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 6v6l4 2"></path>
+            </svg>
+            Spin the Wheel!
+          </button>
+        </div>
+
+        <!-- Winner Display -->
+        <div class="winner-display" id="winnerDisplay" style="display: none;">
+          <div class="winner-card">
+            <div class="winner-emoji">🎉</div>
+            <h3 class="winner-title">Winner!</h3>
+            <div class="winner-names" id="winnerNames"></div>
+            <div class="winner-actions">
+              <button class="btn btn-secondary" id="announceWinnerBtn">Announce in Chat</button>
+              <button class="btn btn-secondary" id="rerollWinnerBtn">Re-roll</button>
+              <button class="btn btn-secondary" id="closeWinnerBtn">Close</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Chat Metrics -->
+        <hr class="section-divider">
+        <h3 class="section-title">Live Chat Metrics</h3>
+        <div class="chat-metrics-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="metricMessagesPerMin">0</div>
+            <div class="stat-label">Msgs/Min</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="metricUniqueChatters">0</div>
+            <div class="stat-label">Chatters</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="metricPeakMsgs">0</div>
+            <div class="stat-label">Peak</div>
+          </div>
+        </div>
+        <div class="metrics-actions">
+          <button class="btn btn-secondary btn-sm" id="refreshMetricsBtn">Refresh Metrics</button>
+        </div>
+      </section>
+
+      <!-- Analytics Tab (Pro Feature) -->
+      <section class="tab-panel" id="analytics-panel" role="tabpanel" aria-labelledby="analytics-tab">
+        <div class="analytics-container" id="analyticsContainer">
+          <!-- Pro tier check will show content or upgrade prompt -->
+        </div>
+
+        <div class="analytics-locked" id="analyticsLocked">
+          <div class="locked-content">
+            <div class="locked-icon">📊</div>
+            <h3>Analytics Dashboard</h3>
+            <p>Track your bot performance with detailed analytics</p>
+            <ul class="locked-features">
+              <li>Messages sent per day/week</li>
+              <li>Welcome vs FAQ vs Timer breakdown</li>
+              <li>Peak activity hours</li>
+              <li>Top FAQ triggers</li>
+              <li>Export to CSV</li>
+            </ul>
+            <button class="btn btn-primary" id="unlockAnalyticsBtn">Upgrade to Pro</button>
+          </div>
+        </div>
+
+        <div class="analytics-content" id="analyticsContent" style="display: none;">
+          <div class="analytics-stats">
+            <div class="stat-card">
+              <div class="stat-value" id="statTotalMessages">0</div>
+              <div class="stat-label">Total Messages</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="statTodayMessages">0</div>
+              <div class="stat-label">Today</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="statPeakHour">--</div>
+              <div class="stat-label">Peak Hour</div>
+            </div>
+          </div>
+
+          <div class="analytics-section">
+            <h4>Last 7 Days</h4>
+            <div class="chart-container" id="weeklyChart"></div>
+          </div>
+
+          <div class="analytics-section">
+            <h4>Message Breakdown</h4>
+            <div class="breakdown-row">
+              <div class="chart-container pie-chart" id="typePieChart"></div>
+              <div class="breakdown-legend" id="breakdownLegend">
+                <div class="legend-item"><span class="legend-color" style="background: #10b981;"></span> Welcome: <span id="legendWelcome">0</span></div>
+                <div class="legend-item"><span class="legend-color" style="background: #f59e0b;"></span> FAQ: <span id="legendFaq">0</span></div>
+                <div class="legend-item"><span class="legend-color" style="background: #7c3aed;"></span> Timer: <span id="legendTimer">0</span></div>
+                <div class="legend-item"><span class="legend-color" style="background: #3b82f6;"></span> Template: <span id="legendTemplate">0</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="analytics-section">
+            <h4>Top FAQ Triggers</h4>
+            <div class="faq-triggers-list" id="faqTriggersList">
+              <p class="empty-triggers">No FAQ triggers yet</p>
+            </div>
+          </div>
+
+          <div class="analytics-actions">
+            <button class="btn btn-secondary" id="exportAnalyticsBtn">Export CSV</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <button class="btn btn-link" id="settingsBtn">Settings</button>
+      <a href="https://github.com/JakeLiuMe/buzzchat/issues" target="_blank" rel="noopener" class="support-link">Report Issue</a>
+      <span class="version">v1.2.0</span>
+    </footer>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal" id="settingsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button class="modal-close" id="closeSettingsBtn" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="toggle-label dark-mode-toggle">
+            <span>Dark Mode</span>
+            <input type="checkbox" id="darkModeToggle" aria-label="Enable dark mode" role="switch">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="chatSelector">Chat Input Selector (Advanced)</label>
+          <input type="text" id="chatSelector" placeholder="Auto-detect">
+          <small class="help-text">Leave blank for auto-detection</small>
+        </div>
+        <div class="form-group">
+          <label class="toggle-label">
+            <span>Sound Notifications</span>
+            <input type="checkbox" id="soundNotifications" checked aria-label="Enable sound notifications" role="switch">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label class="toggle-label">
+            <span>Show Message Count</span>
+            <input type="checkbox" id="showMessageCount" checked aria-label="Show message count" role="switch">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="form-group watermark-setting">
+          <label class="toggle-label">
+            <span>Powered by BuzzChat</span>
+            <input type="checkbox" id="watermarkToggle" aria-label="Add BuzzChat watermark to messages" role="switch">
+            <span class="toggle-slider"></span>
+          </label>
+          <small class="help-text watermark-bonus">Enable for +5 bonus messages per show!</small>
+        </div>
+        <div class="form-group">
+          <h4>Export / Import</h4>
+          <div class="form-row">
+            <button class="btn btn-secondary" id="exportSettingsBtn">Export All</button>
+            <button class="btn btn-secondary" id="importSettingsBtn">Import</button>
+          </div>
+          <input type="file" id="importFile" accept=".json" style="display: none;">
+        </div>
+
+        <!-- Quick Reply Settings -->
+        <hr class="section-divider">
+        <div class="quick-reply-settings">
+          <h4>Quick Reply Buttons</h4>
+          <p class="help-text">These buttons appear on the live stream page for fast messaging.</p>
+          <div class="form-group">
+            <label class="toggle-label">
+              <span>Show Quick Reply Bar</span>
+              <input type="checkbox" id="quickReplyToggle" checked aria-label="Enable quick reply buttons" role="switch">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="quick-reply-buttons-list" id="quickReplyButtonsList">
+            <!-- Buttons rendered by JS -->
+          </div>
+          <button class="btn btn-secondary btn-sm" id="addQuickReplyBtn">+ Add Button</button>
+        </div>
+
+        <!-- Quick Reply Button Template -->
+        <template id="quickReplyTemplate">
+          <div class="quick-reply-edit-item">
+            <div class="quick-reply-edit-row">
+              <input type="text" class="quick-reply-emoji-input" placeholder="🔥" maxlength="2" aria-label="Button emoji">
+              <input type="text" class="quick-reply-text-input" placeholder="Message text" maxlength="100" aria-label="Button text">
+              <button class="btn btn-danger btn-icon remove-quick-reply-btn" aria-label="Remove button">&times;</button>
+            </div>
+          </div>
+        </template>
+
+        <!-- API Access Section (Business tier only) -->
+        <hr class="section-divider">
+        <div class="api-section" id="apiSection" style="display: none;">
+          <h4>API Access</h4>
+          <p class="api-description">Control BuzzChat externally via MCP server or REST API.</p>
+
+          <!-- API Keys List -->
+          <div class="api-keys-container" id="apiKeysContainer">
+            <div class="api-keys-list" id="apiKeysList">
+              <p class="empty-keys" id="emptyKeysMessage">No API keys yet. Create one to get started.</p>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="createApiKeyBtn">
+              + Create API Key
+            </button>
+          </div>
+
+          <!-- API Key Created Modal (inline) -->
+          <div class="api-key-created" id="apiKeyCreated" style="display: none;">
+            <div class="api-key-alert">
+              <strong>Save this key now!</strong>
+              <p>This is the only time you'll see the full key.</p>
+              <div class="api-key-display">
+                <code id="newApiKeyValue"></code>
+                <button class="btn btn-primary btn-sm" id="copyNewApiKeyBtn">Copy</button>
+              </div>
+              <button class="btn btn-secondary btn-sm" id="closeApiKeyCreatedBtn">Done</button>
+            </div>
+          </div>
+
+          <!-- Connection Instructions -->
+          <div class="api-instructions">
+            <details>
+              <summary>MCP Server Setup</summary>
+              <div class="code-block">
+                <p>Add to your Claude Desktop config:</p>
+                <pre>{
+  "mcpServers": {
+    "buzzchat": {
+      "command": "npx",
+      "args": ["buzzchat-mcp"],
+      "env": {
+        "BUZZCHAT_API_KEY": "your-api-key"
+      }
+    }
+  }
+}</pre>
+              </div>
+            </details>
+            <details>
+              <summary>REST API Examples</summary>
+              <div class="code-block">
+                <p>Get bot status:</p>
+                <pre>curl http://localhost:3847/status \
+  -H "Authorization: Bearer your-api-key"</pre>
+                <p>Enable bot:</p>
+                <pre>curl -X POST http://localhost:3847/bot/enable \
+  -H "Authorization: Bearer your-api-key"</pre>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- API Access Locked (Free/Pro tier) -->
+        <div class="api-locked" id="apiLocked">
+          <div class="locked-badge">
+            <span class="locked-icon">🔒</span>
+            <span class="locked-text">Business Feature</span>
+          </div>
+          <p>API access lets you control BuzzChat from external tools, automation scripts, or AI assistants like Claude.</p>
+          <button class="btn btn-primary btn-sm" id="unlockApiBtn">Upgrade to Business</button>
+        </div>
+
+        <!-- Referral Section -->
+        <hr class="section-divider">
+        <div class="referral-section" id="referralSection">
+          <h4>Invite Friends, Earn Rewards</h4>
+          <p class="referral-description">Share BuzzChat with other Whatnot sellers. You both get +10 bonus messages when they join!</p>
+
+          <div class="referral-link-container">
+            <label for="referralLink">Your Referral Code</label>
+            <div class="referral-input-row">
+              <input type="text" id="referralCode" readonly class="referral-code-input">
+              <button class="btn btn-primary btn-sm" id="copyReferralBtn">Copy</button>
+            </div>
+          </div>
+
+          <div class="referral-stats">
+            <div class="referral-stat">
+              <span class="referral-stat-value" id="referralCount">0</span>
+              <span class="referral-stat-label">Friends Joined</span>
+            </div>
+            <div class="referral-stat">
+              <span class="referral-stat-value" id="referralBonus">0</span>
+              <span class="referral-stat-label">Bonus Messages</span>
+            </div>
+          </div>
+
+          <div class="referral-redeem">
+            <label for="redeemCode">Have a referral code?</label>
+            <div class="referral-input-row">
+              <input type="text" id="redeemCode" placeholder="Enter code" class="redeem-code-input">
+              <button class="btn btn-secondary btn-sm" id="redeemCodeBtn">Redeem</button>
+            </div>
+            <small class="help-text referral-redeemed" id="referralRedeemedMsg" style="display: none;">You've already redeemed a referral code</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upgrade Modal -->
+  <div class="modal" id="upgradeModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Upgrade to Pro</h2>
+        <button class="modal-close" id="closeUpgradeBtn" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Trial Banner -->
+        <div class="trial-banner" id="trialBanner">
+          <div class="trial-text">
+            <strong>Try Pro free for 7 days</strong>
+            <span>No credit card required</span>
+          </div>
+          <button class="btn btn-success" id="startTrialBtn">Start Free Trial</button>
+        </div>
+
+        <!-- Billing Toggle -->
+        <div class="billing-toggle" id="billingToggle">
+          <span class="billing-option" data-billing="monthly">Monthly</span>
+          <label class="billing-switch">
+            <input type="checkbox" id="annualBillingToggle">
+            <span class="billing-slider"></span>
+          </label>
+          <span class="billing-option" data-billing="annual">Annual <span class="save-badge">Save 38%</span></span>
+        </div>
+
+        <div class="pricing-card">
+          <h3>Pro Plan</h3>
+          <div class="price" id="proPrice">$7.99<span>/month</span></div>
+          <div class="price-annual" id="proPriceAnnual" style="display: none;">$59<span>/year</span></div>
+          <p class="price-note" id="proPriceNote" style="display: none;">$4.92/month billed annually</p>
+          <ul class="features-list">
+            <li><strong>Unlimited messages per show</strong></li>
+            <li><strong>Unlimited FAQ rules</strong></li>
+            <li>Full analytics history (90 days)</li>
+            <li>Export analytics to CSV</li>
+            <li>Priority support</li>
+            <li>Early access to new features</li>
+          </ul>
+          <button class="btn btn-primary btn-lg" id="subscribePro">Subscribe to Pro</button>
+        </div>
+        <div class="pricing-card featured">
+          <div class="featured-badge">Best Value</div>
+          <h3>Business Plan</h3>
+          <div class="price" id="businessPrice">$19.99<span>/month</span></div>
+          <div class="price-annual" id="businessPriceAnnual" style="display: none;">$149<span>/year</span></div>
+          <p class="price-note" id="businessPriceNote" style="display: none;">$12.42/month billed annually</p>
+          <ul class="features-list">
+            <li>Everything in Pro</li>
+            <li>Giveaway management tools</li>
+            <li>Advanced analytics dashboard</li>
+            <li><strong>Multi-account support</strong></li>
+            <li>Priority support</li>
+            <li><strong>API access (MCP + REST)</strong></li>
+          </ul>
+          <button class="btn btn-primary btn-lg" id="subscribeBusiness">Subscribe to Business</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Account Manager Modal (Business tier only) -->
+  <div class="modal" id="accountManagerModal" role="dialog" aria-labelledby="account-manager-title" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="account-manager-title">Manage Setups</h2>
+        <button class="modal-close" id="closeAccountManagerBtn" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-description">Create separate configurations for different shows, products, or streaming styles.</p>
+
+        <div class="accounts-list" id="accountsList">
+          <!-- Populated dynamically -->
+        </div>
+
+        <div class="account-actions">
+          <button class="btn btn-primary" id="createAccountModalBtn">+ New Setup</button>
+        </div>
+
+        <!-- Create Account Form (inline) -->
+        <div class="create-account-form" id="createAccountForm" style="display: none;">
+          <div class="form-group">
+            <label for="newAccountName">Setup Name</label>
+            <input type="text" id="newAccountName" placeholder="e.g., Weekend Sales, Electronics Show">
+          </div>
+          <div class="form-row">
+            <button class="btn btn-primary btn-sm" id="confirmCreateAccountBtn">Create</button>
+            <button class="btn btn-secondary btn-sm" id="cancelCreateAccountBtn">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onboarding/Disclaimer Modal - 3 Step Wizard -->
+  <div class="modal" id="onboardingModal" role="dialog" aria-labelledby="onboarding-title" aria-modal="true">
+    <div class="modal-content onboarding-modal">
+      <div class="modal-header">
+        <h2 id="onboarding-title">Welcome to BuzzChat</h2>
+      </div>
+
+      <!-- Step Indicator -->
+      <div class="onboarding-steps">
+        <div class="onboarding-step active" data-step="1">
+          <span class="step-number">1</span>
+          <span class="step-label">Welcome</span>
+        </div>
+        <div class="onboarding-step" data-step="2">
+          <span class="step-number">2</span>
+          <span class="step-label">Setup</span>
+        </div>
+        <div class="onboarding-step" data-step="3">
+          <span class="step-number">3</span>
+          <span class="step-label">First Message</span>
+        </div>
+      </div>
+
+      <!-- Step 1: Welcome & Disclaimer -->
+      <div class="onboarding-panel active" id="onboarding-step-1">
+        <div class="onboarding-section">
+          <h3>What This Extension Does</h3>
+          <ul>
+            <li>Automatically sends welcome messages to new viewers</li>
+            <li>Sends timed promotional messages during your stream</li>
+            <li>Auto-replies to frequently asked questions</li>
+            <li>Saves you time so you can focus on selling</li>
+          </ul>
+        </div>
+
+        <div class="onboarding-section disclaimer">
+          <h3>Important Disclaimer</h3>
+          <p>This extension automates chat messages on live selling platforms. By using this extension, you agree that:</p>
+          <ul>
+            <li>You will use it responsibly and in compliance with the platform's Terms of Service</li>
+            <li>You are solely responsible for the messages sent by this bot</li>
+            <li>We are not affiliated with any live selling platform</li>
+            <li>Misuse may result in account restrictions (use at your own risk)</li>
+          </ul>
+        </div>
+
+        <label class="checkbox-accept">
+          <input type="checkbox" id="acceptTerms">
+          <span>I understand and accept responsibility for using this extension</span>
+        </label>
+      </div>
+
+      <!-- Step 2: Quick Setup -->
+      <div class="onboarding-panel" id="onboarding-step-2">
+        <div class="onboarding-section">
+          <h3>Choose Your Features</h3>
+          <p style="font-size: 13px; color: var(--gray-600); margin-bottom: 16px;">Select which features you want to enable. You can change these later.</p>
+        </div>
+
+        <div class="setup-options">
+          <label class="setup-option">
+            <input type="checkbox" id="setupWelcome" checked>
+            <div class="setup-option-content">
+              <h4>Welcome Messages</h4>
+              <p>Automatically greet new viewers when they join</p>
+            </div>
+          </label>
+
+          <label class="setup-option">
+            <input type="checkbox" id="setupTimer">
+            <div class="setup-option-content">
+              <h4>Timer Messages</h4>
+              <p>Send recurring promotional messages on a schedule</p>
+            </div>
+          </label>
+
+          <label class="setup-option">
+            <input type="checkbox" id="setupFaq">
+            <div class="setup-option-content">
+              <h4>FAQ Auto-Reply</h4>
+              <p>Automatically answer common questions like "shipping?"</p>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Step 3: First Message -->
+      <div class="onboarding-panel" id="onboarding-step-3">
+        <div class="onboarding-section">
+          <h3>Create Your Welcome Message</h3>
+          <p style="font-size: 13px; color: var(--gray-600); margin-bottom: 16px;">This message will be sent when new viewers join your stream.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="onboardingMessage">Welcome Message</label>
+          <textarea id="onboardingMessage" rows="3" placeholder="Hey {username}! Welcome to the stream! 🎉">Hey {username}! Welcome to the stream! Drop a comment to enter our giveaway!</textarea>
+          <small class="help-text">Use {username} to include the viewer's name</small>
+        </div>
+
+        <div class="message-preview">
+          <div class="message-preview-label">Preview</div>
+          <div class="message-bubble" id="messagePreview">Hey StreamViewer! Welcome to the stream! Drop a comment to enter our giveaway!</div>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="onboarding-nav">
+        <button class="btn btn-secondary" id="onboardingPrevBtn" style="visibility: hidden;">Back</button>
+        <button class="btn btn-primary" id="onboardingNextBtn" disabled>Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="helpModal" role="dialog" aria-labelledby="help-modal-title" aria-modal="true">
+    <div class="modal-content help-modal">
+      <div class="modal-header">
+        <h2 id="help-modal-title">Help & Support</h2>
+        <button class="modal-close" id="closeHelpBtn" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="help-section">
+          <h3>Quick Help</h3>
+          <div class="help-faq">
+            <details>
+              <summary>How do I enable the bot?</summary>
+              <p>Toggle the "Bot Active" switch at the top of the extension. Make sure you're on a supported live selling page.</p>
+            </details>
+            <details>
+              <summary>Why aren't my messages sending?</summary>
+              <p>Check that you're on a live stream page, the bot is enabled, and your message limits haven't been reached.</p>
+            </details>
+            <details>
+              <summary>How do FAQ auto-replies work?</summary>
+              <p>Add trigger keywords (like "shipping") and a response. When someone types a message containing that keyword, the bot will reply automatically.</p>
+            </details>
+          </div>
+        </div>
+
+        <div class="help-section">
+          <h3>Get Support</h3>
+          <div class="help-links">
+            <a href="https://github.com/JakeLiuMe/buzzchat/issues/new?template=bug_report.md" target="_blank" rel="noopener" class="help-link">
+              <span class="help-link-icon">🐛</span>
+              <span class="help-link-text">
+                <strong>Report a Bug</strong>
+                <small>Found something broken? Let us know</small>
+              </span>
+            </a>
+            <a href="https://github.com/JakeLiuMe/buzzchat/issues/new?template=feature_request.md" target="_blank" rel="noopener" class="help-link">
+              <span class="help-link-icon">💡</span>
+              <span class="help-link-text">
+                <strong>Request a Feature</strong>
+                <small>Have an idea? We'd love to hear it</small>
+              </span>
+            </a>
+            <a href="https://github.com/JakeLiuMe/buzzchat#troubleshooting" target="_blank" rel="noopener" class="help-link">
+              <span class="help-link-icon">📖</span>
+              <span class="help-link-text">
+                <strong>Troubleshooting Guide</strong>
+                <small>Common issues and solutions</small>
+              </span>
+            </a>
+            <a href="https://github.com/JakeLiuMe/buzzchat" target="_blank" rel="noopener" class="help-link">
+              <span class="help-link-icon">📚</span>
+              <span class="help-link-text">
+                <strong>Documentation</strong>
+                <small>Full guide and setup instructions</small>
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spinning Wheel Overlay -->
+  <div class="wheel-overlay" id="wheelOverlay" role="dialog" aria-labelledby="wheelStatus" aria-modal="true">
+    <div class="wheel-container">
+      <div class="wheel-pointer"></div>
+      <div class="wheel" id="spinningWheel" role="img" aria-label="Spinning giveaway wheel">
+        <!-- Wheel segments generated by JS -->
+      </div>
+      <div class="wheel-center">
+        <span>SPIN</span>
+      </div>
+    </div>
+    <div class="wheel-status" id="wheelStatus" aria-live="polite">Spinning...</div>
+  </div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <script src="popup.js" type="module"></script>
+</body>
+</html>

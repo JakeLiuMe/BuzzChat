@@ -1,0 +1,9 @@
+{
+  "name": "com.buzzchat.mcp",
+  "description": "BuzzChat MCP Bridge - Enables AI assistant communication with BuzzChat Chrome extension",
+  "path": "PLACEHOLDER_PATH",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://EXTENSION_ID/"
+  ]
+}
