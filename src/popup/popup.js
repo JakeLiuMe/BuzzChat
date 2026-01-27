@@ -627,6 +627,11 @@ const elements = {
   statusBadge: document.getElementById('statusBadge'),
   tierBanner: document.getElementById('tierBanner'),
 
+  // Platform Badge
+  platformBadge: document.getElementById('platformBadge'),
+  platformIcon: document.getElementById('platformIcon'),
+  platformName: document.getElementById('platformName'),
+
   // Welcome
   welcomeToggle: document.getElementById('welcomeToggle'),
   welcomeMessage: document.getElementById('welcomeMessage'),
@@ -829,9 +834,72 @@ const elements = {
   clearChatHistoryBtn: document.getElementById('clearChatHistoryBtn')
 };
 
+// Platform detection for popup badge
+const PLATFORM_PATTERNS = {
+  whatnot: { hosts: ['whatnot.com'], name: 'Whatnot', icon: '🛒', color: '#FF6B35' },
+  youtube: { hosts: ['youtube.com'], paths: ['/live', '/watch'], name: 'YouTube', icon: '▶️', color: '#FF0000' },
+  ebay: { hosts: ['ebay.com'], paths: ['/live'], name: 'eBay', icon: '🏷️', color: '#E53238' },
+  twitch: { hosts: ['twitch.tv'], name: 'Twitch', icon: '🎮', color: '#9146FF' },
+  kick: { hosts: ['kick.com'], name: 'Kick', icon: '🎬', color: '#53FC18' }
+};
+
+function detectPlatformFromUrl(url) {
+  try {
+    const urlObj = new URL(url);
+    const hostname = urlObj.hostname.toLowerCase().replace(/^www\./, '');
+    const pathname = urlObj.pathname.toLowerCase();
+
+    for (const [platformId, config] of Object.entries(PLATFORM_PATTERNS)) {
+      const hostMatch = config.hosts.some(h => hostname === h || hostname.endsWith('.' + h));
+      if (hostMatch) {
+        // Check path patterns if defined
+        if (config.paths) {
+          const pathMatch = config.paths.some(p => pathname.startsWith(p));
+          if (!pathMatch) continue;
+        }
+        return { id: platformId, ...config };
+      }
+    }
+  } catch (e) {
+    console.log('[BuzzChat] Platform detection error:', e);
+  }
+  return null;
+}
+
+function updatePlatformBadge(platform) {
+  if (!elements.platformBadge) return;
+
+  if (platform) {
+    elements.platformBadge.setAttribute('data-platform', platform.id);
+    elements.platformBadge.classList.add('detected');
+    if (elements.platformIcon) elements.platformIcon.textContent = platform.icon;
+    if (elements.platformName) elements.platformName.textContent = platform.name;
+    elements.platformBadge.title = `Detected: ${platform.name}`;
+  } else {
+    elements.platformBadge.setAttribute('data-platform', 'unsupported');
+    elements.platformBadge.classList.remove('detected');
+    if (elements.platformIcon) elements.platformIcon.textContent = '❓';
+    if (elements.platformName) elements.platformName.textContent = 'Not Detected';
+    elements.platformBadge.title = 'No supported platform detected on this page';
+  }
+}
+
+function detectAndDisplayPlatform() {
+  // Query the active tab to get its URL
+  browserAPI.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs && tabs[0] && tabs[0].url) {
+      const platform = detectPlatformFromUrl(tabs[0].url);
+      updatePlatformBadge(platform);
+    } else {
+      updatePlatformBadge(null);
+    }
+  });
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
   await loadSettings();
+  detectAndDisplayPlatform(); // Detect current platform from active tab
   initUI();
   initEventListeners();
   init10x10Features(); // 10/10 Features initialization

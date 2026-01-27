@@ -35,9 +35,20 @@ Add a visible indicator in the popup header showing which platform was detected.
 - [ ] Playwright test verifies badge display
 
 ## Done summary
-TBD
+## What Changed
+- Added platform badge to popup header next to BuzzChat logo
+- Added URL-based platform detection for 5 platforms
+- Added CSS styling with platform-specific colors (Whatnot orange, YouTube red, etc.)
+- Added 17 unit tests for platform detection logic
 
+## Why
+- Users need visual feedback showing which platform the extension detected
+- Helps debug when extension isn't working on expected platform
+
+## Verification
+- npm run test:unit: 192 tests passing (17 new platform indicator tests)
+- Verified badge HTML structure and CSS classes
 ## Evidence
-- Commits:
-- Tests:
+- Commits: 4d4a31d
+- Tests: npm run test:unit - 192 passed
 - PRs:

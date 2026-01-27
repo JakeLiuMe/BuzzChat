@@ -171,6 +171,65 @@ body {
   font-weight: 600;
 }
 
+/* Platform Detection Badge */
+.platform-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.platform-badge.detected {
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--text-primary);
+}
+
+.platform-icon {
+  font-size: 12px;
+}
+
+.platform-name {
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Platform-specific colors */
+.platform-badge[data-platform="whatnot"] {
+  background: #FF6B35;
+  color: white;
+}
+
+.platform-badge[data-platform="youtube"] {
+  background: #FF0000;
+  color: white;
+}
+
+.platform-badge[data-platform="ebay"] {
+  background: #E53238;
+  color: white;
+}
+
+.platform-badge[data-platform="twitch"] {
+  background: #9146FF;
+  color: white;
+}
+
+.platform-badge[data-platform="kick"] {
+  background: #53FC18;
+  color: #111;
+}
+
+.platform-badge[data-platform="unsupported"] {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+}
+
 .header-right {
   display: flex;
   align-items: center;
