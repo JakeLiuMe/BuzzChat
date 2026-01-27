@@ -394,6 +394,160 @@ const Loading = {
   }
 };
 
+// Form validation helpers
+const FormValidator = {
+  /**
+   * Show error state on a form group
+   * @param {HTMLElement} input - The input element
+   * @param {string} message - Error message to display
+   */
+  showError(input, message) {
+    if (!input) return;
+
+    const formGroup = input.closest('.form-group');
+    if (!formGroup) return;
+
+    // Add error class
+    formGroup.classList.add('has-error');
+    input.setAttribute('aria-invalid', 'true');
+
+    // Find or create error message element
+    let errorEl = formGroup.querySelector('.form-error');
+    if (!errorEl) {
+      errorEl = document.createElement('div');
+      errorEl.className = 'form-error';
+      errorEl.setAttribute('role', 'alert');
+      input.parentNode.insertBefore(errorEl, input.nextSibling);
+    }
+    errorEl.textContent = message;
+  },
+
+  /**
+   * Clear error state from a form group
+   * @param {HTMLElement} input - The input element
+   */
+  clearError(input) {
+    if (!input) return;
+
+    const formGroup = input.closest('.form-group');
+    if (!formGroup) return;
+
+    formGroup.classList.remove('has-error');
+    input.removeAttribute('aria-invalid');
+
+    const errorEl = formGroup.querySelector('.form-error');
+    if (errorEl) {
+      errorEl.remove();
+    }
+  },
+
+  /**
+   * Validate required field
+   * @param {HTMLElement} input - The input element
+   * @param {string} fieldName - Human-readable field name
+   * @returns {boolean} - Whether validation passed
+   */
+  validateRequired(input, fieldName = 'This field') {
+    if (!input) return false;
+
+    const value = input.value.trim();
+    if (!value) {
+      this.showError(input, `${fieldName} is required`);
+      return false;
+    }
+    this.clearError(input);
+    return true;
+  },
+
+  /**
+   * Validate minimum length
+   * @param {HTMLElement} input - The input element
+   * @param {number} minLength - Minimum required length
+   * @param {string} fieldName - Human-readable field name
+   * @returns {boolean} - Whether validation passed
+   */
+  validateMinLength(input, minLength, fieldName = 'This field') {
+    if (!input) return false;
+
+    const value = input.value.trim();
+    if (value.length < minLength) {
+      this.showError(input, `${fieldName} must be at least ${minLength} characters`);
+      return false;
+    }
+    this.clearError(input);
+    return true;
+  },
+
+  /**
+   * Update character counter for an input
+   * @param {HTMLElement} input - The input element
+   * @param {number} maxLength - Maximum allowed length
+   */
+  updateCharCounter(input, maxLength) {
+    if (!input) return;
+
+    const formGroup = input.closest('.form-group');
+    if (!formGroup) return;
+
+    const remaining = maxLength - input.value.length;
+
+    // Find or create counter element
+    let counter = formGroup.querySelector('.char-counter');
+    if (!counter) {
+      counter = document.createElement('div');
+      counter.className = 'char-counter';
+      formGroup.appendChild(counter);
+    }
+
+    counter.textContent = `${remaining} characters remaining`;
+
+    // Update styling based on remaining chars
+    counter.classList.remove('warning', 'error');
+    if (remaining <= 0) {
+      counter.classList.add('error');
+    } else if (remaining <= 50) {
+      counter.classList.add('warning');
+    }
+  },
+
+  /**
+   * Initialize character counter for inputs with maxlength
+   * @param {HTMLElement} container - Container to search within
+   */
+  initCharCounters(container = document) {
+    const inputs = container.querySelectorAll('input[maxlength], textarea[maxlength]');
+    inputs.forEach(input => {
+      const maxLength = parseInt(input.getAttribute('maxlength'), 10);
+      if (maxLength) {
+        // Update on input
+        input.addEventListener('input', () => {
+          this.updateCharCounter(input, maxLength);
+        });
+        // Initial update
+        this.updateCharCounter(input, maxLength);
+      }
+    });
+  },
+
+  /**
+   * Clear all validation errors in a container
+   * @param {HTMLElement} container - Container to clear
+   */
+  clearAllErrors(container = document) {
+    container.querySelectorAll('.form-group.has-error').forEach(group => {
+      group.classList.remove('has-error');
+      const input = group.querySelector('input, textarea');
+      if (input) {
+        input.removeAttribute('aria-invalid');
+      }
+      const errorEl = group.querySelector('.form-error');
+      if (errorEl) {
+        errorEl.remove();
+      }
+    });
+  }
+};
+
 // Input validation limits
 const VALIDATION = {
   MAX_MESSAGE_LENGTH: 500,

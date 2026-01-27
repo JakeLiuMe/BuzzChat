@@ -37,9 +37,17 @@ Form inputs don't show visual feedback when validation fails. Users don't see er
 - [ ] Unit tests for validation states
 
 ## Done summary
-TBD
+- Added CSS error states: .has-error class with red border, .form-error message element
+- Added FormValidator helper with showError, clearError, validateRequired, validateMinLength
+- Added character counter component with warning/error states
+- Added dark mode support for all error state styles
 
+- Visual feedback helps users understand validation issues
+- aria-invalid attribute improves accessibility for screen readers
+
+- 294 unit tests passing (21 new validation tests)
+- Lint check unchanged
 ## Evidence
-- Commits:
-- Tests:
+- Commits: 7c4db70
+- Tests: npm run test:unit
 - PRs:
