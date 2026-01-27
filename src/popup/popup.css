@@ -667,6 +667,44 @@ body {
   margin-bottom: 12px;
 }
 
+/* FAQ AI Toggle */
+.faq-ai-toggle-group {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(16, 185, 129, 0.05));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: var(--radius-md);
+}
+
+.ai-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ai-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.ai-icon {
+  font-size: 16px;
+}
+
+.ai-help {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .faq-ai-toggle-group {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(16, 185, 129, 0.08));
+  border-color: rgba(124, 58, 237, 0.3);
+}
+
 /* Templates */
 .templates-list {
   display: flex;

@@ -1973,10 +1973,27 @@ function createFaqItem(rule, index) {
   const replyInput = item.querySelector('.faq-reply');
   const caseSensitiveInput = item.querySelector('.faq-case-sensitive');
   const removeBtn = item.querySelector('.remove-faq-btn');
+  const aiToggleGroup = item.querySelector('.faq-ai-toggle-group');
+  const useAiInput = item.querySelector('.faq-use-ai');
 
   triggersInput.value = rule.triggers?.join(', ') || '';
   replyInput.value = rule.reply || '';
   caseSensitiveInput.checked = rule.caseSensitive || false;
+
+  // Show AI toggle only for Max tier users
+  const isMaxTier = settings.tier === 'max' || settings.tier === 'business';
+  if (isMaxTier && aiToggleGroup) {
+    aiToggleGroup.style.display = 'block';
+    useAiInput.checked = rule.useAI || false;
+
+    useAiInput.addEventListener('change', async () => {
+      settings.faq.rules[index].useAI = useAiInput.checked;
+      await saveSettings();
+      if (useAiInput.checked) {
+        Toast.success('AI responses enabled for this rule');
+      }
+    });
+  }
 
   triggersInput.addEventListener('input', debounce(async () => {
     let triggers = triggersInput.value.split(',').map(t => t.trim()).filter(t => t);
@@ -2012,7 +2029,7 @@ function createFaqItem(rule, index) {
 
 function addFaqRule() {
   if (!canAddItem('faq')) return;
-  settings.faq.rules.push({ triggers: [], reply: '', caseSensitive: false });
+  settings.faq.rules.push({ triggers: [], reply: '', caseSensitive: false, useAI: false });
   renderFaqRules();
   saveSettings();
 }

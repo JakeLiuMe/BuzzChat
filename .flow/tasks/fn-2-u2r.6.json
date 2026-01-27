@@ -1,0 +1,14 @@
+{
+  "assignee": null,
+  "claim_note": "",
+  "claimed_at": null,
+  "created_at": "2026-01-27T09:27:37.838137Z",
+  "depends_on": [],
+  "epic": "fn-2-u2r",
+  "id": "fn-2-u2r.6",
+  "priority": null,
+  "spec_path": ".flow/tasks/fn-2-u2r.6.md",
+  "status": "todo",
+  "title": "Final Polish and 10/10 Grading",
+  "updated_at": "2026-01-27T09:27:37.838154Z"
+}
