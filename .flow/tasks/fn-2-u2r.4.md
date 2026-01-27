@@ -47,8 +47,7 @@ Add user-facing feedback when AI operations fail. Currently errors only log to c
 - [ ] Playwright test verifies error handling
 
 ## Done summary
-TBD
-
+Added AI error handler with user-friendly messages for 7 error types (NO_API_KEY, INVALID_API_KEY, RATE_LIMITED, NO_CREDITS, NETWORK_ERROR, TIMEOUT, UNKNOWN). Toast shows action buttons for configurable errors. Added credit warnings at 50 and 10 remaining. 22 new unit tests (232 total).
 ## Evidence
 - Commits:
 - Tests:

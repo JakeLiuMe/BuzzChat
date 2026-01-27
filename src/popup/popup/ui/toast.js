@@ -54,7 +54,67 @@ export const Toast = {
   success(message) { return this.show(message, 'success'); },
   error(message) { return this.show(message, 'error'); },
   info(message) { return this.show(message, 'info'); },
-  warning(message) { return this.show(message, 'warning'); }
+  warning(message) { return this.show(message, 'warning'); },
+
+  /**
+   * Show toast with an action button
+   * @param {string} message - Toast message
+   * @param {string} type - Toast type (success, error, info, warning)
+   * @param {Object} action - Action config { label, onClick }
+   * @param {number} duration - Auto-dismiss duration (0 = no auto-dismiss)
+   */
+  showWithAction(message, type, action, duration = 5000) {
+    this.init();
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type} toast-with-action`;
+    toast.setAttribute('role', 'alert');
+
+    const icons = {
+      success: '✓',
+      error: '✕',
+      info: 'ℹ',
+      warning: '⚠'
+    };
+
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'toast-icon';
+    iconSpan.textContent = icons[type] || icons.info;
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'toast-content';
+
+    const messageSpan = document.createElement('span');
+    messageSpan.className = 'toast-message';
+    messageSpan.textContent = message;
+    contentDiv.appendChild(messageSpan);
+
+    if (action && action.label && action.onClick) {
+      const actionBtn = document.createElement('button');
+      actionBtn.className = 'toast-action';
+      actionBtn.textContent = action.label;
+      actionBtn.addEventListener('click', () => {
+        action.onClick();
+        toast.remove();
+      });
+      contentDiv.appendChild(actionBtn);
+    }
+
+    toast.appendChild(iconSpan);
+    toast.appendChild(contentDiv);
+
+    this.container.appendChild(toast);
+
+    // Auto remove after duration (0 = no auto-dismiss)
+    if (duration > 0) {
+      setTimeout(() => {
+        toast.classList.add('toast-exit');
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
+    }
+
+    return toast;
+  }
 };
 
 // Save Indicator

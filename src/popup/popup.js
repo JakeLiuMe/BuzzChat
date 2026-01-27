@@ -59,7 +59,56 @@ const Toast = {
   success(message) { return this.show(message, 'success'); },
   error(message) { return this.show(message, 'error'); },
   info(message) { return this.show(message, 'info'); },
-  warning(message) { return this.show(message, 'warning'); }
+  warning(message) { return this.show(message, 'warning'); },
+
+  /**
+   * Show toast with an action button
+   */
+  showWithAction(message, type, action, duration = 5000) {
+    this.init();
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type} toast-with-action`;
+    toast.setAttribute('role', 'alert');
+
+    const icons = { success: '✓', error: '✕', info: 'ℹ', warning: '⚠' };
+
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'toast-icon';
+    iconSpan.textContent = icons[type] || icons.info;
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'toast-content';
+
+    const messageSpan = document.createElement('span');
+    messageSpan.className = 'toast-message';
+    messageSpan.textContent = message;
+    contentDiv.appendChild(messageSpan);
+
+    if (action && action.label && action.onClick) {
+      const actionBtn = document.createElement('button');
+      actionBtn.className = 'toast-action';
+      actionBtn.textContent = action.label;
+      actionBtn.addEventListener('click', () => {
+        action.onClick();
+        toast.remove();
+      });
+      contentDiv.appendChild(actionBtn);
+    }
+
+    toast.appendChild(iconSpan);
+    toast.appendChild(contentDiv);
+    this.container.appendChild(toast);
+
+    if (duration > 0) {
+      setTimeout(() => {
+        toast.classList.add('toast-exit');
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
+    }
+
+    return toast;
+  }
 };
 
 // Save Indicator
@@ -87,6 +136,75 @@ const SaveIndicator = {
     this.timeout = setTimeout(() => {
       this.element.classList.remove('visible');
     }, 2000);
+  }
+};
+
+// AI Error Handler - displays user-friendly error messages for AI operations
+const AIErrorHandler = {
+  ERROR_MESSAGES: {
+    NO_API_KEY: { message: 'AI requires an API key. Click to configure.', type: 'error', action: 'Configure' },
+    INVALID_API_KEY: { message: 'Invalid API key. Please check your settings.', type: 'error', action: 'Configure' },
+    RATE_LIMITED: { message: 'AI rate limited. Using template response.', type: 'warning', action: null },
+    NO_CREDITS: { message: 'AI credits exhausted. Resets on {resetDate}.', type: 'error', action: 'View Credits' },
+    NETWORK_ERROR: { message: 'AI unavailable. Using template response.', type: 'warning', action: null },
+    TIMEOUT: { message: 'AI response timed out. Using template.', type: 'warning', action: null },
+    UNKNOWN: { message: 'AI error occurred. Using template response.', type: 'error', action: null }
+  },
+
+  classifyError(errorMessage) {
+    if (!errorMessage) return 'UNKNOWN';
+    const msg = errorMessage.toLowerCase();
+    if (msg.includes('api key required') || msg.includes('no api key')) return 'NO_API_KEY';
+    if (msg.includes('invalid api key') || msg.includes('401') || msg.includes('authentication')) return 'INVALID_API_KEY';
+    if (msg.includes('rate limit') || msg.includes('429') || msg.includes('too many requests')) return 'RATE_LIMITED';
+    if (msg.includes('no ai credits') || msg.includes('credits exhausted') || msg.includes('no_credits')) return 'NO_CREDITS';
+    if (msg.includes('network') || msg.includes('fetch') || msg.includes('offline')) return 'NETWORK_ERROR';
+    if (msg.includes('timeout') || msg.includes('timed out') || msg.includes('abort')) return 'TIMEOUT';
+    return 'UNKNOWN';
+  },
+
+  showError(errorMessage, options = {}) {
+    const errorType = this.classifyError(errorMessage);
+    const config = this.ERROR_MESSAGES[errorType];
+    let message = config.message;
+    if (options.resetDate) message = message.replace('{resetDate}', options.resetDate);
+
+    let actionConfig = null;
+    if (config.action) {
+      const onClick = config.action === 'Configure' ? options.onConfigureClick : options.onViewCreditsClick;
+      if (onClick) actionConfig = { label: config.action, onClick };
+    }
+
+    if (actionConfig) {
+      Toast.showWithAction(message, config.type, actionConfig, 5000);
+    } else {
+      Toast.show(message, config.type, 4000);
+    }
+  },
+
+  showCreditWarning(creditsRemaining, options = {}) {
+    if (creditsRemaining <= 10) {
+      Toast.showWithAction('Only 10 AI credits left! Renews soon.', 'warning',
+        options.onViewCreditsClick ? { label: 'View Credits', onClick: options.onViewCreditsClick } : null, 5000);
+    } else if (creditsRemaining <= 50) {
+      Toast.show('50 AI credits remaining this month.', 'warning', 4000);
+    }
+  },
+
+  init(options = {}) {
+    browserAPI.runtime.onMessage.addListener((message) => {
+      if (message.type === 'AI_ERROR') {
+        this.showError(message.error, {
+          resetDate: message.resetDate,
+          onConfigureClick: options.onConfigureClick,
+          onViewCreditsClick: options.onViewCreditsClick
+        });
+      }
+      if (message.type === 'AI_CREDIT_WARNING') {
+        this.showCreditWarning(message.creditsRemaining, { onViewCreditsClick: options.onViewCreditsClick });
+      }
+      return false;
+    });
   }
 };
 
@@ -905,6 +1023,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   init10x10Features(); // 10/10 Features initialization
   initReferral();
   checkOnboarding();
+
+  // Initialize AI error handler to show user-friendly error messages
+  AIErrorHandler.init({
+    onConfigureClick: () => {
+      // Open settings modal to AI section
+      if (elements.settingsModal) {
+        elements.settingsModal.classList.add('active');
+        FocusTrap.activate(elements.settingsModal);
+      }
+    },
+    onViewCreditsClick: () => {
+      // Navigate to analytics tab where credits are shown
+      const analyticsTab = document.querySelector('[data-tab="analytics"]');
+      if (analyticsTab) analyticsTab.click();
+    }
+  });
 
   // Signal that popup is fully initialized (for testing)
   window.__POPUP_INITIALIZED__ = true;
