@@ -3746,3 +3746,82 @@ body {
 [data-theme="dark"] .chat-export-stats {
   background: var(--bg-tertiary);
 }
+
+/* AI Credits Section */
+.credits-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  margin: var(--space-md) 0;
+  color: white;
+}
+
+.credits-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.credits-icon {
+  font-size: 18px;
+}
+
+.credits-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.credits-bar {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-md);
+  height: 8px;
+  overflow: hidden;
+  margin-bottom: var(--space-sm);
+}
+
+.credits-fill {
+  background: white;
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: var(--radius-md);
+}
+
+.credits-info {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: var(--space-xs);
+}
+
+.credits-reset {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+/* Warning states */
+.credits-section.credits-warning {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.credits-section.credits-critical {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  animation: credits-pulse 2s infinite;
+}
+
+@keyframes credits-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* Dark mode */
+[data-theme="dark"] .credits-section {
+  background: linear-gradient(135deg, #4c1d95 0%, #5b21b6 100%);
+}
+
+[data-theme="dark"] .credits-section.credits-warning {
+  background: linear-gradient(135deg, #be185d 0%, #db2777 100%);
+}
+
+[data-theme="dark"] .credits-section.credits-critical {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}

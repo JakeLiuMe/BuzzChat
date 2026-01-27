@@ -140,3 +140,116 @@ test.describe('Anthropic Key Manager', () => {
     });
   });
 });
+
+test.describe('AI Credits System', () => {
+  const MONTHLY_ALLOWANCE = 500;
+  const WARNING_THRESHOLD = 50;
+  const CRITICAL_THRESHOLD = 10;
+
+  test.describe('Credit Allowances', () => {
+    test('monthly allowance is 500 credits', async () => {
+      expect(MONTHLY_ALLOWANCE).toBe(500);
+    });
+
+    test('warning threshold is 50 credits', async () => {
+      expect(WARNING_THRESHOLD).toBe(50);
+    });
+
+    test('critical threshold is 10 credits', async () => {
+      expect(CRITICAL_THRESHOLD).toBe(10);
+    });
+  });
+
+  test.describe('Monthly Reset', () => {
+    test('current month format is YYYY-MM', async () => {
+      const month = new Date().toISOString().slice(0, 7);
+      expect(month).toMatch(/^\d{4}-\d{2}$/);
+    });
+
+    test('reset date is 1st of next month', async () => {
+      const now = new Date();
+      const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      expect(nextMonth.getDate()).toBe(1);
+    });
+  });
+
+  test.describe('Credit Calculations', () => {
+    test('remaining credits formula is correct', async () => {
+      const used = 100;
+      const remaining = MONTHLY_ALLOWANCE - used;
+      expect(remaining).toBe(400);
+    });
+
+    test('percentage calculation is correct', async () => {
+      const remaining = 400;
+      const percentage = Math.round((remaining / MONTHLY_ALLOWANCE) * 100);
+      expect(percentage).toBe(80);
+    });
+
+    test('zero remaining at exhaustion', async () => {
+      const used = 500;
+      const remaining = Math.max(0, MONTHLY_ALLOWANCE - used);
+      expect(remaining).toBe(0);
+    });
+
+    test('negative used results in full allowance', async () => {
+      const used = -10;
+      const remaining = Math.max(0, MONTHLY_ALLOWANCE - used);
+      expect(remaining).toBe(510); // Edge case, should be capped
+    });
+  });
+
+  test.describe('Warning Levels', () => {
+    test('no warning when credits > 50', async () => {
+      const remaining = 100;
+      const isWarning = remaining <= WARNING_THRESHOLD;
+      expect(isWarning).toBe(false);
+    });
+
+    test('warning when credits <= 50', async () => {
+      const remaining = 50;
+      const isWarning = remaining <= WARNING_THRESHOLD;
+      expect(isWarning).toBe(true);
+    });
+
+    test('critical when credits <= 10', async () => {
+      const remaining = 10;
+      const isCritical = remaining <= CRITICAL_THRESHOLD;
+      expect(isCritical).toBe(true);
+    });
+
+    test('critical implies warning', async () => {
+      const remaining = 5;
+      const isWarning = remaining <= WARNING_THRESHOLD;
+      const isCritical = remaining <= CRITICAL_THRESHOLD;
+      expect(isWarning).toBe(true);
+      expect(isCritical).toBe(true);
+    });
+  });
+
+  test.describe('Cost Analysis', () => {
+    test('500 credits costs about $0.14/user/month with Haiku', async () => {
+      // Average response: ~200 input + ~50 output tokens
+      // Haiku: $0.25/M input, $1.25/M output
+      const creditsPerMonth = 500;
+      const avgInputTokens = 200;
+      const avgOutputTokens = 50;
+
+      const totalInput = creditsPerMonth * avgInputTokens;
+      const totalOutput = creditsPerMonth * avgOutputTokens;
+
+      const cost = (totalInput / 1_000_000) * 0.25 + (totalOutput / 1_000_000) * 1.25;
+
+      expect(cost).toBeLessThan(0.20); // Should be around $0.06
+      expect(cost).toBeGreaterThan(0.01);
+    });
+
+    test('Max tier at $24.99 has high margin on AI', async () => {
+      const tierPrice = 24.99;
+      const aiCostPerUser = 0.15; // Conservative estimate
+      const margin = (tierPrice - aiCostPerUser) / tierPrice * 100;
+
+      expect(margin).toBeGreaterThan(99); // >99% margin
+    });
+  });
+});

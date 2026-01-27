@@ -1176,20 +1176,24 @@ async function updateTierBanner() {
   // Clear previous tier classes
   elements.tierBanner.classList.remove('pro', 'vip-pro', 'vip-business');
 
-  if (settings.tier === 'pro' || settings.tier === 'business') {
+  // Check for premium tiers (max is the highest tier with AI features)
+  const isPremium = settings.tier === 'pro' || settings.tier === 'business' || settings.tier === 'max';
+  const isMaxTier = settings.tier === 'max' || settings.tier === 'business';
+
+  if (isPremium) {
     // Add VIP styling based on tier
-    const vipClass = settings.tier === 'business' ? 'vip-business' : 'vip-pro';
+    const vipClass = isMaxTier ? 'vip-business' : 'vip-pro';
     elements.tierBanner.classList.add(vipClass);
 
     // Show and configure VIP badge
     if (vipBadge) {
       vipBadge.style.display = 'inline-flex';
       if (vipTierText) {
-        vipTierText.textContent = settings.tier === 'business' ? 'BIZ' : 'PRO';
+        vipTierText.textContent = isMaxTier ? 'MAX' : 'PRO';
       }
-      // Use diamond icon for business tier (safe SVG creation)
+      // Use diamond icon for max tier (safe SVG creation)
       const vipIcon = vipBadge.querySelector('.vip-icon');
-      if (vipIcon && settings.tier === 'business') {
+      if (vipIcon && isMaxTier) {
         while (vipIcon.firstChild) vipIcon.removeChild(vipIcon.firstChild);
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('d', 'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5');
@@ -1212,8 +1216,13 @@ async function updateTierBanner() {
       memberSince.style.display = 'none';
     }
 
-    tierLabel.textContent = settings.tier === 'business' ? 'Business' : 'Pro';
-    tierUsage.textContent = 'Unlimited features + Analytics';
+    tierLabel.textContent = isMaxTier ? 'Max' : 'Pro';
+    tierUsage.textContent = isMaxTier ? 'AI-powered + Unlimited features' : 'Unlimited features + Analytics';
+
+    // Show AI credits for Max tier
+    if (isMaxTier) {
+      updateAICreditsDisplay();
+    }
   } else {
     // Free tier
     if (vipBadge) vipBadge.style.display = 'none';
@@ -1236,6 +1245,72 @@ async function updateTierBanner() {
     } else {
       tierUsage.textContent = `${faqLimit - faqRulesUsed} FAQ rules, ${cmdLimit - commandsUsed} commands left`;
     }
+  }
+
+  // Hide credits section for non-max tiers
+  const creditsSection = document.getElementById('aiCreditsSection');
+  if (creditsSection && !isMaxTier) {
+    creditsSection.style.display = 'none';
+  }
+}
+
+// Update AI Credits display (Max tier only)
+async function updateAICreditsDisplay() {
+  const creditsSection = document.getElementById('aiCreditsSection');
+  const creditsFill = document.getElementById('creditsFill');
+  const creditsRemaining = document.getElementById('creditsRemaining');
+  const creditsResetDate = document.getElementById('creditsResetDate');
+
+  if (!creditsSection) return;
+
+  try {
+    // Get credits from storage via background message
+    const response = await new Promise((resolve) => {
+      browserAPI.runtime.sendMessage({ action: 'getAICredits' }, resolve);
+    });
+
+    if (!response || response.error) {
+      // Fallback: show default values
+      creditsSection.style.display = 'block';
+      if (creditsFill) creditsFill.style.width = '100%';
+      if (creditsRemaining) creditsRemaining.textContent = '500';
+      return;
+    }
+
+    const { remaining, resetDate } = response;
+    const percentage = Math.round((remaining / 500) * 100);
+
+    // Show the credits section
+    creditsSection.style.display = 'block';
+
+    // Update the fill bar
+    if (creditsFill) {
+      creditsFill.style.width = `${percentage}%`;
+    }
+
+    // Update remaining count
+    if (creditsRemaining) {
+      creditsRemaining.textContent = remaining;
+    }
+
+    // Update reset date
+    if (creditsResetDate && resetDate) {
+      const date = new Date(resetDate);
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      creditsResetDate.textContent = `${monthNames[date.getMonth()]} ${date.getDate()}`;
+    }
+
+    // Add warning classes based on remaining credits
+    creditsSection.classList.remove('credits-warning', 'credits-critical');
+    if (remaining <= 10) {
+      creditsSection.classList.add('credits-critical');
+    } else if (remaining <= 50) {
+      creditsSection.classList.add('credits-warning');
+    }
+  } catch (error) {
+    console.error('[BuzzChat] Failed to update credits display:', error);
+    // Show section with defaults on error
+    creditsSection.style.display = 'block';
   }
 }
 

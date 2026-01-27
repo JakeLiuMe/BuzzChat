@@ -194,9 +194,66 @@ function calculateCost(inputTokens, outputTokens) {
   return inputCost + outputCost;
 }
 
+/**
+ * Generate AI response with credit checking
+ * Checks credits before generating and deducts after success
+ * @param {Object} options - Same as generateAIResponse
+ * @returns {Promise<{text?: string, usage?: Object, error?: string, creditsRemaining?: number, warning?: Object}>}
+ */
+async function generateAIResponseWithCredits(options) {
+  // Get credits manager if available
+  const CreditsManager = typeof window !== 'undefined' && window.AICreditsManager
+    ? window.AICreditsManager
+    : null;
+
+  if (!CreditsManager) {
+    // No credits system - just generate response
+    return await generateAIResponse(options);
+  }
+
+  try {
+    // Check credits first
+    const credits = await CreditsManager.getCredits();
+
+    if (credits.remaining <= 0) {
+      return {
+        error: 'NO_CREDITS',
+        message: `No AI credits remaining. Resets ${CreditsManager._formatResetDate()}`,
+        creditsRemaining: 0
+      };
+    }
+
+    // Check warning threshold
+    const warning = await CreditsManager.checkCreditWarning();
+
+    // Generate response
+    const response = await generateAIResponse(options);
+
+    // Deduct credit on success
+    const remaining = await CreditsManager.useCredit();
+
+    return {
+      ...response,
+      creditsRemaining: remaining,
+      warning: warning.warning ? warning : null
+    };
+  } catch (error) {
+    // If it's a credit error, pass it through
+    if (error.message === 'No AI credits remaining') {
+      return {
+        error: 'NO_CREDITS',
+        message: error.message,
+        creditsRemaining: 0
+      };
+    }
+    throw error;
+  }
+}
+
 // Export for ES modules and content scripts
 const AIService = {
   generateAIResponse,
+  generateAIResponseWithCredits,
   testApiKey,
   calculateCost,
   TONE_STYLES,

@@ -62,7 +62,7 @@
         "https://www.kick.com/*",
         "https://kick.com/*"
       ],
-      "js": ["src/lib/security.js", "src/lib/platforms.js", "src/lib/selectors.js", "src/lib/analytics.js", "src/lib/anthropicKey.js", "src/lib/aiService.js", "src/scripts/content.js"],
+      "js": ["src/lib/security.js", "src/lib/platforms.js", "src/lib/selectors.js", "src/lib/analytics.js", "src/lib/anthropicKey.js", "src/lib/aiCredits.js", "src/lib/aiService.js", "src/scripts/content.js"],
       "css": ["src/styles/content.css"],
       "run_at": "document_idle"
     }

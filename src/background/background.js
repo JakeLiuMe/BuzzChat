@@ -269,10 +269,65 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
       return true;
 
+    case 'GET_AI_CREDITS':
+    case 'getAICredits':
+      // Get AI credits for Max tier users
+      getAICredits().then(credits => {
+        sendResponse(credits);
+      }).catch(err => {
+        sendResponse({ error: err.message });
+      });
+      return true;
+
     default:
+      // Also handle action-based messages for backward compatibility
+      if (message.action === 'getAICredits') {
+        getAICredits().then(credits => {
+          sendResponse(credits);
+        }).catch(err => {
+          sendResponse({ error: err.message });
+        });
+        return true;
+      }
       sendResponse({ success: false, error: 'Unknown message type' });
   }
 });
+
+// Get AI credits from storage
+async function getAICredits() {
+  return new Promise((resolve) => {
+    browserAPI.storage.sync.get(['buzzchat_ai_credits'], (result) => {
+      const data = result.buzzchat_ai_credits || {};
+      const currentMonth = new Date().toISOString().slice(0, 7); // "2026-01"
+      const MONTHLY_ALLOWANCE = 500;
+
+      // Reset if new month
+      if (data.month !== currentMonth) {
+        resolve({
+          remaining: MONTHLY_ALLOWANCE,
+          used: 0,
+          month: currentMonth,
+          resetDate: getNextResetDate()
+        });
+        return;
+      }
+
+      resolve({
+        remaining: Math.max(0, MONTHLY_ALLOWANCE - (data.used || 0)),
+        used: data.used || 0,
+        month: currentMonth,
+        resetDate: getNextResetDate()
+      });
+    });
+  });
+}
+
+// Get next reset date (1st of next month)
+function getNextResetDate() {
+  const now = new Date();
+  const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  return nextMonth.toISOString();
+}
 
 // Forward message to popup
 function forwardToPopup(message) {

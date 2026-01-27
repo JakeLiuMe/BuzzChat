@@ -1,14 +1,14 @@
 {
-  "assignee": null,
+  "assignee": "147540282+JakeLiuMe@users.noreply.github.com",
   "claim_note": "",
-  "claimed_at": null,
+  "claimed_at": "2026-01-27T08:52:01.137857Z",
   "created_at": "2026-01-27T06:06:38.270950Z",
   "depends_on": [],
   "epic": "fn-1-6ya",
   "id": "fn-1-6ya.5",
   "priority": null,
   "spec_path": ".flow/tasks/fn-1-6ya.5.md",
-  "status": "todo",
+  "status": "in_progress",
   "title": "AI Credit System and Usage Tracking",
-  "updated_at": "2026-01-27T06:10:22.800033Z"
+  "updated_at": "2026-01-27T08:52:01.137870Z"
 }

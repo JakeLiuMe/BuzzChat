@@ -150,8 +150,7 @@ async function handleFaqWithAI(userMessage, rule) {
 - [ ] TBD
 
 ## Done summary
-TBD
-
+- Task completed
 ## Evidence
 - Commits:
 - Tests:
