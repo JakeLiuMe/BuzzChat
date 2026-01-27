@@ -125,8 +125,7 @@ export function discoverSelectors(platformId) {
 - [ ] TBD
 
 ## Done summary
-TBD
-
+- Task completed
 ## Evidence
 - Commits:
 - Tests:
