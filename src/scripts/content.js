@@ -1059,6 +1059,8 @@
             sendChatMessage(reply);
             // Track analytics with trigger keyword
             safeTrackAnalytics('faq', { trigger: trigger.toLowerCase() });
+            // Persist updated usage count to storage
+            StorageWriter.queue('whatnotBotSettings', state.settings);
           }
 
           return; // Only send one reply per message
