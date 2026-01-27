@@ -20,6 +20,14 @@
   "host_permissions": [
     "https://www.whatnot.com/*",
     "https://whatnot.com/*",
+    "https://www.youtube.com/*",
+    "https://youtube.com/*",
+    "https://www.ebay.com/*",
+    "https://ebay.com/*",
+    "https://www.twitch.tv/*",
+    "https://twitch.tv/*",
+    "https://www.kick.com/*",
+    "https://kick.com/*",
     "https://extensionpay.com/pay/*",
     "https://extensionpay.com/manage/*"
   ],
@@ -44,9 +52,17 @@
     {
       "matches": [
         "https://www.whatnot.com/*",
-        "https://whatnot.com/*"
+        "https://whatnot.com/*",
+        "https://www.youtube.com/*",
+        "https://youtube.com/*",
+        "https://www.ebay.com/*",
+        "https://ebay.com/*",
+        "https://www.twitch.tv/*",
+        "https://twitch.tv/*",
+        "https://www.kick.com/*",
+        "https://kick.com/*"
       ],
-      "js": ["src/lib/security.js", "src/lib/selectors.js", "src/lib/analytics.js", "src/scripts/content.js"],
+      "js": ["src/lib/security.js", "src/lib/platforms.js", "src/lib/selectors.js", "src/lib/analytics.js", "src/scripts/content.js"],
       "css": ["src/styles/content.css"],
       "run_at": "document_idle"
     }
@@ -54,7 +70,18 @@
   "web_accessible_resources": [
     {
       "resources": ["assets/*"],
-      "matches": ["https://www.whatnot.com/*", "https://whatnot.com/*"]
+      "matches": [
+        "https://www.whatnot.com/*",
+        "https://whatnot.com/*",
+        "https://www.youtube.com/*",
+        "https://youtube.com/*",
+        "https://www.ebay.com/*",
+        "https://ebay.com/*",
+        "https://www.twitch.tv/*",
+        "https://twitch.tv/*",
+        "https://www.kick.com/*",
+        "https://kick.com/*"
+      ]
     }
   ]
 }

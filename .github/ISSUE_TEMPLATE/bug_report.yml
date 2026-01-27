@@ -1,0 +1,88 @@
+name: Bug Report
+description: Report a bug to help us improve BuzzChat
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the form below.
+
+        **Note:** Our AI will automatically analyze this issue and attempt to create a fix.
+        The more details you provide, the better chance of an automated fix!
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear description of what the bug is.
+      placeholder: "When I click the welcome toggle, nothing happens..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this bug?
+      placeholder: |
+        1. Open popup
+        2. Go to Home tab
+        3. Click welcome toggle
+        4. Nothing happens
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should have happened?
+      placeholder: "The toggle should switch and enable welcome messages"
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: "The toggle doesn't respond to clicks"
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Extension Version
+      description: Which version of BuzzChat are you using?
+      placeholder: "v1.3.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options:
+        - Chrome
+        - Chrome (Canary)
+        - Chromium
+        - Edge
+        - Brave
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Console Errors
+      description: Any errors in the browser console? (Right-click popup > Inspect > Console)
+      placeholder: "TypeError: Cannot read property 'addEventListener' of null"
+      render: shell
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other information that might help?

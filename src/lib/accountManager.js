@@ -22,7 +22,7 @@ const AccountManager = {
       settings: {
         tier: 'free',
         messagesUsed: 0,
-        messagesLimit: 25,
+        messagesLimit: 50, // Free tier default (overridden by stored settings)
         referralBonus: 0,
         masterEnabled: false,
         welcome: {

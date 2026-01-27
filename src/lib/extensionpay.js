@@ -225,16 +225,19 @@ const ExtensionPay = {
         if (settings.tier !== newTier) {
           settings.tier = newTier;
 
-          // Update message limits based on tier
-          if (newTier === 'pro' || newTier === 'business') {
-            settings.messagesLimit = Infinity;
-          } else {
-            settings.messagesLimit = 25; // Generous free tier
-          }
-
-          browserAPI.storage.sync.set({ whatnotBotSettings: settings }, () => {
-            console.log('[BuzzChat] Settings synced with tier:', newTier);
-            resolve(settings);
+          // Tier limits are managed by background.js via getTierLimits()
+          // Request limits from background to stay in sync
+          browserAPI.runtime.sendMessage({ type: 'GET_TIER_LIMITS', tier: newTier }, (response) => {
+            if (response?.limits) {
+              settings.messagesLimit = response.limits.messages;
+              settings.faqRulesLimit = response.limits.faqRules;
+              settings.timersLimit = response.limits.timers;
+              settings.templatesLimit = response.limits.templates;
+            }
+            browserAPI.storage.sync.set({ whatnotBotSettings: settings }, () => {
+              console.log('[BuzzChat] Settings synced with tier:', newTier, 'limits:', response?.limits);
+              resolve(settings);
+            });
           });
         } else {
           resolve(settings);

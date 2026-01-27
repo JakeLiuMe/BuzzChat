@@ -16,6 +16,40 @@ const LICENSE_CONFIG = {
   CACHE_EXPIRY_MS: 24 * 60 * 60 * 1000 // 24 hours
 };
 
+// Tier-specific limits (Claude-style pricing model)
+// Free: Generous to compete with free bots (Nightbot, etc.)
+// Pro: Power users - more capacity
+// Max: Premium with AI features (future)
+function getTierLimits(tier) {
+  switch(tier) {
+    case 'max':
+      return {
+        messages: Infinity,
+        faqRules: Infinity,
+        timers: Infinity,
+        templates: Infinity,
+        aiCredits: 500  // Monthly AI credits (future feature)
+      };
+    case 'pro':
+    case 'business': // Legacy tier name
+      return {
+        messages: 250,  // Per show
+        faqRules: Infinity,
+        timers: Infinity,
+        templates: Infinity,
+        aiCredits: 0
+      };
+    default: // 'free'
+      return {
+        messages: 50,   // Per show (generous - beats "crippled free tier" trap)
+        faqRules: 3,    // Enough to be useful
+        timers: 2,      // Basic functionality
+        templates: 5,   // Starter pack
+        aiCredits: 0
+      };
+  }
+}
+
 // Verify and sync license on startup
 async function verifyLicense() {
   try {
@@ -36,12 +70,13 @@ async function verifyLicense() {
     if (user) {
       if (user.paid) {
         // Paid user
+        // SECURITY: Don't store email/customerId in sync storage - only store tier info
         license = {
           tier: user.planId === 'business' ? 'business' : 'pro',
           paid: true,
           trialActive: false,
-          email: user.email,
-          customerId: user.id
+          // Email and customerId are available from ExtensionPay when needed
+          hasAccount: true
         };
       } else if (user.trialStartedAt) {
         // Check if trial is still active
@@ -67,12 +102,16 @@ async function verifyLicense() {
       whatnotBotLicense: { ...license, cachedAt: Date.now() }
     });
 
-    // Sync tier with settings
+    // Sync tier with settings and apply tier-specific limits
     if (settings.tier !== license.tier) {
+      const limits = getTierLimits(license.tier);
       settings.tier = license.tier;
-      settings.messagesLimit = (license.tier === 'pro' || license.tier === 'business') ? Infinity : 25;
+      settings.messagesLimit = limits.messages;
+      settings.faqRulesLimit = limits.faqRules;
+      settings.timersLimit = limits.timers;
+      settings.templatesLimit = limits.templates;
       await browserAPI.storage.sync.set({ whatnotBotSettings: settings });
-      console.log('[BuzzChat] License synced:', license.tier);
+      console.log('[BuzzChat] License synced:', license.tier, 'limits:', limits);
     }
 
     return license;
@@ -89,11 +128,15 @@ browserAPI.runtime.onInstalled.addListener((details) => {
 
   // Set default settings if new install (sync storage for cross-device sync)
   if (details.reason === 'install') {
+    const freeLimits = getTierLimits('free');
     browserAPI.storage.sync.set({
       whatnotBotSettings: {
         tier: 'free',
         messagesUsed: 0,
-        messagesLimit: 25, // Generous free tier - enough to experience the "aha moment"
+        messagesLimit: freeLimits.messages, // Per-show limit based on tier
+        faqRulesLimit: freeLimits.faqRules,
+        timersLimit: freeLimits.timers,
+        templatesLimit: freeLimits.templates,
         referralBonus: 0, // Bonus messages from referrals
         masterEnabled: false,
         welcome: {
@@ -217,6 +260,15 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
       return true;
 
+    case 'GET_TIER_LIMITS':
+      // Get limits for a specific tier (or current tier if not specified)
+      browserAPI.storage.sync.get(['whatnotBotSettings'], (result) => {
+        const tier = message.tier || result.whatnotBotSettings?.tier || 'free';
+        const limits = getTierLimits(tier);
+        sendResponse({ tier, limits });
+      });
+      return true;
+
     default:
       sendResponse({ success: false, error: 'Unknown message type' });
   }
@@ -224,8 +276,11 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Forward message to popup
 function forwardToPopup(message) {
-  browserAPI.runtime.sendMessage(message).catch(() => {
-    // Popup might not be open, ignore error
+  browserAPI.runtime.sendMessage(message).catch(err => {
+    // Popup might not be open - only log unexpected errors
+    if (err?.message && !err.message.includes('Receiving end does not exist')) {
+      console.warn('[BuzzChat] Forward to popup failed:', err.message);
+    }
   });
 }
 

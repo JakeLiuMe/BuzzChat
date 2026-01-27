@@ -1,0 +1,14 @@
+{
+  "assignee": null,
+  "claim_note": "",
+  "claimed_at": null,
+  "created_at": "2026-01-27T06:06:38.270950Z",
+  "depends_on": [],
+  "epic": "fn-1-6ya",
+  "id": "fn-1-6ya.5",
+  "priority": null,
+  "spec_path": ".flow/tasks/fn-1-6ya.5.md",
+  "status": "todo",
+  "title": "AI Credit System and Usage Tracking",
+  "updated_at": "2026-01-27T06:10:22.800033Z"
+}

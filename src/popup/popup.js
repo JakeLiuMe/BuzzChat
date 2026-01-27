@@ -162,6 +162,105 @@ const FocusTrap = {
   }
 };
 
+// Event Listener Manager - tracks and cleans up event listeners
+const EventManager = {
+  listeners: new Map(), // Map<element, Map<event, Set<handler>>>
+
+  // Add an event listener with tracking
+  add(element, event, handler, options) {
+    if (!element) return;
+
+    element.addEventListener(event, handler, options);
+
+    // Track the listener
+    if (!this.listeners.has(element)) {
+      this.listeners.set(element, new Map());
+    }
+    const elementMap = this.listeners.get(element);
+    if (!elementMap.has(event)) {
+      elementMap.set(event, new Set());
+    }
+    elementMap.get(event).add(handler);
+  },
+
+  // Remove a specific listener
+  remove(element, event, handler, options) {
+    if (!element) return;
+
+    element.removeEventListener(event, handler, options);
+
+    // Remove from tracking
+    const elementMap = this.listeners.get(element);
+    if (elementMap && elementMap.has(event)) {
+      elementMap.get(event).delete(handler);
+    }
+  },
+
+  // Remove all listeners for an element
+  cleanupElement(element) {
+    if (!element) return;
+
+    const elementMap = this.listeners.get(element);
+    if (!elementMap) return;
+
+    for (const [event, handlers] of elementMap) {
+      for (const handler of handlers) {
+        element.removeEventListener(event, handler);
+      }
+    }
+
+    this.listeners.delete(element);
+  },
+
+  // Remove all listeners within a container (useful for modal cleanup)
+  cleanupContainer(container) {
+    if (!container) return;
+
+    for (const [element] of this.listeners) {
+      if (container.contains(element)) {
+        this.cleanupElement(element);
+      }
+    }
+  },
+
+  // Remove all tracked listeners (for cleanup)
+  cleanupAll() {
+    for (const [element, elementMap] of this.listeners) {
+      for (const [event, handlers] of elementMap) {
+        for (const handler of handlers) {
+          element.removeEventListener(event, handler);
+        }
+      }
+    }
+    this.listeners.clear();
+  }
+};
+
+// Storage error handler - notifies user of storage failures
+const StorageErrorHandler = {
+  lastError: null,
+  errorCount: 0,
+  MAX_ERRORS_BEFORE_NOTIFY: 3,
+
+  handleError(error, operation = 'storage') {
+    this.errorCount++;
+    this.lastError = error;
+
+    console.error(`[BuzzChat] ${operation} error:`, error);
+
+    // Only notify user after repeated failures
+    if (this.errorCount >= this.MAX_ERRORS_BEFORE_NOTIFY) {
+      Toast.error(`Settings may not be saving. Please refresh and try again.`);
+      this.errorCount = 0; // Reset counter
+    }
+  },
+
+  reset() {
+    this.lastError = null;
+    this.errorCount = 0;
+  }
+};
+
 // Loading state helpers
 const Loading = {
   show(button) {
@@ -182,7 +281,9 @@ const VALIDATION = {
   MAX_MESSAGE_LENGTH: 500,
   MAX_TIMER_MESSAGES: 10,
   MAX_FAQ_RULES: 20, // Pro/Business limit
-  MAX_FAQ_RULES_FREE: 2, // Free tier limit
+  MAX_FAQ_RULES_FREE: 3, // Free tier limit (research: 3 rules to show value, upgrade path)
+  MAX_COMMANDS: 50, // Pro/Business limit
+  MAX_COMMANDS_FREE: 5, // Free tier limit (research: 5 commands to show value)
   MAX_TEMPLATES: 20,
   MAX_FAQ_TRIGGERS: 10,
   MIN_TIMER_INTERVAL: 1,
@@ -195,7 +296,7 @@ const VALIDATION = {
 const DEFAULT_SETTINGS = {
   tier: 'free',
   messagesUsed: 0,
-  messagesLimit: 25, // Generous free tier - enough to experience the "aha moment"
+  messagesLimit: 50, // Free tier default (overridden by stored settings)
   referralBonus: 0, // Bonus messages from referrals
   masterEnabled: false,
   welcome: {
@@ -244,6 +345,22 @@ const DEFAULT_SETTINGS = {
     showMessageCount: true,
     darkMode: false,
     watermark: false
+  },
+  // 10/10 Features
+  quickReplies: [
+    'Thanks for watching!',
+    'Shipping is $5 flat rate',
+    'Check out our other items!'
+  ],
+  keywordAlerts: {
+    enabled: false,
+    keywords: ['shipping', 'returns'],
+    soundEnabled: true
+  },
+  bidAlerts: {
+    enabled: false,
+    soundEnabled: true,
+    minAmount: 0
   }
 };
 
@@ -680,7 +797,36 @@ const elements = {
   quickReplyToggle: document.getElementById('quickReplyToggle'),
   quickReplyButtonsList: document.getElementById('quickReplyButtonsList'),
   addQuickReplyBtn: document.getElementById('addQuickReplyBtn'),
-  quickReplyTemplate: document.getElementById('quickReplyTemplate')
+  quickReplyTemplate: document.getElementById('quickReplyTemplate'),
+
+  // 10/10 Features: Hotkeys
+  hotkeyList: document.getElementById('hotkeyList'),
+  hotkeySlotTemplate: document.getElementById('hotkeySlotTemplate'),
+
+  // 10/10 Features: Keyword Alerts
+  keywordAlertsToggle: document.getElementById('keywordAlertsToggle'),
+  keywordAlertsList: document.getElementById('keywordAlertsList'),
+  keywordAlertsSoundToggle: document.getElementById('keywordAlertsSoundToggle'),
+
+  // 10/10 Features: Bid Alerts
+  bidAlertsToggle: document.getElementById('bidAlertsToggle'),
+  bidAlertsMinAmount: document.getElementById('bidAlertsMinAmount'),
+  bidAlertsSoundToggle: document.getElementById('bidAlertsSoundToggle'),
+
+  // 10/10 Features: Viewer Leaderboard
+  viewerLeaderboard: document.getElementById('viewerLeaderboard'),
+  refreshViewersBtn: document.getElementById('refreshViewersBtn'),
+  resetViewersBtn: document.getElementById('resetViewersBtn'),
+
+  // 10/10 Features: Recent Bids
+  recentBidsList: document.getElementById('recentBidsList'),
+  refreshBidsBtn: document.getElementById('refreshBidsBtn'),
+  resetBidsBtn: document.getElementById('resetBidsBtn'),
+
+  // 10/10 Features: Chat Export
+  chatHistoryCount: document.getElementById('chatHistoryCount'),
+  exportChatBtn: document.getElementById('exportChatBtn'),
+  clearChatHistoryBtn: document.getElementById('clearChatHistoryBtn')
 };
 
 // Initialize
@@ -688,8 +834,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadSettings();
   initUI();
   initEventListeners();
+  init10x10Features(); // 10/10 Features initialization
   initReferral();
   checkOnboarding();
+
+  // Signal that popup is fully initialized (for testing)
+  window.__POPUP_INITIALIZED__ = true;
+
+  // Check for milestone celebrations after a short delay (let UI settle)
+  setTimeout(() => {
+    checkMilestones();
+  }, 1000);
 });
 
 // Onboarding Wizard State
@@ -872,11 +1027,13 @@ async function saveSettings(showToast = false) {
   return new Promise((resolve) => {
     browserAPI.storage.sync.set({ whatnotBotSettings: settings }, () => {
       if (browserAPI.runtime.lastError) {
-        console.error('[BuzzChat] Failed to save settings:', browserAPI.runtime.lastError);
-        Toast.error('Failed to save settings');
+        StorageErrorHandler.handleError(browserAPI.runtime.lastError, 'save settings');
         resolve();
         return;
       }
+
+      // Reset error count on successful save
+      StorageErrorHandler.reset();
 
       // Notify content script of settings change
       browserAPI.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -1008,41 +1165,76 @@ function updateStatusBadge() {
   }
 }
 
-// Update tier banner
+// Update tier banner with VIP styling
 async function updateTierBanner() {
   const tierLabel = elements.tierBanner.querySelector('.tier-label');
   const tierUsage = elements.tierBanner.querySelector('.tier-usage');
+  const vipBadge = document.getElementById('vipBadge');
+  const vipTierText = vipBadge?.querySelector('.vip-tier-text');
+  const memberSince = document.getElementById('memberSince');
+
+  // Clear previous tier classes
+  elements.tierBanner.classList.remove('pro', 'vip-pro', 'vip-business');
 
   if (settings.tier === 'pro' || settings.tier === 'business') {
-    elements.tierBanner.classList.add('pro');
-    tierLabel.textContent = settings.tier === 'business' ? 'Business Plan' : 'Pro Plan';
-    tierUsage.textContent = 'Unlimited messages';
+    // Add VIP styling based on tier
+    const vipClass = settings.tier === 'business' ? 'vip-business' : 'vip-pro';
+    elements.tierBanner.classList.add(vipClass);
+
+    // Show and configure VIP badge
+    if (vipBadge) {
+      vipBadge.style.display = 'inline-flex';
+      if (vipTierText) {
+        vipTierText.textContent = settings.tier === 'business' ? 'BIZ' : 'PRO';
+      }
+      // Use diamond icon for business tier (safe SVG creation)
+      const vipIcon = vipBadge.querySelector('.vip-icon');
+      if (vipIcon && settings.tier === 'business') {
+        while (vipIcon.firstChild) vipIcon.removeChild(vipIcon.firstChild);
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', 'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5');
+        vipIcon.appendChild(path);
+      }
+    }
+
+    // Show membership date if available
+    if (memberSince && settings.memberSince) {
+      const date = new Date(settings.memberSince);
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      memberSince.textContent = `Member since ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+      memberSince.style.display = 'inline';
+    } else if (memberSince) {
+      // If no memberSince date, set it now for new Pro users
+      if (!settings.memberSince) {
+        settings.memberSince = new Date().toISOString();
+        saveSettings();
+      }
+      memberSince.style.display = 'none';
+    }
+
+    tierLabel.textContent = settings.tier === 'business' ? 'Business' : 'Pro';
+    tierUsage.textContent = 'Unlimited features + Analytics';
   } else {
-    elements.tierBanner.classList.remove('pro');
+    // Free tier
+    if (vipBadge) vipBadge.style.display = 'none';
+    if (memberSince) memberSince.style.display = 'none';
+
     tierLabel.textContent = 'Free Plan';
 
-    // Calculate effective limit with watermark bonus + referral bonus
-    const baseLimit = 25;
-    const watermarkBonus = settings.settings?.watermark ? 5 : 0;
-    const referralBonus = settings.referralBonus || 0;
-    const effectiveLimit = baseLimit + watermarkBonus + referralBonus;
-    settings.messagesLimit = effectiveLimit;
+    // Free tier has 50 messages/show (limits managed by background.js)
+    // Don't override - use what's set in storage from license verification
 
-    const remaining = Math.max(0, effectiveLimit - settings.messagesUsed);
+    // Show feature limits instead of message count
+    const faqRulesUsed = settings.faq?.rules?.length || 0;
+    const commandsUsed = settings.commands?.list?.length || 0;
+    const faqLimit = VALIDATION.MAX_FAQ_RULES_FREE;
+    const cmdLimit = VALIDATION.MAX_COMMANDS_FREE;
 
-    // Build bonus text
-    const bonuses = [];
-    if (watermarkBonus > 0) bonuses.push(`+${watermarkBonus} watermark`);
-    if (referralBonus > 0) bonuses.push(`+${referralBonus} referral`);
-    const bonusText = bonuses.length > 0 ? ` (${bonuses.join(', ')})` : '';
-
-    // Show encouraging message instead of warning
-    if (remaining > 10) {
-      tierUsage.textContent = `${remaining} messages this show${bonusText}`;
-    } else if (remaining > 0) {
-      tierUsage.textContent = `${remaining} left${bonusText} - Upgrade for unlimited`;
+    // Show what they get with Pro
+    if (faqRulesUsed >= faqLimit || commandsUsed >= cmdLimit) {
+      tierUsage.textContent = 'Upgrade to Pro for unlimited rules & analytics';
     } else {
-      tierUsage.textContent = 'Upgrade for unlimited messages';
+      tierUsage.textContent = `${faqLimit - faqRulesUsed} FAQ rules, ${cmdLimit - commandsUsed} commands left`;
     }
   }
 }
@@ -1391,10 +1583,9 @@ function initEventListeners() {
     elements.watermarkToggle.addEventListener('change', async () => {
       settings.settings.watermark = elements.watermarkToggle.checked;
       // Update message limit with watermark bonus
-      updateMessageLimitWithBonus();
       await saveSettings();
       Toast.success(settings.settings.watermark ?
-        'Watermark enabled! +5 bonus messages added.' :
+        'Watermark enabled - help spread the word!' :
         'Watermark disabled.');
       updateTierBanner();
     });
@@ -1523,17 +1714,13 @@ function renderTimerMessages() {
   elements.timerMessages.innerHTML = '';
 
   if (settings.timer.messages.length === 0) {
-    const emptyState = document.createElement('div');
-    emptyState.className = 'empty-state';
-    emptyState.innerHTML = `
-      <div class="empty-state-icon">⏰</div>
-      <h4>No Timer Messages Yet</h4>
-      <p>Add timed promotions that repeat during your stream</p>
-      <button class="btn btn-primary empty-state-cta">Add Your First Timer</button>
-    `;
-    emptyState.querySelector('.empty-state-cta').addEventListener('click', () => {
-      if (canAddFeature()) addTimerMessage();
-    });
+    const emptyState = createEmptyState(
+      '⏰',
+      'No Timer Messages Yet',
+      'Add timed promotions that repeat during your stream',
+      'Add Your First Timer',
+      () => { if (canAddFeature()) addTimerMessage(); }
+    );
     elements.timerMessages.appendChild(emptyState);
     return;
   }
@@ -1595,17 +1782,13 @@ function renderFaqRules() {
   elements.faqItems.innerHTML = '';
 
   if (settings.faq.rules.length === 0) {
-    const emptyState = document.createElement('div');
-    emptyState.className = 'empty-state';
-    emptyState.innerHTML = `
-      <div class="empty-state-icon">❓</div>
-      <h4>No FAQ Rules Yet</h4>
-      <p>Auto-reply to common questions like "shipping?" or "payment?"</p>
-      <button class="btn btn-primary empty-state-cta">Add Your First FAQ</button>
-    `;
-    emptyState.querySelector('.empty-state-cta').addEventListener('click', () => {
-      if (canAddFeature()) addFaqRule();
-    });
+    const emptyState = createEmptyState(
+      '❓',
+      'No FAQ Rules Yet',
+      'Auto-reply to common questions like "shipping?" or "payment?"',
+      'Add Your First FAQ',
+      () => { if (canAddFeature()) addFaqRule(); }
+    );
     elements.faqItems.appendChild(emptyState);
     return;
   }
@@ -1673,17 +1856,13 @@ function renderTemplates() {
   elements.templatesList.innerHTML = '';
 
   if (settings.templates.length === 0) {
-    const emptyState = document.createElement('div');
-    emptyState.className = 'empty-state';
-    emptyState.innerHTML = `
-      <div class="empty-state-icon">📝</div>
-      <h4>No Templates Yet</h4>
-      <p>Save frequently used messages for quick sending</p>
-      <button class="btn btn-primary empty-state-cta">Add Your First Template</button>
-    `;
-    emptyState.querySelector('.empty-state-cta').addEventListener('click', () => {
-      if (canAddFeature()) addTemplate();
-    });
+    const emptyState = createEmptyState(
+      '📝',
+      'No Templates Yet',
+      'Save frequently used messages for quick sending',
+      'Add Your First Template',
+      () => { if (canAddFeature()) addTemplate(); }
+    );
     elements.templatesList.appendChild(emptyState);
     return;
   }
@@ -1755,17 +1934,13 @@ function renderCommands() {
   const commands = settings.commands?.list || [];
 
   if (commands.length === 0) {
-    const emptyState = document.createElement('div');
-    emptyState.className = 'empty-state';
-    emptyState.innerHTML = `
-      <div class="empty-state-icon">⌨️</div>
-      <h4>No Commands Yet</h4>
-      <p>Create chat commands like !shipping or !payment</p>
-      <button class="btn btn-primary empty-state-cta">Add Your First Command</button>
-    `;
-    emptyState.querySelector('.empty-state-cta').addEventListener('click', () => {
-      if (canAddFeature()) addCommand();
-    });
+    const emptyState = createEmptyState(
+      '⌨️',
+      'No Commands Yet',
+      'Create chat commands like !shipping or !payment',
+      'Add Your First Command',
+      () => { if (canAddFeature()) addCommand(); }
+    );
     elements.commandsList.appendChild(emptyState);
     return;
   }
@@ -1913,7 +2088,7 @@ async function importCommands(event) {
 let currentWinners = [];
 let giveawayEntries = [];
 
-// Spin the giveaway wheel
+// Spin the giveaway wheel (or random pick for free tier)
 async function spinGiveawayWheel() {
   // Prevent double-click during spin
   if (elements.spinWheelBtn?.classList.contains('loading')) return;
@@ -1938,14 +2113,36 @@ async function spinGiveawayWheel() {
       return;
     }
 
-    // Show wheel overlay
-    showWheelOverlay(giveawayEntries);
+    // Check tier: Free tier gets random pick, Pro/Business get animated wheel
+    const isPro = settings.tier === 'pro' || settings.tier === 'business';
 
-    // Spin animation and pick winners
-    await animateWheel(giveawayEntries, numWinners);
+    if (isPro) {
+      // Pro/Business: Show animated wheel spinner
+      showWheelOverlay(giveawayEntries);
+      await animateWheel(giveawayEntries, numWinners);
+    } else {
+      // Free tier: Simple random pick (no animation)
+      await randomPickWinners(giveawayEntries, numWinners);
+    }
   } finally {
     Loading.hide(elements.spinWheelBtn);
   }
+}
+
+// Simple random pick for free tier (no wheel animation)
+async function randomPickWinners(entries, numWinners) {
+  return new Promise(resolve => {
+    // Pick random winners
+    const shuffled = [...entries].sort(() => Math.random() - 0.5);
+    currentWinners = shuffled.slice(0, numWinners);
+
+    // Brief delay for UX feedback
+    setTimeout(() => {
+      showWinnerDisplay(currentWinners);
+      Toast.info('Upgrade to Pro for the animated spinner wheel!');
+      resolve();
+    }, 500);
+  });
 }
 
 // Show the wheel overlay with segments
@@ -2219,6 +2416,387 @@ function addQuickReplyButton() {
   saveSettings();
 }
 
+// ===============================================
+// 10/10 FEATURES: Hotkey Slots Renderer
+// ===============================================
+function renderHotkeySlots() {
+  if (!elements.hotkeyList) return;
+  elements.hotkeyList.innerHTML = '';
+
+  const replies = settings.quickReplies || [];
+
+  // Render 9 hotkey slots (Ctrl+1 through Ctrl+9)
+  for (let i = 0; i < 9; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'hotkey-slot';
+    slot.style.cssText = 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px;';
+
+    const label = document.createElement('span');
+    label.className = 'hotkey-label';
+    label.style.cssText = 'min-width: 60px; font-family: monospace; font-size: 12px; color: var(--gray-500);';
+    label.textContent = `Ctrl+${i + 1}`;
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'hotkey-message';
+    input.placeholder = 'Enter message...';
+    input.maxLength = 200;
+    input.value = replies[i] || '';
+    input.style.cssText = 'flex: 1;';
+
+    const index = i;
+    input.addEventListener('input', debounce(async () => {
+      if (!settings.quickReplies) {
+        settings.quickReplies = [];
+      }
+      // Pad array if needed
+      while (settings.quickReplies.length <= index) {
+        settings.quickReplies.push('');
+      }
+      settings.quickReplies[index] = input.value.slice(0, 200);
+      await saveSettings();
+    }, 500));
+
+    slot.appendChild(label);
+    slot.appendChild(input);
+    elements.hotkeyList.appendChild(slot);
+  }
+}
+
+// ===============================================
+// 10/10 FEATURES: Viewer Leaderboard Renderer
+// ===============================================
+async function loadViewerLeaderboard() {
+  if (!elements.viewerLeaderboard) return;
+
+  try {
+    const tabs = await browserAPI.tabs.query({ active: true, currentWindow: true });
+    if (tabs.length === 0) return;
+
+    const response = await browserAPI.tabs.sendMessage(tabs[0].id, {
+      type: 'GET_TOP_VIEWERS',
+      limit: 10
+    });
+
+    if (response?.success && response.viewers?.length > 0) {
+      renderViewerLeaderboard(response.viewers);
+    } else {
+      elements.viewerLeaderboard.innerHTML = `
+        <div class="empty-state-inline">
+          <span class="empty-icon">👥</span>
+          <p class="empty-entries">No viewers tracked yet</p>
+          <p class="empty-hint">Viewer activity will appear here as chat messages come in.</p>
+        </div>
+      `;
+    }
+  } catch (e) {
+    // Content script not active
+  }
+}
+
+function renderViewerLeaderboard(viewers) {
+  if (!elements.viewerLeaderboard) return;
+  elements.viewerLeaderboard.innerHTML = '';
+
+  viewers.forEach((viewer, index) => {
+    const item = document.createElement('div');
+    item.className = 'viewer-item';
+    item.style.cssText = 'display: flex; align-items: center; gap: 8px; padding: 8px; border-bottom: 1px solid var(--gray-200);';
+
+    const rank = document.createElement('span');
+    rank.className = 'viewer-rank';
+    rank.style.cssText = 'min-width: 24px; font-weight: 600; color: var(--gray-500);';
+    rank.textContent = `#${index + 1}`;
+
+    const name = document.createElement('span');
+    name.className = 'viewer-name';
+    name.style.cssText = 'flex: 1; font-weight: 500;';
+    name.textContent = viewer.username;
+
+    const count = document.createElement('span');
+    count.className = 'viewer-count';
+    count.style.cssText = 'color: var(--primary); font-weight: 600;';
+    count.textContent = `${viewer.messageCount} msgs`;
+
+    item.appendChild(rank);
+    item.appendChild(name);
+    item.appendChild(count);
+    elements.viewerLeaderboard.appendChild(item);
+  });
+}
+
+// ===============================================
+// 10/10 FEATURES: Recent Bids Renderer
+// ===============================================
+async function loadRecentBids() {
+  if (!elements.recentBidsList) return;
+
+  try {
+    const tabs = await browserAPI.tabs.query({ active: true, currentWindow: true });
+    if (tabs.length === 0) return;
+
+    const response = await browserAPI.tabs.sendMessage(tabs[0].id, {
+      type: 'GET_RECENT_BIDS'
+    });
+
+    if (response?.success && response.bids?.length > 0) {
+      renderRecentBids(response.bids);
+    } else {
+      elements.recentBidsList.innerHTML = `
+        <div class="empty-state-inline">
+          <span class="empty-icon">💰</span>
+          <p class="empty-entries">No bids detected</p>
+          <p class="empty-hint">Enable Bid Alerts in Settings to track bids.</p>
+        </div>
+      `;
+    }
+  } catch (e) {
+    // Content script not active
+  }
+}
+
+function renderRecentBids(bids) {
+  if (!elements.recentBidsList) return;
+  elements.recentBidsList.innerHTML = '';
+
+  // Show most recent first
+  const recentBids = [...bids].reverse().slice(0, 10);
+
+  recentBids.forEach(bid => {
+    const item = document.createElement('div');
+    item.className = 'bid-item';
+    item.style.cssText = 'display: flex; align-items: center; gap: 8px; padding: 8px; border-bottom: 1px solid var(--gray-200);';
+
+    const amount = document.createElement('span');
+    amount.className = 'bid-amount';
+    amount.style.cssText = 'min-width: 60px; font-weight: 600; color: var(--success);';
+    amount.textContent = `$${bid.amount.toFixed(2)}`;
+
+    const name = document.createElement('span');
+    name.className = 'bid-username';
+    name.style.cssText = 'flex: 1; font-weight: 500;';
+    name.textContent = bid.username;
+
+    const time = document.createElement('span');
+    time.className = 'bid-time';
+    time.style.cssText = 'color: var(--gray-500); font-size: 12px;';
+    time.textContent = formatTimeAgo(bid.timestamp);
+
+    item.appendChild(amount);
+    item.appendChild(name);
+    item.appendChild(time);
+    elements.recentBidsList.appendChild(item);
+  });
+}
+
+function formatTimeAgo(timestamp) {
+  const seconds = Math.floor((Date.now() - timestamp) / 1000);
+  if (seconds < 60) return 'just now';
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  return `${Math.floor(seconds / 86400)}d ago`;
+}
+
+// ===============================================
+// 10/10 FEATURES: Chat Export Functions
+// ===============================================
+async function loadChatHistoryCount() {
+  if (!elements.chatHistoryCount) return;
+
+  try {
+    const tabs = await browserAPI.tabs.query({ active: true, currentWindow: true });
+    if (tabs.length === 0) return;
+
+    const response = await browserAPI.tabs.sendMessage(tabs[0].id, {
+      type: 'GET_CHAT_HISTORY',
+      limit: 1
+    });
+
+    if (response?.success) {
+      elements.chatHistoryCount.textContent = response.totalMessages || 0;
+    }
+  } catch (e) {
+    elements.chatHistoryCount.textContent = '0';
+  }
+}
+
+async function exportChatHistory() {
+  try {
+    const tabs = await browserAPI.tabs.query({ active: true, currentWindow: true });
+    if (tabs.length === 0) {
+      Toast.error('No active tab found');
+      return;
+    }
+
+    const response = await browserAPI.tabs.sendMessage(tabs[0].id, {
+      type: 'EXPORT_CHAT_CSV'
+    });
+
+    if (response?.success && response.csv) {
+      // Create and download CSV file
+      const blob = new Blob([response.csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `buzzchat-export-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      Toast.success(`Exported ${response.messageCount} messages`);
+    } else {
+      Toast.warning('No chat messages to export');
+    }
+  } catch (e) {
+    Toast.error('Unable to export chat history');
+  }
+}
+
+async function clearChatHistory() {
+  if (!confirm('Clear all captured chat messages? This cannot be undone.')) return;
+
+  try {
+    const tabs = await browserAPI.tabs.query({ active: true, currentWindow: true });
+    if (tabs.length === 0) return;
+
+    await browserAPI.tabs.sendMessage(tabs[0].id, {
+      type: 'CLEAR_CHAT_HISTORY'
+    });
+
+    if (elements.chatHistoryCount) {
+      elements.chatHistoryCount.textContent = '0';
+    }
+
+    Toast.success('Chat history cleared');
+  } catch (e) {
+    Toast.error('Unable to clear chat history');
+  }
+}
+
+// ===============================================
+// 10/10 FEATURES: Event Listeners Setup
+// ===============================================
+function init10x10Features() {
+  // Render hotkey slots
+  renderHotkeySlots();
+
+  // Initialize keyword alerts settings
+  if (elements.keywordAlertsToggle) {
+    elements.keywordAlertsToggle.checked = settings.keywordAlerts?.enabled || false;
+    elements.keywordAlertsToggle.addEventListener('change', async () => {
+      if (!settings.keywordAlerts) settings.keywordAlerts = { enabled: false, keywords: [], soundEnabled: true };
+      settings.keywordAlerts.enabled = elements.keywordAlertsToggle.checked;
+      await saveSettings();
+    });
+  }
+
+  if (elements.keywordAlertsList) {
+    elements.keywordAlertsList.value = (settings.keywordAlerts?.keywords || []).join(', ');
+    elements.keywordAlertsList.addEventListener('input', debounce(async () => {
+      if (!settings.keywordAlerts) settings.keywordAlerts = { enabled: false, keywords: [], soundEnabled: true };
+      settings.keywordAlerts.keywords = elements.keywordAlertsList.value
+        .split(',')
+        .map(k => k.trim())
+        .filter(k => k.length > 0);
+      await saveSettings();
+    }, 500));
+  }
+
+  if (elements.keywordAlertsSoundToggle) {
+    elements.keywordAlertsSoundToggle.checked = settings.keywordAlerts?.soundEnabled !== false;
+    elements.keywordAlertsSoundToggle.addEventListener('change', async () => {
+      if (!settings.keywordAlerts) settings.keywordAlerts = { enabled: false, keywords: [], soundEnabled: true };
+      settings.keywordAlerts.soundEnabled = elements.keywordAlertsSoundToggle.checked;
+      await saveSettings();
+    });
+  }
+
+  // Initialize bid alerts settings
+  if (elements.bidAlertsToggle) {
+    elements.bidAlertsToggle.checked = settings.bidAlerts?.enabled || false;
+    elements.bidAlertsToggle.addEventListener('change', async () => {
+      if (!settings.bidAlerts) settings.bidAlerts = { enabled: false, soundEnabled: true, minAmount: 0 };
+      settings.bidAlerts.enabled = elements.bidAlertsToggle.checked;
+      await saveSettings();
+    });
+  }
+
+  if (elements.bidAlertsMinAmount) {
+    elements.bidAlertsMinAmount.value = settings.bidAlerts?.minAmount || 0;
+    elements.bidAlertsMinAmount.addEventListener('change', async () => {
+      if (!settings.bidAlerts) settings.bidAlerts = { enabled: false, soundEnabled: true, minAmount: 0 };
+      settings.bidAlerts.minAmount = Math.max(0, parseInt(elements.bidAlertsMinAmount.value) || 0);
+      await saveSettings();
+    });
+  }
+
+  if (elements.bidAlertsSoundToggle) {
+    elements.bidAlertsSoundToggle.checked = settings.bidAlerts?.soundEnabled !== false;
+    elements.bidAlertsSoundToggle.addEventListener('change', async () => {
+      if (!settings.bidAlerts) settings.bidAlerts = { enabled: false, soundEnabled: true, minAmount: 0 };
+      settings.bidAlerts.soundEnabled = elements.bidAlertsSoundToggle.checked;
+      await saveSettings();
+    });
+  }
+
+  // Viewer leaderboard buttons
+  if (elements.refreshViewersBtn) {
+    elements.refreshViewersBtn.addEventListener('click', loadViewerLeaderboard);
+  }
+
+  if (elements.resetViewersBtn) {
+    elements.resetViewersBtn.addEventListener('click', async () => {
+      if (!confirm('Reset viewer tracking? This cannot be undone.')) return;
+      try {
+        const tabs = await browserAPI.tabs.query({ active: true, currentWindow: true });
+        if (tabs.length > 0) {
+          await browserAPI.tabs.sendMessage(tabs[0].id, { type: 'RESET_VIEWERS' });
+          loadViewerLeaderboard();
+          Toast.success('Viewer tracking reset');
+        }
+      } catch (e) {
+        Toast.error('Unable to reset viewers');
+      }
+    });
+  }
+
+  // Recent bids buttons
+  if (elements.refreshBidsBtn) {
+    elements.refreshBidsBtn.addEventListener('click', loadRecentBids);
+  }
+
+  if (elements.resetBidsBtn) {
+    elements.resetBidsBtn.addEventListener('click', async () => {
+      if (!confirm('Clear all detected bids? This cannot be undone.')) return;
+      try {
+        const tabs = await browserAPI.tabs.query({ active: true, currentWindow: true });
+        if (tabs.length > 0) {
+          await browserAPI.tabs.sendMessage(tabs[0].id, { type: 'RESET_BIDS' });
+          loadRecentBids();
+          Toast.success('Bids cleared');
+        }
+      } catch (e) {
+        Toast.error('Unable to reset bids');
+      }
+    });
+  }
+
+  // Chat export buttons
+  if (elements.exportChatBtn) {
+    elements.exportChatBtn.addEventListener('click', exportChatHistory);
+  }
+
+  if (elements.clearChatHistoryBtn) {
+    elements.clearChatHistoryBtn.addEventListener('click', clearChatHistory);
+  }
+
+  // Load initial data
+  loadViewerLeaderboard();
+  loadRecentBids();
+  loadChatHistoryCount();
+}
+
 // Check if user can add more features (tier check)
 // NOTE: Free tier now has access to ALL features - only message count is limited
 // This encourages users to experience the full "aha moment" before upgrading
@@ -2485,9 +3063,9 @@ const ExtensionPay = {
 
     await this.cacheLicense(license);
 
-    // Update settings
+    // Update settings - Pro tier gets 250 messages/show
     settings.tier = 'pro';
-    settings.messagesLimit = Infinity;
+    settings.messagesLimit = 250; // Pro tier limit (will be synced by background.js)
     await saveSettings();
 
     return license;
@@ -2607,12 +3185,9 @@ function togglePricingDisplay(isAnnual) {
 
 // Update message limit with watermark bonus + referral bonus
 function updateMessageLimitWithBonus() {
-  if (settings.tier !== 'free') return; // Only applies to free tier
-
-  const baseLimit = 25;
-  const watermarkBonus = settings.settings.watermark ? 5 : 0;
-  const referralBonus = settings.referralBonus || 0;
-  settings.messagesLimit = baseLimit + watermarkBonus + referralBonus;
+  // Message limits are managed by background.js via getTierLimits()
+  // This function preserved for backwards compatibility but no longer overrides limits
+  // Bonuses could add to the base limit: settings.messagesLimit + settings.referralBonus
 }
 
 // Utility functions
@@ -2628,6 +3203,63 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+// Safe empty state creator - no innerHTML with dynamic content
+function createEmptyState(icon, title, description, ctaText, ctaCallback) {
+  const container = document.createElement('div');
+  container.className = 'empty-state';
+
+  const iconDiv = document.createElement('div');
+  iconDiv.className = 'empty-state-icon';
+  iconDiv.textContent = icon;
+
+  const h4 = document.createElement('h4');
+  h4.textContent = title;
+
+  const p = document.createElement('p');
+  p.textContent = description;
+
+  container.appendChild(iconDiv);
+  container.appendChild(h4);
+  container.appendChild(p);
+
+  if (ctaText && ctaCallback) {
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-primary empty-state-cta';
+    btn.textContent = ctaText;
+    btn.addEventListener('click', ctaCallback);
+    container.appendChild(btn);
+  }
+
+  return container;
+}
+
+// Retry utility for failed async operations
+async function withRetry(fn, options = {}) {
+  const { maxRetries = 3, delay = 1000, backoff = 2, onRetry = null } = options;
+
+  let lastError;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+
+      if (attempt < maxRetries) {
+        const waitTime = delay * Math.pow(backoff, attempt - 1);
+
+        if (onRetry) {
+          onRetry(attempt, waitTime, error);
+        }
+
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+      }
+    }
+  }
+
+  throw lastError;
 }
 
 // Validate and truncate text input
@@ -2661,9 +3293,15 @@ function canAddItem(type) {
       break;
     case 'faq':
       count = settings.faq.rules.length;
-      // Free tier gets 2 FAQ rules, Pro/Business get 20
+      // Free tier gets 3 FAQ rules, Pro/Business get 20
       max = isPro ? VALIDATION.MAX_FAQ_RULES : VALIDATION.MAX_FAQ_RULES_FREE;
       name = 'FAQ rules';
+      break;
+    case 'command':
+      count = settings.commands?.list?.length || 0;
+      // Free tier gets 5 commands, Pro/Business get 50
+      max = isPro ? VALIDATION.MAX_COMMANDS : VALIDATION.MAX_COMMANDS_FREE;
+      name = 'commands';
       break;
     case 'template':
       count = settings.templates.length;
@@ -2675,11 +3313,13 @@ function canAddItem(type) {
   }
 
   if (count >= max) {
-    if (type === 'faq' && !isPro) {
-      Toast.warning(`Free plan allows ${max} FAQ rules. Upgrade to Pro for unlimited!`);
+    if ((type === 'faq' || type === 'command') && !isPro) {
+      Toast.warning(`Free plan allows ${max} ${name}. Upgrade to Pro for unlimited!`);
     } else {
       Toast.warning(`Maximum of ${max} ${name} reached`);
     }
+    // Update tier banner to show upgrade prompt
+    updateTierBanner();
     return false;
   }
   return true;
@@ -3169,8 +3809,92 @@ async function loadAnalyticsData() {
         elements.faqTriggersList.appendChild(emptyMsg);
       }
     }
+
+    // Load impact summary for VIP users
+    await loadImpactSummary();
   } catch (error) {
     console.error('[BuzzChat] Failed to load analytics data:', error);
+  }
+}
+
+// Check and celebrate milestones
+async function checkMilestones() {
+  try {
+    const newMilestones = await Analytics.checkMilestones();
+
+    if (newMilestones.length > 0) {
+      // Celebrate the first milestone (most important one)
+      const milestone = newMilestones[0];
+
+      // Show confetti!
+      triggerConfetti();
+
+      // Show celebratory toast
+      Toast.success(`${milestone.title} ${milestone.message}`);
+
+      // If multiple milestones, show a note
+      if (newMilestones.length > 1) {
+        setTimeout(() => {
+          Toast.info(`+${newMilestones.length - 1} more milestone${newMilestones.length > 2 ? 's' : ''} unlocked!`);
+        }, 3000);
+      }
+    }
+  } catch (error) {
+    console.error('[BuzzChat] Failed to check milestones:', error);
+  }
+}
+
+// Load emotionally rewarding impact summary for VIP users
+async function loadImpactSummary() {
+  const isPro = settings.tier === 'pro' || settings.tier === 'business';
+  const impactSummary = document.getElementById('impactSummary');
+
+  if (!impactSummary) return;
+
+  // Only show impact summary for Pro/Business users
+  if (!isPro) {
+    impactSummary.style.display = 'none';
+    return;
+  }
+
+  impactSummary.style.display = 'block';
+
+  try {
+    const impact = await Analytics.getImpactSummary();
+
+    // Update impact values
+    const impactViewers = document.getElementById('impactViewers');
+    const impactTimeSaved = document.getElementById('impactTimeSaved');
+    const impactTimeLabel = document.getElementById('impactTimeLabel');
+    const impactQuestions = document.getElementById('impactQuestions');
+    const impactGrowth = document.getElementById('impactGrowth');
+
+    if (impactViewers) {
+      impactViewers.textContent = impact.viewersEngaged.toLocaleString();
+    }
+
+    if (impactTimeSaved) {
+      impactTimeSaved.textContent = impact.hoursSaved;
+    }
+
+    if (impactTimeLabel) {
+      impactTimeLabel.textContent = `${impact.hoursSavedUnit} Saved`;
+    }
+
+    if (impactQuestions) {
+      impactQuestions.textContent = impact.questionsAnswered.toLocaleString();
+    }
+
+    // Show growth indicator if we have comparison data
+    if (impactGrowth && impact.growthPercent !== 0) {
+      impactGrowth.style.display = 'inline';
+      impactGrowth.className = `impact-growth ${impact.isGrowing ? 'positive' : 'negative'}`;
+      impactGrowth.textContent = `${impact.isGrowing ? '+' : ''}${impact.growthPercent}% vs last month`;
+    } else if (impactGrowth) {
+      impactGrowth.style.display = 'none';
+    }
+  } catch (error) {
+    console.error('[BuzzChat] Failed to load impact summary:', error);
   }
 }
 

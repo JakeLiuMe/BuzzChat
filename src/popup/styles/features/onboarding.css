@@ -1,0 +1,340 @@
+/* BuzzChat - Onboarding Styles */
+/* 3-step wizard and setup flow */
+
+/* Onboarding Modal */
+.onboarding-modal {
+  max-width: 380px;
+  max-height: 95vh;
+}
+
+.onboarding-modal .modal-header {
+  background: linear-gradient(135deg, var(--primary), #9333ea);
+  color: white;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.onboarding-modal .modal-header h2 {
+  color: white;
+}
+
+/* Step Indicator */
+.onboarding-steps {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.onboarding-step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 12px;
+  color: var(--gray-400);
+  transition: color 0.2s;
+}
+
+.onboarding-step.active {
+  color: var(--primary);
+}
+
+.onboarding-step.completed {
+  color: var(--success);
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: var(--gray-200);
+  color: var(--gray-500);
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  transition: all 0.2s;
+}
+
+.onboarding-step.active .step-number {
+  background: var(--primary);
+  color: white;
+}
+
+.onboarding-step.completed .step-number {
+  background: var(--success);
+  color: white;
+}
+
+.step-label {
+  font-weight: 500;
+}
+
+/* Step Panels */
+.onboarding-panel {
+  display: none;
+  padding: var(--space-lg);
+}
+
+.onboarding-panel.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Setup Options */
+.setup-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.setup-option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.setup-option:hover {
+  border-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+}
+
+.setup-option input[type="checkbox"] {
+  margin-top: 2px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+}
+
+.setup-option-content h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin-bottom: var(--space-xs);
+}
+
+.setup-option-content p {
+  font-size: 12px;
+  color: var(--gray-600);
+  margin: 0;
+}
+
+/* Message Preview */
+.message-preview {
+  margin-top: var(--space-lg);
+  padding: var(--space-md);
+  background: var(--gray-100);
+  border-radius: var(--radius-md);
+}
+
+.message-preview-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--space-sm);
+}
+
+.message-bubble {
+  display: inline-block;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--primary);
+  color: white;
+  border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-sm);
+  font-size: 13px;
+  max-width: 90%;
+}
+
+/* Navigation Buttons */
+.onboarding-nav {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-lg);
+  border-top: 1px solid var(--gray-200);
+}
+
+.onboarding-nav .btn {
+  min-width: 100px;
+}
+
+/* Onboarding Content */
+.onboarding-content {
+  padding: 8px 0;
+}
+
+.onboarding-section {
+  margin-bottom: 16px;
+}
+
+.onboarding-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin-bottom: 8px;
+}
+
+.onboarding-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.onboarding-section li {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--gray-600);
+}
+
+.onboarding-section li::before {
+  content: '•';
+  position: absolute;
+  left: 6px;
+  color: var(--primary);
+  font-weight: bold;
+}
+
+/* Disclaimer Section */
+.onboarding-section.disclaimer {
+  background: #fef3c7;
+  border: 1px solid var(--warning);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+
+.onboarding-section.disclaimer h3 {
+  color: #92400e;
+}
+
+.onboarding-section.disclaimer p {
+  font-size: 12px;
+  color: #92400e;
+  margin-bottom: 8px;
+}
+
+.onboarding-section.disclaimer li {
+  color: #92400e;
+  font-size: 12px;
+}
+
+.onboarding-section.disclaimer li::before {
+  color: var(--warning);
+}
+
+/* Tips Section */
+.onboarding-section.tips {
+  background: #ecfdf5;
+  border: 1px solid var(--success);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+
+.onboarding-section.tips h3 {
+  color: #065f46;
+}
+
+.onboarding-section.tips li {
+  color: #065f46;
+  font-size: 12px;
+}
+
+.onboarding-section.tips li::before {
+  color: var(--success);
+}
+
+/* Footer */
+.onboarding-footer {
+  padding-top: 16px;
+  border-top: 1px solid var(--gray-200);
+}
+
+.checkbox-accept {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.checkbox-accept input {
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.checkbox-accept span {
+  font-size: 12px;
+  color: var(--gray-600);
+  line-height: 1.4;
+}
+
+.onboarding-footer .btn {
+  width: 100%;
+}
+
+.onboarding-footer .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Dark mode onboarding */
+[data-theme="dark"] .onboarding-steps {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .setup-option {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .setup-option:hover {
+  background: rgba(124, 58, 237, 0.1);
+}
+
+[data-theme="dark"] .setup-option-content h4 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .setup-option-content p {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .message-preview {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .onboarding-section h3 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .onboarding-section li {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .onboarding-section.disclaimer {
+  background: rgba(245, 158, 11, 0.1);
+}
+
+[data-theme="dark"] .onboarding-section.tips {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+[data-theme="dark"] .onboarding-footer {
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .checkbox-accept span {
+  color: var(--text-secondary);
+}

@@ -85,7 +85,14 @@ const SELECTORS = {
 // Test configuration
 test.describe.configure({ mode: 'serial' }); // Run tests sequentially
 
-test.describe('Real Whatnot E2E Tests', () => {
+// Skip in CI - these tests require real network access to whatnot.com
+// Run manually with: npx playwright test real-whatnot.test.js --headed
+const SKIP_NETWORK_TESTS = process.env.CI === 'true' || process.env.SKIP_NETWORK_TESTS === 'true';
+
+// Use conditional describe to skip in CI
+const describeOrSkip = SKIP_NETWORK_TESTS ? test.describe.skip : test.describe;
+
+describeOrSkip('Real Whatnot E2E Tests', () => {
   let context;
   let extensionPage;
 

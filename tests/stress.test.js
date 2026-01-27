@@ -137,7 +137,8 @@ test.describe('Stress Tests', () => {
 
   test.describe('Rapid UI Interactions', () => {
     test('should handle rapid tab switching', async ({ popupPage }) => {
-      const tabs = ['home', 'messages', 'faq', 'analytics'];
+      // All tabs: home, messages, faq, commands, moderation, giveaway, analytics
+      const tabs = ['home', 'messages', 'faq', 'commands', 'moderation', 'giveaway', 'analytics'];
 
       // Switch tabs 20 times rapidly
       for (let i = 0; i < 20; i++) {
@@ -151,12 +152,13 @@ test.describe('Stress Tests', () => {
     });
 
     test('should handle rapid toggle clicks', async ({ popupPage }) => {
-      await helpers.switchTab(popupPage, 'messages');
+      // Welcome toggle is in home tab
+      await helpers.switchTab(popupPage, 'home');
 
-      // Toggle welcome message rapidly 10 times
+      // Toggle welcome message rapidly 10 times (use helper for hidden checkbox)
       const toggle = popupPage.locator('#welcomeToggle');
       for (let i = 0; i < 10; i++) {
-        await toggle.click();
+        await helpers.toggleCheckbox(popupPage, 'welcomeToggle');
         await popupPage.waitForTimeout(50);
       }
 
@@ -166,7 +168,8 @@ test.describe('Stress Tests', () => {
     });
 
     test('should handle rapid input changes with debounce', async ({ popupPage }) => {
-      await helpers.switchTab(popupPage, 'messages');
+      // Welcome message input is in home tab
+      await helpers.switchTab(popupPage, 'home');
 
       const input = popupPage.locator('#welcomeMessage');
 

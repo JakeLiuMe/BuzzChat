@@ -1,0 +1,24 @@
+{
+  "assignee": "147540282+JakeLiuMe@users.noreply.github.com",
+  "claim_note": "",
+  "claimed_at": "2026-01-27T08:10:28.205435Z",
+  "created_at": "2026-01-27T06:06:22.827051Z",
+  "depends_on": [],
+  "epic": "fn-1-6ya",
+  "evidence": {
+    "commits": [
+      "498f33713111479a6be24b48c1e9c5af040a4c24"
+    ],
+    "prs": [],
+    "tests": [
+      "npm test",
+      "npm run test:unit"
+    ]
+  },
+  "id": "fn-1-6ya.1",
+  "priority": null,
+  "spec_path": ".flow/tasks/fn-1-6ya.1.md",
+  "status": "done",
+  "title": "Platform Detection System",
+  "updated_at": "2026-01-27T08:18:02.550700Z"
+}

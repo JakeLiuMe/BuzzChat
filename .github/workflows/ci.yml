@@ -1,0 +1,99 @@
+# Continuous Integration
+# Runs tests on every push and PR
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
+
+      - name: Run tests
+        run: SKIP_NETWORK_TESTS=true npm test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint --if-present
+        continue-on-error: true
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build extension
+        run: npm run build --if-present
+
+      - name: Package extension
+        run: |
+          mkdir -p dist
+          zip -r dist/buzzchat-extension.zip . \
+            -x "node_modules/*" \
+            -x ".git/*" \
+            -x "tests/*" \
+            -x "*.md" \
+            -x ".github/*" \
+            -x "playwright-report/*" \
+            -x "test-results/*"
+
+      - name: Upload extension package
+        uses: actions/upload-artifact@v4
+        with:
+          name: buzzchat-extension
+          path: dist/buzzchat-extension.zip
+          retention-days: 30

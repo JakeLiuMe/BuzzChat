@@ -152,6 +152,33 @@
     };
   }
 
+  // Utility: Validate CSS selector to prevent injection attacks
+  function isValidCSSSelector(selector) {
+    if (!selector || typeof selector !== 'string') return false;
+    // Limit selector length to prevent DoS
+    if (selector.length > 200) return false;
+    // Block potentially dangerous patterns
+    const dangerousPatterns = [
+      /javascript:/i,
+      /expression\(/i,
+      /url\s*\(/i,
+      /<script/i,
+      /on\w+\s*=/i,
+      /behavior\s*:/i,
+      /-moz-binding/i
+    ];
+    for (const pattern of dangerousPatterns) {
+      if (pattern.test(selector)) return false;
+    }
+    // Try to validate by parsing
+    try {
+      document.createDocumentFragment().querySelector(selector);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   // Batched storage writer to reduce storage operations
   // Uses sync storage for settings (cross-device sync)
   const StorageWriter = {
@@ -218,7 +245,13 @@
       uniqueChattersThisSession: new LRUSet(CONFIG.MAX_UNIQUE_CHATTERS),
       messageTimestamps: [],
       peakMessagesPerMinute: 0
-    }
+    },
+    // Chat history for export
+    chatHistory: [],
+    // Bid alerts tracking
+    recentBids: [],
+    // Viewer engagement tracking
+    viewers: new LRUMap(500) // username -> { messageCount, firstSeen, lastSeen }
   };
 
   // Fallback selectors if SelectorManager is not available
@@ -380,6 +413,9 @@
     // Start observing the page for changes
     startPageObserver();
 
+    // Setup quick reply hotkeys (Ctrl+1-9)
+    setupQuickReplyHotkeys();
+
     state.initialized = true;
     console.log('[BuzzChat] Initialized successfully');
   }
@@ -399,7 +435,7 @@
     return {
       tier: 'free',
       messagesUsed: 0,
-      messagesLimit: 25, // Generous free tier - enough to experience the "aha moment"
+      messagesLimit: 50, // Free tier default (overridden by stored settings)
       masterEnabled: false,
       welcome: {
         enabled: false,
@@ -694,8 +730,20 @@
 
     console.log(`[BuzzChat] New message from ${username}: ${messageText}`);
 
+    // Store message in chat history for export
+    storeChatMessage(username, messageText);
+
+    // Track viewer engagement
+    trackViewer(username);
+
     // Update chat engagement metrics
     updateChatMetrics(username);
+
+    // Check for keyword alerts
+    checkKeywordAlerts(messageText, username);
+
+    // Check for bid alerts
+    checkBidAlerts(messageText, username);
 
     // Check moderation - blocked words filter
     if (state.settings?.moderation?.enabled) {
@@ -769,12 +817,17 @@
     command.usageCount = (command.usageCount || 0) + 1;
     StorageWriter.queue('whatnotBotSettings', state.settings);
 
-    // Notify popup of command usage update
+    // Notify popup of command usage update (popup may not be open)
     browserAPI.runtime.sendMessage({
       type: 'COMMAND_USED',
       trigger: commandTrigger,
       usageCount: command.usageCount
-    }).catch(() => {});
+    }).catch(err => {
+      // Expected to fail if popup is not open - only warn if unexpected error
+      if (err?.message && !err.message.includes('Receiving end does not exist')) {
+        console.warn('[BuzzChat] Command notification failed:', err.message);
+      }
+    });
 
     console.log(`[BuzzChat] Command !${commandTrigger} executed for ${username}`);
     return true;
@@ -1056,10 +1109,13 @@
     // Try to find chat input if not already found (with caching)
     if (!state.chatInput) {
       state.chatInput = findElement(selectors.chatInput, 'chatInput');
-      if (state.settings?.settings?.chatSelector) {
+      const customSelector = state.settings?.settings?.chatSelector;
+      if (customSelector && isValidCSSSelector(customSelector)) {
         try {
-          state.chatInput = document.querySelector(state.settings.settings.chatSelector) || state.chatInput;
-        } catch (e) {}
+          state.chatInput = document.querySelector(customSelector) || state.chatInput;
+        } catch (e) {
+          console.warn('[BuzzChat] Custom selector failed:', e.message);
+        }
       }
     }
 
@@ -1146,7 +1202,15 @@
       'RESET_GIVEAWAY',
       'GET_CHAT_METRICS',
       'RESET_CHAT_METRICS',
-      'SEND_QUICK_REPLY'
+      'SEND_QUICK_REPLY',
+      // 10/10 features
+      'GET_RECENT_BIDS',
+      'RESET_BIDS',
+      'GET_TOP_VIEWERS',
+      'RESET_VIEWERS',
+      'GET_CHAT_HISTORY',
+      'EXPORT_CHAT_CSV',
+      'CLEAR_CHAT_HISTORY'
     ];
     return allowedTypes.includes(message.type);
   }
@@ -1158,7 +1222,7 @@
     return {
       tier: ['free', 'pro', 'business'].includes(settings.tier) ? settings.tier : 'free',
       messagesUsed: typeof settings.messagesUsed === 'number' ? Math.max(0, settings.messagesUsed) : 0,
-      messagesLimit: typeof settings.messagesLimit === 'number' ? settings.messagesLimit : 25,
+      messagesLimit: typeof settings.messagesLimit === 'number' ? settings.messagesLimit : 50, // Default to free tier
       masterEnabled: Boolean(settings.masterEnabled),
       welcome: settings.welcome ? {
         enabled: Boolean(settings.welcome.enabled),
@@ -1211,7 +1275,23 @@
         showMessageCount: Boolean(settings.settings.showMessageCount),
         darkMode: Boolean(settings.settings.darkMode),
         watermark: Boolean(settings.settings.watermark)
-      } : { chatSelector: '', soundNotifications: true, showMessageCount: true, darkMode: false, watermark: false }
+      } : { chatSelector: '', soundNotifications: true, showMessageCount: true, darkMode: false, watermark: false },
+      // 10/10 Features settings
+      quickReplies: Array.isArray(settings.quickReplies)
+        ? settings.quickReplies.slice(0, 9).map(r => typeof r === 'string' ? r.slice(0, 200) : '')
+        : [],
+      keywordAlerts: settings.keywordAlerts ? {
+        enabled: Boolean(settings.keywordAlerts.enabled),
+        keywords: Array.isArray(settings.keywordAlerts.keywords)
+          ? settings.keywordAlerts.keywords.slice(0, 20).map(k => typeof k === 'string' ? k.slice(0, 50) : '')
+          : [],
+        soundEnabled: Boolean(settings.keywordAlerts.soundEnabled)
+      } : { enabled: false, keywords: [], soundEnabled: true },
+      bidAlerts: settings.bidAlerts ? {
+        enabled: Boolean(settings.bidAlerts.enabled),
+        soundEnabled: Boolean(settings.bidAlerts.soundEnabled),
+        minAmount: typeof settings.bidAlerts.minAmount === 'number' ? Math.max(0, settings.bidAlerts.minAmount) : 0
+      } : { enabled: false, soundEnabled: true, minAmount: 0 }
     };
   }
 
@@ -1320,6 +1400,62 @@
         } else {
           sendResponse({ success: false, error: 'Invalid message text' });
         }
+        break;
+
+      // 10/10 Features: Bid Alerts
+      case 'GET_RECENT_BIDS':
+        sendResponse({
+          success: true,
+          bids: state.recentBids.slice(-20), // Last 20 bids
+          totalBids: state.recentBids.length
+        });
+        break;
+
+      case 'RESET_BIDS':
+        state.recentBids = [];
+        console.log('[BuzzChat] Bids reset');
+        sendResponse({ success: true });
+        break;
+
+      // 10/10 Features: Viewer Tracking
+      case 'GET_TOP_VIEWERS':
+        const limit = typeof message.limit === 'number' ? Math.min(message.limit, 50) : 10;
+        sendResponse({
+          success: true,
+          viewers: getTopViewers(limit),
+          totalViewers: state.viewers.size
+        });
+        break;
+
+      case 'RESET_VIEWERS':
+        state.viewers.clear();
+        console.log('[BuzzChat] Viewer tracking reset');
+        sendResponse({ success: true });
+        break;
+
+      // 10/10 Features: Chat Export
+      case 'GET_CHAT_HISTORY':
+        const historyLimit = typeof message.limit === 'number' ? Math.min(message.limit, 500) : 100;
+        sendResponse({
+          success: true,
+          messages: state.chatHistory.slice(-historyLimit),
+          totalMessages: state.chatHistory.length
+        });
+        break;
+
+      case 'EXPORT_CHAT_CSV':
+        const csvData = exportChatCSV();
+        sendResponse({
+          success: csvData !== null,
+          csv: csvData,
+          messageCount: state.chatHistory.length
+        });
+        break;
+
+      case 'CLEAR_CHAT_HISTORY':
+        state.chatHistory = [];
+        console.log('[BuzzChat] Chat history cleared');
+        sendResponse({ success: true });
         break;
 
       default:
@@ -1435,6 +1571,310 @@
       toast.style.animation = 'slideOut 0.3s ease';
       setTimeout(() => toast.remove(), 300);
     }, 3000);
+  }
+
+  // ===============================================
+  // 10/10 FEATURES: Quick Reply Hotkeys
+  // ===============================================
+
+  // Global hotkey listener for quick replies (Ctrl+1-9)
+  function setupQuickReplyHotkeys() {
+    document.addEventListener('keydown', (e) => {
+      // Only process if bot is enabled and on live stream
+      if (!state.settings?.masterEnabled || !state.isLiveStream) return;
+
+      // Check for Ctrl+1 through Ctrl+9
+      if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
+        const index = parseInt(e.key) - 1;
+        const replies = state.settings.quickReplies || [];
+
+        if (replies[index]) {
+          e.preventDefault();
+          if (canSendMessage()) {
+            sendChatMessage(replies[index]);
+            safeTrackAnalytics('quickReplyHotkey', { key: e.key });
+            showNotification(`Quick reply sent: ${replies[index].substring(0, 30)}...`);
+          }
+        }
+      }
+    });
+
+    console.log('[BuzzChat] Quick reply hotkeys initialized (Ctrl+1-9)');
+  }
+
+  // ===============================================
+  // 10/10 FEATURES: Keyword Mention Alerts
+  // ===============================================
+
+  // Check message for keyword alerts
+  function checkKeywordAlerts(messageText, username) {
+    const alertSettings = state.settings?.keywordAlerts;
+    if (!alertSettings?.enabled) return;
+
+    const keywords = alertSettings.keywords || [];
+    if (keywords.length === 0) return;
+
+    const lowerMessage = messageText.toLowerCase();
+
+    for (const keyword of keywords) {
+      if (lowerMessage.includes(keyword.toLowerCase())) {
+        showKeywordAlert(username, messageText, keyword);
+        break; // Only one alert per message
+      }
+    }
+  }
+
+  // Display keyword alert notification
+  function showKeywordAlert(username, message, keyword) {
+    const alertSettings = state.settings?.keywordAlerts;
+
+    // Create alert notification
+    const alert = document.createElement('div');
+    alert.style.cssText = `
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+      border-radius: 8px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px;
+      z-index: 10002;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+      animation: slideIn 0.3s ease;
+      max-width: 300px;
+    `;
+
+    const title = document.createElement('div');
+    title.style.cssText = 'font-weight: 600; margin-bottom: 4px;';
+    title.textContent = `"${keyword}" mentioned`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'font-size: 12px; opacity: 0.9;';
+    content.textContent = `${username}: ${message.substring(0, 100)}${message.length > 100 ? '...' : ''}`;
+
+    alert.appendChild(title);
+    alert.appendChild(content);
+    document.body.appendChild(alert);
+
+    // Optional sound
+    if (alertSettings?.soundEnabled) {
+      playNotificationSound();
+    }
+
+    // Notify popup
+    browserAPI.runtime.sendMessage({
+      type: 'KEYWORD_ALERT',
+      username,
+      keyword,
+      message: message.substring(0, 200)
+    }).catch(() => {});
+
+    // Remove after 5 seconds
+    setTimeout(() => {
+      alert.style.animation = 'slideOut 0.3s ease';
+      setTimeout(() => alert.remove(), 300);
+    }, 5000);
+  }
+
+  // Play notification sound
+  function playNotificationSound() {
+    try {
+      // Use Web Audio API for a simple beep
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+      gainNode.gain.value = 0.1;
+
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + 0.15);
+    } catch (e) {
+      // Audio not supported or blocked
+    }
+  }
+
+  // ===============================================
+  // 10/10 FEATURES: Bid Alerts
+  // ===============================================
+
+  // Bid detection patterns
+  const BID_PATTERNS = [
+    /\$(\d+(?:\.\d{2})?)/,        // $45 or $45.00
+    /bid\s*\$?(\d+)/i,            // bid 45, bid $45
+    /(\d+)\s*dollars?/i           // 45 dollars
+  ];
+
+  // Detect bid in message
+  function detectBid(message) {
+    for (const pattern of BID_PATTERNS) {
+      const match = message.match(pattern);
+      if (match) {
+        return parseFloat(match[1]);
+      }
+    }
+    return null;
+  }
+
+  // Check message for bids
+  function checkBidAlerts(messageText, username) {
+    const bidSettings = state.settings?.bidAlerts;
+    if (!bidSettings?.enabled) return;
+
+    const bidAmount = detectBid(messageText);
+    if (bidAmount === null) return;
+
+    const minAmount = bidSettings.minAmount || 0;
+    if (bidAmount < minAmount) return;
+
+    // Record bid
+    const bid = {
+      username,
+      amount: bidAmount,
+      message: messageText.substring(0, 100),
+      timestamp: Date.now()
+    };
+
+    state.recentBids.push(bid);
+
+    // Keep last 50 bids
+    if (state.recentBids.length > 50) {
+      state.recentBids.shift();
+    }
+
+    // Show alert
+    showBidAlert(bid);
+
+    // Notify popup
+    browserAPI.runtime.sendMessage({
+      type: 'BID_ALERT',
+      bid,
+      totalBids: state.recentBids.length
+    }).catch(() => {});
+  }
+
+  // Display bid alert notification
+  function showBidAlert(bid) {
+    const bidSettings = state.settings?.bidAlerts;
+
+    const alert = document.createElement('div');
+    alert.style.cssText = `
+      position: fixed;
+      top: 140px;
+      right: 20px;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border-radius: 8px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      z-index: 10002;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+      animation: slideIn 0.3s ease;
+    `;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'display: flex; align-items: center; gap: 8px;';
+    content.textContent = `💰 ${bid.username} bid $${bid.amount.toFixed(2)}`;
+
+    alert.appendChild(content);
+    document.body.appendChild(alert);
+
+    // Optional sound
+    if (bidSettings?.soundEnabled) {
+      playNotificationSound();
+    }
+
+    // Remove after 4 seconds
+    setTimeout(() => {
+      alert.style.animation = 'slideOut 0.3s ease';
+      setTimeout(() => alert.remove(), 300);
+    }, 4000);
+
+    console.log(`[BuzzChat] Bid detected: ${bid.username} - $${bid.amount}`);
+  }
+
+  // ===============================================
+  // 10/10 FEATURES: Viewer Engagement Tracking
+  // ===============================================
+
+  // Track viewer message activity
+  function trackViewer(username) {
+    const now = Date.now();
+
+    if (!state.viewers.has(username)) {
+      state.viewers.set(username, {
+        messageCount: 0,
+        firstSeen: now,
+        lastSeen: now
+      });
+    }
+
+    const viewer = state.viewers.get(username);
+    viewer.messageCount++;
+    viewer.lastSeen = now;
+    state.viewers.set(username, viewer); // Update in LRU
+  }
+
+  // Get top viewers by message count
+  function getTopViewers(limit = 10) {
+    const viewers = [];
+    for (const [username, stats] of state.viewers.entries()) {
+      viewers.push({ username, ...stats });
+    }
+
+    return viewers
+      .sort((a, b) => b.messageCount - a.messageCount)
+      .slice(0, limit);
+  }
+
+  // ===============================================
+  // 10/10 FEATURES: Chat History & Export
+  // ===============================================
+
+  // Store message in chat history
+  function storeChatMessage(username, message) {
+    state.chatHistory.push({
+      timestamp: Date.now(),
+      username,
+      message
+    });
+
+    // Keep last 5000 messages
+    if (state.chatHistory.length > 5000) {
+      state.chatHistory = state.chatHistory.slice(-5000);
+    }
+  }
+
+  // Escape CSV field
+  function escapeCSV(str) {
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  }
+
+  // Export chat history to CSV
+  function exportChatCSV() {
+    if (state.chatHistory.length === 0) {
+      return null;
+    }
+
+    const headers = 'Timestamp,Username,Message\n';
+    const rows = state.chatHistory.map(m => {
+      const ts = new Date(m.timestamp).toISOString();
+      const user = escapeCSV(m.username);
+      const msg = escapeCSV(m.message);
+      return `${ts},${user},${msg}`;
+    }).join('\n');
+
+    return headers + rows;
   }
 
   // Quick Reply Floating Bar

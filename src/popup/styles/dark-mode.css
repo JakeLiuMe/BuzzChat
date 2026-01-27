@@ -1,0 +1,194 @@
+/* BuzzChat - Dark Mode Overrides */
+/* Theme variables and component overrides for dark mode */
+
+[data-theme="dark"] {
+  /* Inverted grays */
+  --gray-50: #1f2937;
+  --gray-100: #374151;
+  --gray-200: #4b5563;
+  --gray-300: #6b7280;
+  --gray-400: #9ca3af;
+  --gray-500: #d1d5db;
+  --gray-600: #e5e7eb;
+  --gray-700: #f3f4f6;
+  --gray-800: #f9fafb;
+  --gray-900: #ffffff;
+
+  /* Dark theme colors */
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --bg-tertiary: #374151;
+  --text-primary: #f9fafb;
+  --text-secondary: #e5e7eb;
+  --text-muted: #9ca3af;
+  --border-color: #374151;
+  --input-bg: #1f2937;
+  --card-bg: #1f2937;
+
+  /* Shadows */
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-lg: 0 4px 6px rgba(0,0,0,0.3);
+
+  /* Confetti colors for dark mode */
+  --confetti-1: #a78bfa;
+  --confetti-2: #fbbf24;
+  --confetti-3: #ffffff;
+  --confetti-4: #a78bfa;
+  --confetti-5: #fbbf24;
+  --confetti-6: #ffffff;
+  --confetti-7: #a78bfa;
+  --confetti-8: #fbbf24;
+}
+
+/* Dark mode specific overrides */
+[data-theme="dark"] .header {
+  background: linear-gradient(135deg, #6d28d9, #7c3aed);
+}
+
+[data-theme="dark"] .tier-banner {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .tab-btn {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .tab-btn.active {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .card {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .form-textarea,
+[data-theme="dark"] .form-select {
+  background: var(--input-bg);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .modal-content {
+  background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .pricing-card {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .pricing-card.current-plan {
+  background: var(--bg-tertiary);
+  border-color: var(--gray-500);
+}
+
+[data-theme="dark"] .pricing-card.recommended {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+[data-theme="dark"] .pricing-card.featured {
+  border-color: var(--warning);
+}
+
+[data-theme="dark"] .pricing-card h3 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .pricing-card .features-list li {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .pricing-card .features-list li.feature-limited {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .tier-badge.current {
+  background: var(--gray-500);
+  color: var(--gray-100);
+}
+
+[data-theme="dark"] .feature-comparison {
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .feature-comparison summary {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .feature-comparison summary:hover {
+  background: var(--gray-200);
+}
+
+[data-theme="dark"] .comparison-table th {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .comparison-table td {
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .comparison-table th,
+[data-theme="dark"] .comparison-table td {
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .comparison-table tbody tr:hover {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .help-text {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .empty-state {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .toast {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .entry-item {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .trigger-item {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .stat-card {
+  background: var(--card-bg);
+}
+
+[data-theme="dark"] .legend-item {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .chart-container svg text {
+  fill: var(--text-secondary);
+}
+
+[data-theme="dark"] .account-item {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .api-key-item {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .quick-reply-edit-item {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .command-item {
+  background: var(--bg-tertiary);
+}

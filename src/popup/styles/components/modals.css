@@ -1,0 +1,174 @@
+/* BuzzChat - Modal Styles */
+/* Modal overlays and content */
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s;
+}
+
+.modal.active {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  width: 90%;
+  max-width: 400px;
+  max-height: 90%;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.2s;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  background: var(--bg-primary);
+  z-index: 1;
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.modal-close {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.modal-close:hover {
+  background: var(--gray-100);
+  color: var(--text-primary);
+}
+
+.modal-body {
+  padding: var(--space-lg);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+  border-top: 1px solid var(--border-color);
+}
+
+/* Full-width modal variant */
+.modal-content.modal-wide {
+  max-width: 500px;
+}
+
+/* Drawer variant (slide from side) */
+.modal-drawer {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  bottom: 0;
+  width: 100%;
+  max-width: 360px;
+  background: var(--bg-primary);
+  z-index: 101;
+  transition: right 0.3s;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal.active .modal-drawer {
+  right: 0;
+}
+
+/* Winner Display (special modal) */
+.winner-display {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 200;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  animation: fadeIn 0.3s;
+}
+
+.winner-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+  text-align: center;
+  margin-bottom: var(--space-lg);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.winner-name {
+  font-size: 24px;
+  font-weight: 600;
+  color: #fbbf24;
+  text-align: center;
+  padding: var(--space-sm) var(--space-lg);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-sm);
+  animation: popIn 0.3s backwards;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.winner-actions {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-xl);
+}

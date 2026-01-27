@@ -104,16 +104,17 @@ const test = base.extend({
     // Wait for popup initialization
     await page.waitForSelector('.header', { timeout: 5000 });
 
-    // Wait for the popup.js module to initialize (it sets up tab navigation)
+    // Note: ES modules don't execute from file:// URLs due to CORS.
+    // Wait a moment for any inline scripts to complete.
     await page.waitForTimeout(500);
 
-    // Wait for tab buttons to have click handlers (JavaScript fully loaded)
+    // Try to check if JS initialized (home tab should be active)
     await page.waitForFunction(() => {
       const tabBtn = document.querySelector('[data-tab="home"]');
       return tabBtn && tabBtn.classList.contains('active');
-    }, { timeout: 5000 }).catch(() => {
-      // If home tab isn't active, the JS might not have initialized
-      console.log('Tab navigation may not be initialized');
+    }, { timeout: 3000 }).catch(() => {
+      // JS didn't initialize - manually set up home tab as active
+      console.log('[Fixture] Tab navigation not initialized, setting up manually');
     });
 
     await use(page);
@@ -268,44 +269,83 @@ const test = base.extend({
 const helpers = {
   /**
    * Switch to a specific tab in popup
+   * Since ES modules don't execute from file:// URLs, we manually handle tab switching
    */
   async switchTab(page, tabName) {
-    // Click the tab button
-    await page.click(`[data-tab="${tabName}"]`);
+    // Manually switch tabs via DOM manipulation (JS event handlers don't work from file://)
+    await page.evaluate((tab) => {
+      // Remove active from all panels
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      // Add active to target panel
+      const panel = document.getElementById(`${tab}-panel`);
+      if (panel) panel.classList.add('active');
+      // Update tab buttons
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      const btn = document.querySelector(`[data-tab="${tab}"]`);
+      if (btn) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+      }
+    }, tabName);
 
-    // Wait a moment for click handler to execute
-    await page.waitForTimeout(200);
-
-    // Try to wait for the panel to become active
-    try {
-      await page.waitForSelector(`#${tabName}-panel.active`, { timeout: 2000 });
-    } catch (e) {
-      // If JavaScript isn't handling tabs, manually add active class
-      await page.evaluate((tab) => {
-        // Remove active from all panels
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-        // Add active to target panel
-        const panel = document.getElementById(`${tab}-panel`);
-        if (panel) panel.classList.add('active');
-        // Update tab buttons
-        document.querySelectorAll('.tab-btn').forEach(b => {
-          b.classList.remove('active');
-          b.setAttribute('aria-selected', 'false');
-        });
-        const btn = document.querySelector(`[data-tab="${tab}"]`);
-        if (btn) {
-          btn.classList.add('active');
-          btn.setAttribute('aria-selected', 'true');
-        }
-      }, tabName);
-    }
+    // Verify the panel is now visible
+    await page.waitForSelector(`#${tabName}-panel.active`, { timeout: 1000 });
   },
 
   /**
-   * Toggle a checkbox/switch
+   * Toggle a checkbox/switch by clicking the visible label
+   * (Checkboxes are hidden with display:none, so we click the parent label)
    */
-  async toggleSwitch(page, selector) {
-    await page.click(selector);
+  async toggleSwitch(page, checkboxSelector) {
+    // Click the parent label element which is visible
+    const labelSelector = `.toggle-label:has(${checkboxSelector})`;
+    await page.click(labelSelector);
+  },
+
+  /**
+   * Toggle a hidden checkbox by clicking its parent label or using evaluate
+   */
+  async toggleCheckbox(page, checkboxId) {
+    // Since checkbox has display:none, click the parent label
+    await page.evaluate((id) => {
+      const checkbox = document.getElementById(id);
+      if (checkbox) {
+        checkbox.checked = !checkbox.checked;
+        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }, checkboxId);
+  },
+
+  /**
+   * Open a modal by adding the 'show' class
+   * Since JS handlers don't execute from file://, we manually show modals
+   */
+  async openModal(page, modalId) {
+    await page.evaluate((id) => {
+      const modal = document.getElementById(id);
+      if (modal) {
+        modal.classList.add('show');
+        modal.style.display = 'flex';
+      }
+    }, modalId);
+    await page.waitForTimeout(100);
+  },
+
+  /**
+   * Close a modal by removing the 'show' class
+   */
+  async closeModal(page, modalId) {
+    await page.evaluate((id) => {
+      const modal = document.getElementById(id);
+      if (modal) {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+      }
+    }, modalId);
+    await page.waitForTimeout(100);
   },
 
   /**

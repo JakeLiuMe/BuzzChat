@@ -1,0 +1,36 @@
+# Dependabot configuration
+# Automatically creates PRs for dependency updates
+
+version: 2
+
+updates:
+  # npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "auto-maintenance"
+    commit-message:
+      prefix: "chore(deps)"
+    # Auto-merge patch updates
+    groups:
+      patch-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore(ci)"

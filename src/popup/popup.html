@@ -20,8 +20,8 @@
           <select id="accountSelect" aria-label="Select configuration">
             <!-- Populated dynamically -->
           </select>
-          <button id="newAccountBtn" class="icon-btn" title="New setup">+</button>
-          <button id="manageAccountsBtn" class="icon-btn" title="Manage setups">
+          <button id="newAccountBtn" class="icon-btn" title="Add a new configuration setup" aria-label="Add new configuration">+</button>
+          <button id="manageAccountsBtn" class="icon-btn" title="Manage your configuration setups" aria-label="Manage configurations">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
               <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -41,7 +41,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </button>
-        <div class="status-badge" id="statusBadge">
+        <div class="status-badge" id="statusBadge" title="Shows if bot is currently active on this tab">
           <span class="status-dot"></span>
           <span class="status-text">Inactive</span>
         </div>
@@ -50,9 +50,16 @@
 
     <!-- Tier Info -->
     <div class="tier-banner" id="tierBanner">
+      <div class="vip-badge" id="vipBadge" style="display: none;">
+        <svg class="vip-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+        <span class="vip-tier-text">PRO</span>
+      </div>
       <span class="tier-label">Free Plan</span>
-      <span class="tier-usage">25 messages this show</span>
-      <button class="upgrade-btn" id="upgradeBtn">Upgrade to Pro</button>
+      <span class="tier-usage">Unlimited messages</span>
+      <span class="member-since" id="memberSince" style="display: none;"></span>
+      <button class="upgrade-btn" id="upgradeBtn" title="Unlock unlimited messages and Pro features">Upgrade to Pro</button>
     </div>
 
     <!-- Master Toggle -->
@@ -66,43 +73,43 @@
 
     <!-- Tabs -->
     <nav class="tabs" role="tablist" aria-label="Main navigation">
-      <button class="tab-btn active" data-tab="home" role="tab" aria-selected="true" aria-controls="home-panel">
+      <button id="home-tab" class="tab-btn active" data-tab="home" role="tab" aria-selected="true" aria-controls="home-panel" title="Welcome message settings">
         <svg class="tab-icon" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
         </svg>
         <span>Home</span>
       </button>
-      <button class="tab-btn" data-tab="messages" role="tab" aria-selected="false" aria-controls="messages-panel">
+      <button id="messages-tab" class="tab-btn" data-tab="messages" role="tab" aria-selected="false" aria-controls="messages-panel" title="Timer messages & quick templates">
         <svg class="tab-icon" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
         <span>Messages</span>
       </button>
-      <button class="tab-btn" data-tab="faq" role="tab" aria-selected="false" aria-controls="faq-panel">
+      <button id="faq-tab" class="tab-btn" data-tab="faq" role="tab" aria-selected="false" aria-controls="faq-panel" title="Auto-reply to common questions">
         <svg class="tab-icon" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <span>FAQ</span>
       </button>
-      <button class="tab-btn" data-tab="commands" role="tab" aria-selected="false" aria-controls="commands-panel">
+      <button id="commands-tab" class="tab-btn" data-tab="commands" role="tab" aria-selected="false" aria-controls="commands-panel" title="Create !commands for chat">
         <svg class="tab-icon" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
         <span>Cmds</span>
       </button>
-      <button class="tab-btn" data-tab="moderation" role="tab" aria-selected="false" aria-controls="moderation-panel">
+      <button id="moderation-tab" class="tab-btn" data-tab="moderation" role="tab" aria-selected="false" aria-controls="moderation-panel" title="Block words & spam protection">
         <svg class="tab-icon" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
         <span>Mod</span>
       </button>
-      <button class="tab-btn" data-tab="giveaway" role="tab" aria-selected="false" aria-controls="giveaway-panel">
+      <button id="giveaway-tab" class="tab-btn" data-tab="giveaway" role="tab" aria-selected="false" aria-controls="giveaway-panel" title="Track entries & pick winners">
         <svg class="tab-icon" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
         </svg>
         <span>Giveaway</span>
       </button>
-      <button class="tab-btn" data-tab="analytics" role="tab" aria-selected="false" aria-controls="analytics-panel">
+      <button id="analytics-tab" class="tab-btn" data-tab="analytics" role="tab" aria-selected="false" aria-controls="analytics-panel" title="View message statistics (Pro)">
         <svg class="tab-icon" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
@@ -124,14 +131,14 @@
 
         <div class="form-group">
           <label for="welcomeMessage">Welcome Message</label>
-          <textarea id="welcomeMessage" rows="3" placeholder="Hey {username}! Welcome to the stream! Drop a comment to enter our giveaway!"></textarea>
-          <small class="help-text">Use {username} to include the viewer's name</small>
+          <textarea id="welcomeMessage" rows="3" placeholder="Hey {username}! Welcome to the stream! Drop a comment to enter our giveaway!" aria-describedby="welcomeMessage-help"></textarea>
+          <small id="welcomeMessage-help" class="help-text">Use {username} to include the viewer's name</small>
         </div>
 
         <div class="form-group">
           <label for="welcomeDelay">Delay Between Welcomes (seconds)</label>
-          <input type="number" id="welcomeDelay" value="5" min="1" max="60">
-          <small class="help-text">Avoid spam by spacing out welcome messages</small>
+          <input type="number" id="welcomeDelay" value="5" min="1" max="60" aria-describedby="welcomeDelay-help">
+          <small id="welcomeDelay-help" class="help-text">Avoid spam by spacing out welcome messages</small>
         </div>
       </section>
 
@@ -151,7 +158,7 @@
             <!-- Timer messages will be added here -->
           </div>
 
-          <button class="btn btn-secondary add-timer-btn" id="addTimerBtn">
+          <button class="btn btn-secondary add-timer-btn" id="addTimerBtn" title="Create a recurring message that sends automatically">
             + Add Timer Message
           </button>
         </div>
@@ -166,7 +173,7 @@
             <!-- Templates will be added here -->
           </div>
 
-          <button class="btn btn-secondary add-template-btn" id="addTemplateBtn">
+          <button class="btn btn-secondary add-template-btn" id="addTemplateBtn" title="Add a one-click quick reply template">
             + Add Template
           </button>
         </div>
@@ -221,7 +228,7 @@
           <!-- FAQ items will be added here -->
         </div>
 
-        <button class="btn btn-secondary add-faq-btn" id="addFaqBtn">
+        <button class="btn btn-secondary add-faq-btn" id="addFaqBtn" title="Create an auto-reply rule when keywords are detected">
           + Add FAQ Rule
         </button>
 
@@ -267,15 +274,15 @@
           <!-- Commands will be added here -->
         </div>
 
-        <button class="btn btn-secondary add-command-btn" id="addCommandBtn">
+        <button class="btn btn-secondary add-command-btn" id="addCommandBtn" title="Create a !command trigger for chat">
           + Add Command
         </button>
 
         <hr class="section-divider">
 
         <div class="commands-actions">
-          <button class="btn btn-secondary btn-sm" id="exportCommandsBtn">Export</button>
-          <button class="btn btn-secondary btn-sm" id="importCommandsBtn">Import</button>
+          <button class="btn btn-secondary btn-sm" id="exportCommandsBtn" title="Download commands as JSON file">Export</button>
+          <button class="btn btn-secondary btn-sm" id="importCommandsBtn" title="Import commands from JSON file">Import</button>
           <input type="file" id="importCommandsFile" accept=".json" style="display: none;">
         </div>
 
@@ -298,9 +305,9 @@
             <div class="form-row">
               <div class="form-group">
                 <label>Cooldown (seconds)</label>
-                <input type="number" class="command-cooldown" value="30" min="0" max="300">
+                <input type="number" class="command-cooldown" value="30" min="0" max="300" title="Seconds before this command can be used again">
               </div>
-              <button class="btn btn-danger btn-sm remove-command-btn" aria-label="Remove command">Remove</button>
+              <button class="btn btn-danger btn-sm remove-command-btn" aria-label="Remove command" title="Delete this command">Remove</button>
             </div>
           </div>
         </template>
@@ -362,9 +369,9 @@
         </div>
 
         <!-- Live Entry Counter -->
-        <div class="giveaway-stats">
+        <div class="giveaway-stats" aria-live="polite" aria-atomic="true">
           <div class="stat-card giveaway-counter">
-            <div class="stat-value" id="giveawayEntryCount">0</div>
+            <div class="stat-value" id="giveawayEntryCount" aria-label="Number of giveaway entries">0</div>
             <div class="stat-label">Entries</div>
           </div>
         </div>
@@ -373,7 +380,11 @@
         <div class="giveaway-entries-section">
           <h4>Recent Entries</h4>
           <div class="giveaway-entries-list" id="giveawayEntriesList">
-            <p class="empty-entries">No entries yet. Entries will appear here when viewers type your keywords.</p>
+            <div class="empty-state-inline">
+              <span class="empty-icon">🎫</span>
+              <p class="empty-entries">No entries yet!</p>
+              <p class="empty-hint">When viewers type your keyword in chat, they'll appear here automatically.</p>
+            </div>
           </div>
         </div>
 
@@ -441,6 +452,38 @@
         <div class="metrics-actions">
           <button class="btn btn-secondary btn-sm" id="refreshMetricsBtn">Refresh Metrics</button>
         </div>
+
+        <!-- Viewer Leaderboard -->
+        <hr class="section-divider">
+        <h3 class="section-title">Top Chatters</h3>
+        <p class="section-helper">Most active viewers this session</p>
+        <div class="viewer-leaderboard" id="viewerLeaderboard">
+          <div class="empty-state-inline">
+            <span class="empty-icon">👥</span>
+            <p class="empty-entries">No viewers tracked yet</p>
+            <p class="empty-hint">Viewer activity will appear here as chat messages come in.</p>
+          </div>
+        </div>
+        <div class="viewer-actions">
+          <button class="btn btn-secondary btn-sm" id="refreshViewersBtn">Refresh</button>
+          <button class="btn btn-secondary btn-sm" id="resetViewersBtn">Reset</button>
+        </div>
+
+        <!-- Recent Bids -->
+        <hr class="section-divider">
+        <h3 class="section-title">Recent Bids</h3>
+        <p class="section-helper">Detected bid amounts from chat</p>
+        <div class="recent-bids-list" id="recentBidsList">
+          <div class="empty-state-inline">
+            <span class="empty-icon">💰</span>
+            <p class="empty-entries">No bids detected</p>
+            <p class="empty-hint">Enable Bid Alerts in Settings to track bids.</p>
+          </div>
+        </div>
+        <div class="bid-actions">
+          <button class="btn btn-secondary btn-sm" id="refreshBidsBtn">Refresh</button>
+          <button class="btn btn-secondary btn-sm" id="resetBidsBtn">Reset</button>
+        </div>
       </section>
 
       <!-- Analytics Tab (Pro Feature) -->
@@ -453,31 +496,62 @@
           <div class="locked-content">
             <div class="locked-icon">📊</div>
             <h3>Analytics Dashboard</h3>
-            <p>Track your bot performance with detailed analytics</p>
+            <p>See what's working in your shows</p>
             <ul class="locked-features">
-              <li>Messages sent per day/week</li>
-              <li>Welcome vs FAQ vs Timer breakdown</li>
+              <li>7/30 day message trends</li>
               <li>Peak activity hours</li>
               <li>Top FAQ triggers</li>
+              <li>Message type breakdown</li>
               <li>Export to CSV</li>
             </ul>
-            <button class="btn btn-primary" id="unlockAnalyticsBtn">Upgrade to Pro</button>
+            <button class="btn btn-primary" id="unlockAnalyticsBtn">Upgrade to Pro - $7.99/mo</button>
           </div>
         </div>
 
         <div class="analytics-content" id="analyticsContent" style="display: none;">
+          <!-- Impact Summary - emotionally rewarding stats for VIPs -->
+          <div class="impact-summary" id="impactSummary">
+            <div class="impact-header">
+              <h3>Your Impact This Month</h3>
+              <span class="impact-growth" id="impactGrowth" style="display: none;"></span>
+            </div>
+            <div class="impact-stats">
+              <div class="impact-stat highlight">
+                <div class="impact-value" id="impactViewers">0</div>
+                <div class="impact-label">Viewers Welcomed</div>
+              </div>
+              <div class="impact-stat">
+                <div class="impact-value" id="impactTimeSaved">0</div>
+                <div class="impact-label" id="impactTimeLabel">Minutes Saved</div>
+              </div>
+              <div class="impact-stat">
+                <div class="impact-value" id="impactQuestions">0</div>
+                <div class="impact-label">Questions Answered</div>
+              </div>
+            </div>
+          </div>
+
           <div class="analytics-stats">
             <div class="stat-card">
+              <div class="stat-info">
+                <div class="stat-label">Total Messages</div>
+                <div class="stat-helper">Sent by BuzzChat for you</div>
+              </div>
               <div class="stat-value" id="statTotalMessages">0</div>
-              <div class="stat-label">Total Messages</div>
             </div>
             <div class="stat-card">
+              <div class="stat-info">
+                <div class="stat-label">Today</div>
+                <div class="stat-helper">Messages this session</div>
+              </div>
               <div class="stat-value" id="statTodayMessages">0</div>
-              <div class="stat-label">Today</div>
             </div>
             <div class="stat-card">
+              <div class="stat-info">
+                <div class="stat-label">Peak Hour</div>
+                <div class="stat-helper">When you're busiest</div>
+              </div>
               <div class="stat-value" id="statPeakHour">--</div>
-              <div class="stat-label">Peak Hour</div>
             </div>
           </div>
 
@@ -488,26 +562,57 @@
 
           <div class="analytics-section">
             <h4>Message Breakdown</h4>
-            <div class="breakdown-row">
-              <div class="chart-container pie-chart" id="typePieChart"></div>
-              <div class="breakdown-legend" id="breakdownLegend">
-                <div class="legend-item"><span class="legend-color" style="background: #10b981;"></span> Welcome: <span id="legendWelcome">0</span></div>
-                <div class="legend-item"><span class="legend-color" style="background: #f59e0b;"></span> FAQ: <span id="legendFaq">0</span></div>
-                <div class="legend-item"><span class="legend-color" style="background: #7c3aed;"></span> Timer: <span id="legendTimer">0</span></div>
-                <div class="legend-item"><span class="legend-color" style="background: #3b82f6;"></span> Template: <span id="legendTemplate">0</span></div>
+            <p class="section-helper">How BuzzChat helped you this week</p>
+            <div class="message-types-grid">
+              <div class="message-type-card welcome">
+                <span class="type-icon">👋</span>
+                <span class="type-count" id="legendWelcome">0</span>
+                <span class="type-label">Welcomes</span>
+              </div>
+              <div class="message-type-card faq">
+                <span class="type-icon">❓</span>
+                <span class="type-count" id="legendFaq">0</span>
+                <span class="type-label">FAQ Replies</span>
+              </div>
+              <div class="message-type-card timer">
+                <span class="type-icon">⏰</span>
+                <span class="type-count" id="legendTimer">0</span>
+                <span class="type-label">Timer Messages</span>
+              </div>
+              <div class="message-type-card template">
+                <span class="type-icon">📝</span>
+                <span class="type-count" id="legendTemplate">0</span>
+                <span class="type-label">Templates</span>
               </div>
             </div>
           </div>
 
           <div class="analytics-section">
             <h4>Top FAQ Triggers</h4>
+            <p class="section-helper">Keywords that triggered your auto-replies</p>
             <div class="faq-triggers-list" id="faqTriggersList">
-              <p class="empty-triggers">No FAQ triggers yet</p>
+              <div class="empty-state-inline">
+                <span class="empty-icon">❓</span>
+                <p class="empty-triggers">No triggers yet</p>
+                <p class="empty-hint">Set up FAQ rules in the Timer/FAQ tab to see which keywords are most popular!</p>
+              </div>
             </div>
           </div>
 
           <div class="analytics-actions">
-            <button class="btn btn-secondary" id="exportAnalyticsBtn">Export CSV</button>
+            <button class="btn btn-secondary" id="exportAnalyticsBtn">Download Report</button>
+          </div>
+
+          <!-- Chat Export Section -->
+          <hr class="section-divider">
+          <h4>Chat History Export</h4>
+          <p class="section-helper">Download all chat messages from this session as a CSV file.</p>
+          <div class="chat-export-stats">
+            <span id="chatHistoryCount">0</span> messages captured
+          </div>
+          <div class="chat-export-actions">
+            <button class="btn btn-primary" id="exportChatBtn">Export Chat (CSV)</button>
+            <button class="btn btn-secondary" id="clearChatHistoryBtn">Clear History</button>
           </div>
         </div>
       </section>
@@ -515,9 +620,9 @@
 
     <!-- Footer -->
     <footer class="footer">
-      <button class="btn btn-link" id="settingsBtn">Settings</button>
+      <button class="btn btn-link" id="settingsBtn" title="Open extension settings" aria-label="Settings">Settings</button>
       <a href="https://github.com/JakeLiuMe/buzzchat/issues" target="_blank" rel="noopener" class="support-link">Report Issue</a>
-      <span class="version">v1.2.0</span>
+      <span class="version">v1.3.0</span>
     </footer>
   </div>
 
@@ -538,8 +643,8 @@
         </div>
         <div class="form-group">
           <label for="chatSelector">Chat Input Selector (Advanced)</label>
-          <input type="text" id="chatSelector" placeholder="Auto-detect">
-          <small class="help-text">Leave blank for auto-detection</small>
+          <input type="text" id="chatSelector" placeholder="Auto-detect" aria-describedby="chatSelector-help" title="Custom CSS selector for chat input field">
+          <small id="chatSelector-help" class="help-text">Leave blank for auto-detection</small>
         </div>
         <div class="form-group">
           <label class="toggle-label">
@@ -558,16 +663,16 @@
         <div class="form-group watermark-setting">
           <label class="toggle-label">
             <span>Powered by BuzzChat</span>
-            <input type="checkbox" id="watermarkToggle" aria-label="Add BuzzChat watermark to messages" role="switch">
+            <input type="checkbox" id="watermarkToggle" aria-label="Add BuzzChat watermark to messages" role="switch" title="Adds '- BuzzChat' to the end of your messages">
             <span class="toggle-slider"></span>
           </label>
-          <small class="help-text watermark-bonus">Enable for +5 bonus messages per show!</small>
+          <small id="watermark-help" class="help-text watermark-bonus">Add "- BuzzChat" to your messages to help spread the word</small>
         </div>
         <div class="form-group">
           <h4>Export / Import</h4>
           <div class="form-row">
-            <button class="btn btn-secondary" id="exportSettingsBtn">Export All</button>
-            <button class="btn btn-secondary" id="importSettingsBtn">Import</button>
+            <button class="btn btn-secondary" id="exportSettingsBtn" title="Download all settings as JSON file">Export All</button>
+            <button class="btn btn-secondary" id="importSettingsBtn" title="Restore settings from JSON file">Import</button>
           </div>
           <input type="file" id="importFile" accept=".json" style="display: none;">
         </div>
@@ -590,6 +695,68 @@
           <button class="btn btn-secondary btn-sm" id="addQuickReplyBtn">+ Add Button</button>
         </div>
 
+        <!-- Quick Reply Hotkeys -->
+        <hr class="section-divider">
+        <div class="hotkey-settings">
+          <h4>Quick Reply Hotkeys</h4>
+          <p class="help-text">Use Ctrl+1 through Ctrl+9 to instantly send messages while on a live stream.</p>
+          <div class="hotkey-list" id="hotkeyList">
+            <!-- Hotkey slots rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Keyword Alerts -->
+        <hr class="section-divider">
+        <div class="keyword-alerts-settings">
+          <h4>Keyword Mention Alerts</h4>
+          <p class="help-text">Get notified when specific words appear in chat.</p>
+          <div class="form-group">
+            <label class="toggle-label">
+              <span>Enable Keyword Alerts</span>
+              <input type="checkbox" id="keywordAlertsToggle" aria-label="Enable keyword alerts" role="switch">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label for="keywordAlertsList">Keywords (comma-separated)</label>
+            <input type="text" id="keywordAlertsList" placeholder="shipping, returns, discount">
+            <small class="help-text">You'll be alerted when these words appear in chat</small>
+          </div>
+          <div class="form-group">
+            <label class="toggle-label">
+              <span>Sound Notification</span>
+              <input type="checkbox" id="keywordAlertsSoundToggle" checked aria-label="Enable sound for keyword alerts" role="switch">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Bid Alerts -->
+        <hr class="section-divider">
+        <div class="bid-alerts-settings">
+          <h4>Bid Alerts</h4>
+          <p class="help-text">Get notified when viewers place bids (detects $XX, "bid $XX", etc.)</p>
+          <div class="form-group">
+            <label class="toggle-label">
+              <span>Enable Bid Alerts</span>
+              <input type="checkbox" id="bidAlertsToggle" aria-label="Enable bid alerts" role="switch">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label for="bidAlertsMinAmount">Minimum Bid Amount ($)</label>
+            <input type="number" id="bidAlertsMinAmount" value="0" min="0" max="10000" step="1">
+            <small class="help-text">Only alert for bids at or above this amount</small>
+          </div>
+          <div class="form-group">
+            <label class="toggle-label">
+              <span>Sound Notification</span>
+              <input type="checkbox" id="bidAlertsSoundToggle" checked aria-label="Enable sound for bid alerts" role="switch">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
         <!-- Quick Reply Button Template -->
         <template id="quickReplyTemplate">
           <div class="quick-reply-edit-item">
@@ -598,6 +765,14 @@
               <input type="text" class="quick-reply-text-input" placeholder="Message text" maxlength="100" aria-label="Button text">
               <button class="btn btn-danger btn-icon remove-quick-reply-btn" aria-label="Remove button">&times;</button>
             </div>
+          </div>
+        </template>
+
+        <!-- Hotkey Slot Template -->
+        <template id="hotkeySlotTemplate">
+          <div class="hotkey-slot">
+            <span class="hotkey-label">Ctrl+X</span>
+            <input type="text" class="hotkey-message" placeholder="Enter message..." maxlength="200">
           </div>
         </template>
 
@@ -713,9 +888,9 @@
 
   <!-- Upgrade Modal -->
   <div class="modal" id="upgradeModal">
-    <div class="modal-content">
+    <div class="modal-content modal-content-wide">
       <div class="modal-header">
-        <h2>Upgrade to Pro</h2>
+        <h2>Choose Your Plan</h2>
         <button class="modal-close" id="closeUpgradeBtn" aria-label="Close modal">&times;</button>
       </div>
       <div class="modal-body">
@@ -738,37 +913,125 @@
           <span class="billing-option" data-billing="annual">Annual <span class="save-badge">Save 38%</span></span>
         </div>
 
-        <div class="pricing-card">
-          <h3>Pro Plan</h3>
-          <div class="price" id="proPrice">$7.99<span>/month</span></div>
-          <div class="price-annual" id="proPriceAnnual" style="display: none;">$59<span>/year</span></div>
-          <p class="price-note" id="proPriceNote" style="display: none;">$4.92/month billed annually</p>
-          <ul class="features-list">
-            <li><strong>Unlimited messages per show</strong></li>
-            <li><strong>Unlimited FAQ rules</strong></li>
-            <li>Full analytics history (90 days)</li>
-            <li>Export analytics to CSV</li>
-            <li>Priority support</li>
-            <li>Early access to new features</li>
-          </ul>
-          <button class="btn btn-primary btn-lg" id="subscribePro">Subscribe to Pro</button>
+        <!-- 3-Tier Pricing Grid -->
+        <div class="pricing-grid">
+          <!-- FREE - shown first for comparison -->
+          <div class="pricing-card current-plan" id="freePlanCard">
+            <div class="tier-badge current">Current Plan</div>
+            <h3>Free</h3>
+            <div class="price">$0<span>/forever</span></div>
+            <ul class="features-list">
+              <li>3 FAQ auto-reply rules</li>
+              <li>5 custom commands</li>
+              <li>Basic giveaway picker</li>
+              <li>Welcome messages</li>
+              <li>Timer messages</li>
+              <li class="feature-limited">No analytics</li>
+            </ul>
+            <button class="btn btn-secondary btn-lg" disabled>Your Plan</button>
+          </div>
+
+          <!-- PRO - Most Popular -->
+          <div class="pricing-card recommended">
+            <div class="tier-badge popular">Most Popular</div>
+            <h3>Pro</h3>
+            <div class="price" id="proPrice">$7.99<span>/month</span></div>
+            <div class="price-annual" id="proPriceAnnual" style="display: none;">$59<span>/year</span></div>
+            <p class="price-note" id="proPriceNote" style="display: none;">$4.92/month billed annually</p>
+            <ul class="features-list">
+              <li><strong>20 FAQ rules</strong></li>
+              <li><strong>50 custom commands</strong></li>
+              <li><strong>Animated wheel</strong></li>
+              <li><strong>Full analytics</strong></li>
+              <li>30-day history</li>
+              <li>CSV export</li>
+            </ul>
+            <button class="btn btn-primary btn-lg" id="subscribePro">Start Free Trial</button>
+          </div>
+
+          <!-- BUSINESS - Best Value -->
+          <div class="pricing-card featured">
+            <div class="tier-badge value">Best Value</div>
+            <h3>Business</h3>
+            <div class="price" id="businessPrice">$19.99<span>/month</span></div>
+            <div class="price-annual" id="businessPriceAnnual" style="display: none;">$149<span>/year</span></div>
+            <p class="price-note" id="businessPriceNote" style="display: none;">$12.42/month billed annually</p>
+            <ul class="features-list">
+              <li>Everything in Pro, plus:</li>
+              <li><strong>Multi-account</strong> (10 configs)</li>
+              <li><strong>API access</strong></li>
+              <li><strong>MCP integration</strong></li>
+              <li><strong>90-day analytics</strong></li>
+              <li><strong>Priority support</strong></li>
+            </ul>
+            <button class="btn btn-primary btn-lg" id="subscribeBusiness">Start Free Trial</button>
+          </div>
         </div>
-        <div class="pricing-card featured">
-          <div class="featured-badge">Best Value</div>
-          <h3>Business Plan</h3>
-          <div class="price" id="businessPrice">$19.99<span>/month</span></div>
-          <div class="price-annual" id="businessPriceAnnual" style="display: none;">$149<span>/year</span></div>
-          <p class="price-note" id="businessPriceNote" style="display: none;">$12.42/month billed annually</p>
-          <ul class="features-list">
-            <li>Everything in Pro</li>
-            <li>Giveaway management tools</li>
-            <li>Advanced analytics dashboard</li>
-            <li><strong>Multi-account support</strong></li>
-            <li>Priority support</li>
-            <li><strong>API access (MCP + REST)</strong></li>
-          </ul>
-          <button class="btn btn-primary btn-lg" id="subscribeBusiness">Subscribe to Business</button>
-        </div>
+
+        <!-- Feature Comparison Table -->
+        <details class="feature-comparison">
+          <summary>Compare all features</summary>
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Free</th>
+                <th>Pro</th>
+                <th>Business</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>FAQ Rules</td>
+                <td>3</td>
+                <td>20</td>
+                <td>20</td>
+              </tr>
+              <tr>
+                <td>Custom Commands</td>
+                <td>5</td>
+                <td>50</td>
+                <td>50</td>
+              </tr>
+              <tr>
+                <td>Giveaway Wheel</td>
+                <td>Basic</td>
+                <td>Animated</td>
+                <td>Animated</td>
+              </tr>
+              <tr>
+                <td>Analytics</td>
+                <td class="feature-no">-</td>
+                <td>30 days</td>
+                <td>90 days</td>
+              </tr>
+              <tr>
+                <td>CSV Export</td>
+                <td class="feature-no">-</td>
+                <td class="feature-yes">Yes</td>
+                <td class="feature-yes">Yes</td>
+              </tr>
+              <tr>
+                <td>Multi-Account</td>
+                <td class="feature-no">-</td>
+                <td class="feature-no">-</td>
+                <td>10 configs</td>
+              </tr>
+              <tr>
+                <td>API / MCP Access</td>
+                <td class="feature-no">-</td>
+                <td class="feature-no">-</td>
+                <td class="feature-yes">Yes</td>
+              </tr>
+              <tr>
+                <td>Support</td>
+                <td>Community</td>
+                <td>Email</td>
+                <td>Priority 24hr</td>
+              </tr>
+            </tbody>
+          </table>
+        </details>
       </div>
     </div>
   </div>
@@ -852,9 +1115,22 @@
           </ul>
         </div>
 
+        <div class="onboarding-section privacy">
+          <h3>Privacy & Data Collection</h3>
+          <p>To improve our service, we collect:</p>
+          <ul>
+            <li>Anonymous usage analytics (message counts, feature usage)</li>
+            <li>Your settings (stored locally in your browser)</li>
+            <li>Payment information for Pro/Business (via ExtensionPay)</li>
+          </ul>
+          <p style="margin-top: 8px; font-size: 12px;">
+            <a href="https://buzzchat.app/privacy" target="_blank" rel="noopener noreferrer" style="color: var(--primary);">Read our full Privacy Policy</a>
+          </p>
+        </div>
+
         <label class="checkbox-accept">
           <input type="checkbox" id="acceptTerms">
-          <span>I understand and accept responsibility for using this extension</span>
+          <span>I accept the terms of use and <a href="https://buzzchat.app/privacy" target="_blank" rel="noopener noreferrer" style="color: var(--primary);">Privacy Policy</a></span>
         </label>
       </div>
 

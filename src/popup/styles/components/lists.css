@@ -1,0 +1,270 @@
+/* BuzzChat - List Styles */
+/* Timer, FAQ, template, and command items */
+
+/* List Container */
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Timer Message Item */
+.timer-message-item {
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+
+.timer-message-item .form-group {
+  margin-bottom: var(--space-sm);
+}
+
+.timer-message-item .form-group:last-of-type {
+  margin-bottom: 0;
+}
+
+.timer-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.timer-interval-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* FAQ Item */
+.faq-item {
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+
+.faq-item .form-group {
+  margin-bottom: var(--space-sm);
+}
+
+.faq-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-sm);
+}
+
+/* Template Item */
+.template-item {
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+
+.template-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.template-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+
+/* Command Item */
+.command-item {
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+
+.command-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.command-trigger-input {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.command-trigger-input::before {
+  content: '!';
+  padding: var(--space-sm);
+  background: var(--gray-200);
+  border: 1px solid var(--border-color);
+  border-right: none;
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.command-trigger-input .form-input {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.command-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-sm);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.command-usage-count {
+  color: var(--text-muted);
+}
+
+/* Quick Reply Edit Item */
+.quick-reply-edit-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+}
+
+.quick-reply-emoji-input {
+  width: 40px;
+  text-align: center;
+}
+
+.quick-reply-text-input {
+  flex: 1;
+}
+
+/* Account Item */
+.account-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.account-item.active {
+  border: 2px solid var(--primary);
+}
+
+.account-item-info {
+  flex: 1;
+}
+
+.account-item-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.account-item-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.account-item-badge {
+  padding: 2px 8px;
+  background: var(--primary);
+  color: white;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: var(--radius-full);
+  margin-right: var(--space-sm);
+}
+
+.account-item-actions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+/* API Key Item */
+.api-key-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.api-key-info {
+  flex: 1;
+}
+
+.api-key-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.api-key-preview {
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.api-key-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.api-key-actions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+/* Entry Item (giveaway) */
+.entry-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-xs);
+}
+
+.entry-username {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.entry-time {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Trigger Item (analytics) */
+.trigger-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-xs);
+}
+
+.trigger-keyword {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.trigger-count {
+  font-size: 12px;
+  color: var(--text-muted);
+}

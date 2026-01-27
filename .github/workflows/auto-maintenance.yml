@@ -1,0 +1,167 @@
+# Automatic Maintenance Workflow
+# Keeps the repository healthy without manual intervention
+#
+# Features:
+# - Weekly dependency updates
+# - Stale issue/PR management
+# - Security vulnerability fixes
+# - Automated releases
+
+name: Auto Maintenance
+
+on:
+  schedule:
+    # Run weekly on Sunday at midnight
+    - cron: '0 0 * * 0'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  # Update dependencies weekly
+  update-dependencies:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Update dependencies
+        run: |
+          npm update
+          npm audit fix || true
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet package-lock.json; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run tests
+        if: steps.changes.outputs.has_changes == 'true'
+        run: SKIP_NETWORK_TESTS=true npm test
+
+      - name: Create PR for updates
+        if: steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "BuzzChat Bot"
+          git config user.email "bot@buzzchat.app"
+
+          BRANCH="auto/deps-$(date +%Y%m%d)"
+          git checkout -b $BRANCH
+          git add package.json package-lock.json
+          git commit -m "chore: update dependencies $(date +%Y-%m-%d)
+
+          Automated dependency update.
+
+          Co-Authored-By: BuzzChat Bot <bot@buzzchat.app>"
+          git push -u origin $BRANCH
+
+          gh pr create \
+            --title "chore: Weekly dependency update" \
+            --body "## Automated Dependency Update
+
+          This PR updates npm dependencies to their latest compatible versions.
+
+          - All tests passing
+          - No breaking changes expected
+
+          ---
+          *This PR was generated automatically.*" \
+            --label "dependencies,auto-maintenance"
+
+  # Close stale issues and PRs
+  stale-management:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+          # Issues
+          stale-issue-message: |
+            This issue has been automatically marked as stale because it has not had recent activity.
+            It will be closed in 14 days if no further activity occurs.
+            If this issue is still relevant, please comment or add the "keep-open" label.
+          stale-issue-label: 'stale'
+          days-before-issue-stale: 60
+          days-before-issue-close: 14
+          exempt-issue-labels: 'keep-open,bug,security'
+
+          # PRs
+          stale-pr-message: |
+            This PR has been automatically marked as stale because it has not had recent activity.
+            It will be closed in 7 days if no further activity occurs.
+          stale-pr-label: 'stale'
+          days-before-pr-stale: 30
+          days-before-pr-close: 7
+          exempt-pr-labels: 'keep-open,auto-fix'
+
+  # Check for security vulnerabilities
+  security-audit:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run security audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Check for critical vulnerabilities
+        id: audit
+        run: |
+          CRITICAL=$(npm audit --json 2>/dev/null | jq '.metadata.vulnerabilities.critical // 0')
+          HIGH=$(npm audit --json 2>/dev/null | jq '.metadata.vulnerabilities.high // 0')
+          echo "critical=$CRITICAL" >> $GITHUB_OUTPUT
+          echo "high=$HIGH" >> $GITHUB_OUTPUT
+
+      - name: Create security issue if needed
+        if: steps.audit.outputs.critical > 0 || steps.audit.outputs.high > 0
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if security issue already exists
+          EXISTING=$(gh issue list --label "security" --state open --json number --jq 'length')
+          if [ "$EXISTING" = "0" ]; then
+            gh issue create \
+              --title "Security: Vulnerabilities detected in dependencies" \
+              --body "## Security Alert
+
+          Automated security audit found vulnerabilities:
+          - **Critical:** ${{ steps.audit.outputs.critical }}
+          - **High:** ${{ steps.audit.outputs.high }}
+
+          Run \`npm audit\` for details.
+
+          ---
+          *This issue was created automatically.*" \
+              --label "security,bug"
+          fi

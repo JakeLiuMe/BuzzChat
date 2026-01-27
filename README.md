@@ -2,6 +2,8 @@
 
 A Chrome extension that automates chat interactions during live selling shows. Boost engagement with auto-welcome messages, timed promotions, and FAQ auto-replies.
 
+**Platform Support:** Chrome only (Manifest V3). Firefox is not currently supported.
+
 ## Features
 
 ### Free Tier
@@ -125,45 +127,174 @@ Alternatively, use an online SVG to PNG converter like https://svgtopng.com/
 ### Project Structure
 ```
 buzzchat/
-├── manifest.json          # Chrome extension manifest
+├── manifest.json              # Chrome extension manifest
+├── rollup.config.js           # Rollup bundler configuration
 ├── assets/
-│   └── icons/            # Extension icons
+│   └── icons/                 # Extension icons
 ├── src/
-│   ├── popup/            # Extension popup UI
+│   ├── popup/                 # Extension popup UI
 │   │   ├── popup.html
-│   │   ├── popup.css
-│   │   └── popup.js
-│   ├── scripts/          # Content scripts
-│   │   └── content.js    # Main chat automation logic
-│   ├── background/       # Service worker
+│   │   ├── popup-entry.js     # Main entry point
+│   │   ├── popup/             # Modular popup components
+│   │   │   ├── core/          # Config, state, storage, utils
+│   │   │   ├── ui/            # UI components (tabs, modals, toast)
+│   │   │   ├── features/      # Feature modules (timers, FAQ, giveaway)
+│   │   │   ├── business/      # Business tier features
+│   │   │   └── settings/      # Import/export
+│   │   └── styles/            # Modular CSS
+│   │       ├── main.css       # Entry point
+│   │       ├── variables.css  # CSS custom properties
+│   │       ├── components/    # Button, form, card, modal styles
+│   │       └── features/      # Feature-specific styles
+│   ├── scripts/               # Content scripts
+│   │   ├── content-entry.js   # Main entry point
+│   │   └── content/           # Modular content script components
+│   │       ├── config.js      # Configuration constants
+│   │       ├── state.js       # Global state management
+│   │       ├── messaging.js   # Message processing
+│   │       ├── features/      # Feature modules
+│   │       └── ui.js          # Status indicator, notifications
+│   ├── background/            # Service worker
 │   │   └── background.js
-│   └── styles/           # Injected styles
-│       └── content.css
+│   └── lib/                   # Shared libraries
+│       ├── analytics.js       # Analytics tracking
+│       ├── security.js        # Security utilities
+│       └── selectors.js       # Selector management
+├── tests/                     # Test suites
+│   ├── popup.test.js          # Popup UI tests
+│   ├── e2e.test.js            # End-to-end tests
+│   ├── stress.test.js         # Performance tests
+│   └── unit/                  # Unit tests
+├── dist/                      # Built output (generated)
 └── README.md
 ```
 
-### Building for Production
-1. Update version in `manifest.json`
-2. Generate production icons
-3. Zip the entire extension folder
-4. Submit to Chrome Web Store
+### Prerequisites
+
+```bash
+# Install dependencies
+npm install
+
+# Install Playwright browsers for testing
+npx playwright install chromium
+```
+
+### Building
+
+```bash
+# Development build (with source maps)
+npm run build:dev
+
+# Production build (minified)
+npm run build
+
+# Watch mode for development
+npm run build:watch
+```
 
 ### Testing
-1. Load the extension in developer mode
+
+```bash
+# Run all tests
+npm test
+
+# Run specific test suites
+npm run test:popup     # Popup UI tests (Playwright)
+npm run test:e2e       # End-to-end tests
+npm run test:stress    # Stress/performance tests
+npm run test:unit      # Unit tests
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run linter
+npm run lint
+
+# Auto-fix linting issues
+npm run lint:fix
+```
+
+### CI/CD
+
+This project uses GitHub Actions for continuous integration:
+- Tests run automatically on every push and pull request
+- Linting is enforced before tests
+- Test reports are uploaded as artifacts on failure
+
+### Building for Production
+1. Update version in `manifest.json`
+2. Run `npm run build` for production build
+3. Zip the `dist/` folder
+4. Submit to Chrome Web Store
+
+### Manual Testing
+1. Load the extension in developer mode from `dist/` folder
 2. Navigate to a live stream
 3. Open DevTools (F12) and check the Console for `[BuzzChat]` logs
 4. Test each feature individually
 
 ## Privacy
 
-- All settings are stored locally in Chrome storage
-- No data is sent to external servers
+- All settings are stored locally in Chrome sync storage
+- Analytics data is stored locally and never transmitted
 - Chat messages are processed in-browser only
-- See our Privacy Policy for more details
+- Payment processing is handled securely by ExtensionPay
+- See our full [Privacy Policy](docs/PRIVACY_POLICY.md) for details
+
+### Data Collection Disclosure
+BuzzChat collects:
+- Anonymous usage analytics (message counts, feature usage)
+- Your settings and preferences (stored locally)
+- Payment/subscription info (via ExtensionPay for Pro/Business users)
+
+BuzzChat does NOT collect:
+- Chat message content
+- Viewer usernames or information
+- Browsing history
+
+## Requirements
+
+- **Chrome 100+** (or Chromium-based browsers like Edge, Brave)
+- Manifest V3 compatible browser
+- JavaScript enabled
+
+## Automated Maintenance
+
+This product is designed to run forever with minimal maintenance. The following automation is in place:
+
+### AI-Powered Bug Fixes
+- Users report bugs using the structured issue template
+- **Maintainer** comments `/autofix` to trigger AI analysis
+- AI analyzes the issue and proposes a fix
+- Creates a **draft PR** that requires human review
+- All 220 tests must pass before PR is created
+
+**Safety Features:**
+- Only maintainers can trigger `/autofix` (not random users)
+- Never auto-merges - always requires human review
+- Rate limited to 10 attempts per day
+- AI instructed to reject suspicious requests
+- All PRs clearly labeled as AI-generated
+
+### Automatic Dependency Updates
+- Dependencies are updated weekly via Dependabot
+- Security vulnerabilities are flagged automatically
+- Patch updates can be auto-merged after tests pass
+
+### Stale Issue Management
+- Issues without activity for 60 days are marked stale
+- Stale issues are closed after 14 additional days
+- Add "keep-open" label to prevent auto-closure
+
+### Required Secrets (for maintainers)
+- `ANTHROPIC_API_KEY` - Claude API key for AI auto-fix (~$0.10 per attempt)
 
 ## Support
 
-- **GitHub Issues**: [Report an issue](https://github.com/JakeLiuMe/buzzchat/issues)
+- **GitHub Issues**: [Report a bug](../../issues/new?template=bug_report.yml)
+- **Feature Requests**: [Suggest a feature](../../issues/new?template=feature_request.yml)
+
+*Note: This product is in maintenance mode. Bug fixes are automated, but new features are not planned.*
 
 ## License
 

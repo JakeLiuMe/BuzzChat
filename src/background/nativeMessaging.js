@@ -276,7 +276,7 @@ function getDefaultSettings() {
   return {
     tier: 'free',
     messagesUsed: 0,
-    messagesLimit: 25,
+    messagesLimit: 50, // Free tier default
     referralBonus: 0,
     masterEnabled: false,
     welcome: {

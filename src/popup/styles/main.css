@@ -1,0 +1,272 @@
+/* BuzzChat - Main Stylesheet Entry Point */
+/* This file imports all modular CSS components */
+
+/* ===========================================
+   Core Styles
+   =========================================== */
+
+/* Variables - CSS Custom Properties */
+@import './variables.css';
+
+/* Base - Reset, Typography, Layout */
+@import './base.css';
+
+/* ===========================================
+   Component Styles
+   =========================================== */
+
+/* Buttons - All button variants */
+@import './components/buttons.css';
+
+/* Forms - Inputs, textareas, selects, toggles */
+@import './components/forms.css';
+
+/* Cards - Cards, pricing, stat cards, empty states */
+@import './components/cards.css';
+
+/* Modals - Modal overlays and content */
+@import './components/modals.css';
+
+/* Tabs - Tab navigation and panels */
+@import './components/tabs.css';
+
+/* Lists - Timer, FAQ, template, command, account items */
+@import './components/lists.css';
+
+/* ===========================================
+   Feature Styles
+   =========================================== */
+
+/* Giveaway - Wheel, confetti, winner display */
+@import './features/giveaway.css';
+
+/* Analytics - Charts, stats, impact summary */
+@import './features/analytics.css';
+
+/* Onboarding - 3-step wizard */
+@import './features/onboarding.css';
+
+/* Business - Account manager, API access */
+@import './features/business.css';
+
+/* Misc - Toast, help, commands, referral, billing */
+@import './features/misc.css';
+
+/* ===========================================
+   Theme Overrides
+   =========================================== */
+
+/* Dark Mode - All dark theme overrides */
+@import './dark-mode.css';
+
+/* ===========================================
+   Additional Animations & Effects
+   =========================================== */
+
+/* Fade In Animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.tab-panel.active {
+  animation: fadeIn 0.2s ease;
+}
+
+/* Status badge pulse when active */
+.status-badge.active .status-dot {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+}
+
+/* Modal entrance animation */
+.modal.active {
+  animation: modalFadeIn 0.2s ease;
+}
+
+.modal.active .modal-content {
+  animation: modalSlideIn 0.25s ease;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Toggle bounce effect */
+.toggle-label input:checked + .toggle-slider::after {
+  animation: toggleBounce 0.3s ease;
+}
+
+@keyframes toggleBounce {
+  0% { transform: translateX(0); }
+  60% { transform: translateX(22px); }
+  100% { transform: translateX(20px); }
+}
+
+/* Tab switch indicator animation */
+.tab-btn {
+  position: relative;
+}
+
+.tab-btn::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--primary);
+  transition: all 0.2s ease;
+  transform: translateX(-50%);
+}
+
+.tab-btn.active::after {
+  width: 100%;
+  left: 0;
+  transform: translateX(0);
+}
+
+.tab-btn.active {
+  border-bottom-color: transparent;
+}
+
+/* Hover lift effect for cards */
+.timer-message-item:hover,
+.faq-item:hover,
+.template-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  transition: all 0.2s ease;
+}
+
+/* Form focus glow */
+.form-group input:focus,
+.form-group textarea:focus {
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+
+/* ===========================================
+   Scrollbar Styles
+   =========================================== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--gray-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-400);
+}
+
+/* Scrollbar in dark mode */
+[data-theme="dark"]::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"]::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+[data-theme="dark"]::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* ===========================================
+   Pro/Disabled Feature States
+   =========================================== */
+.pro-feature {
+  position: relative;
+}
+
+.pro-feature::after {
+  content: 'PRO';
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  padding: 2px 6px;
+  background: var(--warning);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 3px;
+}
+
+.disabled-feature {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.disabled-feature::after {
+  content: 'Upgrade to Pro';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 8px 16px;
+  background: var(--primary);
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: var(--radius);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* ===========================================
+   Settings Icon Styles
+   =========================================== */
+#settingsBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#settingsBtn::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z'/%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z'/%3E%3C/svg%3E");
+  background-size: contain;
+}
+
+/* ===========================================
+   Dark Mode Toggle Styles
+   =========================================== */
+.dark-mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.dark-mode-toggle .toggle-icon {
+  font-size: 16px;
+}

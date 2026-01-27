@@ -280,6 +280,129 @@ const Analytics = {
     });
 
     await this.save(data);
+  },
+
+  // Milestone definitions - triggers celebration when reached
+  MILESTONES: {
+    messages_1000: { type: 'messages', value: 1000, title: '1,000 Messages!', message: 'You\'ve sent 1,000 automated messages!' },
+    messages_5000: { type: 'messages', value: 5000, title: '5,000 Messages!', message: 'Incredible! 5,000 messages sent!' },
+    messages_10000: { type: 'messages', value: 10000, title: '10,000 Messages!', message: 'You\'re a chat automation master!' },
+    welcomes_100: { type: 'welcomes', value: 100, title: '100 Viewers Welcomed!', message: 'You\'ve greeted 100 viewers!' },
+    welcomes_500: { type: 'welcomes', value: 500, title: '500 Viewers Welcomed!', message: 'Amazing! 500 viewers welcomed!' },
+    welcomes_1000: { type: 'welcomes', value: 1000, title: '1,000 Viewers!', message: 'You\'re a community builder!' },
+    faq_100: { type: 'faq', value: 100, title: '100 Questions Answered!', message: 'Your bot has helped 100 viewers!' }
+  },
+
+  // Check if any milestones have been reached and return new ones
+  async checkMilestones() {
+    const data = await this.load();
+    const celebratedKey = 'whatnotBotCelebratedMilestones';
+
+    // Get already celebrated milestones from storage
+    const result = await new Promise(resolve => {
+      browserAPI.storage.local.get([celebratedKey], resolve);
+    });
+    const celebrated = result[celebratedKey] || [];
+
+    const newMilestones = [];
+
+    // Check each milestone
+    for (const [id, milestone] of Object.entries(this.MILESTONES)) {
+      if (celebrated.includes(id)) continue;
+
+      let currentValue = 0;
+      switch (milestone.type) {
+        case 'messages':
+          currentValue = data.totalMessagesSent || 0;
+          break;
+        case 'welcomes':
+          currentValue = data.welcomeMessagesSent || 0;
+          break;
+        case 'faq':
+          currentValue = data.faqRepliesSent || 0;
+          break;
+      }
+
+      if (currentValue >= milestone.value) {
+        newMilestones.push({ id, ...milestone });
+        celebrated.push(id);
+      }
+    }
+
+    // Save newly celebrated milestones
+    if (newMilestones.length > 0) {
+      await new Promise(resolve => {
+        browserAPI.storage.local.set({ [celebratedKey]: celebrated }, resolve);
+      });
+    }
+
+    return newMilestones;
+  },
+
+  // Get emotionally rewarding impact summary for VIP users
+  async getImpactSummary() {
+    const data = await this.load();
+    const today = new Date();
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
+
+    // Calculate this month's stats
+    let monthlyWelcomes = 0;
+    let monthlyTotal = 0;
+    let monthlyFaqs = 0;
+
+    // Calculate last month's stats for comparison
+    let lastMonthTotal = 0;
+
+    Object.entries(data.dailyStats).forEach(([dateStr, stats]) => {
+      const date = new Date(dateStr);
+      if (date >= monthStart) {
+        monthlyWelcomes += stats.welcomes || 0;
+        monthlyTotal += stats.messages || 0;
+        monthlyFaqs += stats.faqs || 0;
+      } else if (date >= lastMonthStart && date <= lastMonthEnd) {
+        lastMonthTotal += stats.messages || 0;
+      }
+    });
+
+    // Estimate time saved (avg 5 seconds per manual message typing)
+    const totalSeconds = data.totalMessagesSent * 5;
+    const hoursSaved = totalSeconds / 3600;
+
+    // Calculate growth percentage
+    const growthPercent = lastMonthTotal > 0
+      ? Math.round(((monthlyTotal - lastMonthTotal) / lastMonthTotal) * 100)
+      : 0;
+
+    // Estimate viewers engaged (welcomes = unique viewers greeted)
+    const viewersEngaged = data.welcomeMessagesSent;
+
+    // Questions answered automatically
+    const questionsAnswered = data.faqRepliesSent;
+
+    return {
+      // This month
+      monthlyWelcomes,
+      monthlyTotal,
+      monthlyFaqs,
+
+      // All time
+      totalMessages: data.totalMessagesSent,
+      viewersEngaged,
+      questionsAnswered,
+
+      // Time savings
+      hoursSaved: hoursSaved >= 1 ? hoursSaved.toFixed(1) : (totalSeconds / 60).toFixed(0),
+      hoursSavedUnit: hoursSaved >= 1 ? 'hours' : 'minutes',
+
+      // Growth
+      growthPercent,
+      isGrowing: growthPercent > 0,
+
+      // Sessions
+      sessionsCount: data.sessionsCount
+    };
   }
 };
 

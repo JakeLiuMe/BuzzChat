@@ -182,25 +182,19 @@ const ApiKeyManager = {
     const keyHash = await this.hashKey(key);
 
     // Find the key by comparing hashes (constant-time comparison)
+    // SECURITY: Only hash-based comparison - no plaintext support
     for (const keyId in keys) {
       const storedHash = keys[keyId].keyHash;
 
-      // Support both old (plaintext) and new (hashed) format during migration
-      const isMatch = storedHash
-        ? this._constantTimeCompare(storedHash, keyHash)
-        : keys[keyId].key === key; // Legacy support
+      // Skip keys without hash (legacy keys that weren't migrated)
+      if (!storedHash) {
+        console.warn('[BuzzChat] Skipping key without hash - please recreate:', keyId);
+        continue;
+      }
 
-      if (isMatch) {
+      if (this._constantTimeCompare(storedHash, keyHash)) {
         // Update last used timestamp
         keys[keyId].lastUsed = Date.now();
-
-        // Migrate old plaintext keys to hashed format
-        if (!storedHash && keys[keyId].key) {
-          keys[keyId].keyHash = keyHash;
-          keys[keyId].keyPreview = this.maskKey(key);
-          delete keys[keyId].key; // Remove plaintext
-        }
-
         await this.saveKeys(keys);
 
         return {
@@ -289,6 +283,33 @@ const ApiKeyManager = {
         resolve();
       });
     });
+  },
+
+  // Clean up legacy plaintext keys (run on startup)
+  async cleanupLegacyKeys() {
+    const keys = await this.getKeys();
+    let cleaned = false;
+
+    for (const keyId in keys) {
+      // Remove any keys that still have plaintext stored
+      if (keys[keyId].key) {
+        console.warn('[BuzzChat] Removing legacy plaintext key:', keyId);
+        delete keys[keyId].key;
+        cleaned = true;
+      }
+      // Remove keys without hash (unusable)
+      if (!keys[keyId].keyHash) {
+        console.warn('[BuzzChat] Removing key without hash:', keyId);
+        delete keys[keyId];
+        cleaned = true;
+      }
+    }
+
+    if (cleaned) {
+      await this.saveKeys(keys);
+    }
+
+    return cleaned;
   },
 
   // Check if any API keys exist
