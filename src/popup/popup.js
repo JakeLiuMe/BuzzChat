@@ -1143,6 +1143,9 @@ function initUI() {
 
   // Initialize Business tier features (account selector & API access)
   initBusinessFeatures();
+
+  // Initialize help tooltips
+  initHelpTooltips();
 }
 
 // Apply dark mode to the document
@@ -1311,6 +1314,91 @@ async function updateAICreditsDisplay() {
     console.error('[BuzzChat] Failed to update credits display:', error);
     // Show section with defaults on error
     creditsSection.style.display = 'block';
+  }
+}
+
+// Initialize Quick Actions Bar
+function initQuickActions() {
+  const quickToggle = document.getElementById('quickToggle');
+  const quickTemplate = document.getElementById('quickTemplate');
+  const quickGiveaway = document.getElementById('quickGiveaway');
+
+  // Update quick toggle state based on master toggle
+  function updateQuickToggleState() {
+    if (!quickToggle) return;
+    const isActive = settings.masterEnabled;
+    quickToggle.classList.toggle('active', isActive);
+    quickToggle.querySelector('.quick-label').textContent = isActive ? 'Active' : 'Go Live';
+  }
+
+  // Quick toggle - syncs with master toggle
+  if (quickToggle) {
+    quickToggle.addEventListener('click', async () => {
+      settings.masterEnabled = !settings.masterEnabled;
+      elements.masterToggle.checked = settings.masterEnabled;
+      updateQuickToggleState();
+      updateStatusBadge();
+      await saveSettings();
+      Toast.success(settings.masterEnabled ? 'Bot activated' : 'Bot deactivated');
+    });
+    updateQuickToggleState();
+  }
+
+  // Quick template - opens messages tab for quick access
+  if (quickTemplate) {
+    quickTemplate.addEventListener('click', () => {
+      // Switch to messages tab
+      const messagesTab = document.querySelector('[data-tab="messages"]');
+      if (messagesTab) {
+        messagesTab.click();
+        // Focus on quick reply buttons section
+        const quickReplySection = document.getElementById('quickReplySection');
+        if (quickReplySection) {
+          quickReplySection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+      Toast.info('Set up your quick messages here');
+    });
+  }
+
+  // Quick giveaway - opens giveaway tab
+  if (quickGiveaway) {
+    quickGiveaway.addEventListener('click', () => {
+      // Switch to giveaway tab
+      const giveawayTab = document.querySelector('[data-tab="giveaway"]');
+      if (giveawayTab) {
+        giveawayTab.click();
+        Toast.info('Manage your giveaway here');
+      }
+    });
+  }
+
+  // Update quick toggle when master toggle changes
+  if (elements.masterToggle) {
+    elements.masterToggle.addEventListener('change', updateQuickToggleState);
+  }
+}
+
+// Initialize Help Tooltips
+function initHelpTooltips() {
+  const HELP_TOOLTIPS = {
+    '#masterToggle': 'Turn on when you start streaming',
+    '#welcomeDelay': 'Wait time before greeting new viewers',
+    '#faqToggle': 'Auto-reply when viewers ask questions',
+    '#giveawayToggle': 'Track entries for giveaways',
+    '#timerToggle': 'Send scheduled messages'
+  };
+
+  for (const [selector, text] of Object.entries(HELP_TOOLTIPS)) {
+    const el = document.querySelector(selector);
+    if (el) {
+      // Find the parent label or container
+      const container = el.closest('.toggle-label') || el.parentElement;
+      if (container) {
+        container.setAttribute('data-tooltip', text);
+        container.classList.add('has-tooltip');
+      }
+    }
   }
 }
 
@@ -1722,6 +1810,9 @@ function initEventListeners() {
       Loading.hide(elements.exportAnalyticsBtn);
     });
   }
+
+  // Quick Actions Bar
+  initQuickActions();
 
   // Close modals on backdrop click
   [elements.settingsModal, elements.upgradeModal].forEach(modal => {

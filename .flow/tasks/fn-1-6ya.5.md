@@ -184,8 +184,7 @@ export async function generateAIResponseWithCredits(options) {
 - [ ] TBD
 
 ## Done summary
-TBD
-
+- Task completed
 ## Evidence
 - Commits:
 - Tests:

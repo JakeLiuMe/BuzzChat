@@ -3825,3 +3825,239 @@ body {
 [data-theme="dark"] .credits-section.credits-critical {
   background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
 }
+
+/* Quick Actions Bar */
+.quick-actions {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.quick-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: var(--space-sm) var(--space-xs);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 11px;
+}
+
+.quick-btn:hover {
+  background: var(--gray-200);
+  transform: translateY(-1px);
+}
+
+.quick-btn.primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: white;
+}
+
+.quick-btn.primary:hover {
+  background: linear-gradient(135deg, var(--primary-hover) 0%, #5b21b6 100%);
+}
+
+.quick-btn.active {
+  background: var(--success);
+  color: white;
+}
+
+.quick-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.quick-label {
+  font-weight: 500;
+}
+
+/* Add padding to container for fixed quick actions */
+.container {
+  padding-bottom: 70px;
+}
+
+/* Onboarding Overlay */
+.onboarding-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+}
+
+.onboarding-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.onboarding-tooltip {
+  position: absolute;
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  max-width: 300px;
+  box-shadow: var(--shadow-lg), 0 0 0 4px var(--primary);
+  animation: onboarding-pop 0.3s ease;
+  z-index: 10001;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes onboarding-pop {
+  0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.onboarding-content h3 {
+  margin: 0 0 var(--space-sm);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.onboarding-content p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.onboarding-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-color);
+}
+
+.onboarding-progress {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-right: auto;
+}
+
+.onboarding-btn {
+  padding: var(--space-sm) var(--space-md);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.onboarding-btn.skip {
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.onboarding-btn.skip:hover {
+  color: var(--text-primary);
+}
+
+.onboarding-btn.primary {
+  background: var(--primary);
+  color: white;
+}
+
+.onboarding-btn.primary:hover {
+  background: var(--primary-hover);
+}
+
+/* Onboarding highlight for elements */
+.onboarding-highlight {
+  position: relative;
+  z-index: 10002;
+  box-shadow: 0 0 0 4px var(--primary), 0 0 20px rgba(124, 58, 237, 0.5);
+  animation: pulse-highlight 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+@keyframes pulse-highlight {
+  0%, 100% { box-shadow: 0 0 0 4px var(--primary), 0 0 20px rgba(124, 58, 237, 0.5); }
+  50% { box-shadow: 0 0 0 6px var(--primary), 0 0 30px rgba(124, 58, 237, 0.7); }
+}
+
+/* Help tooltips */
+.has-tooltip {
+  position: relative;
+  cursor: help;
+}
+
+.has-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 10px;
+  background: var(--gray-800);
+  color: white;
+  font-size: 11px;
+  font-weight: normal;
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+  margin-bottom: 4px;
+}
+
+.has-tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Dark mode for quick actions and onboarding */
+[data-theme="dark"] .quick-actions {
+  background: var(--bg-secondary);
+  border-top-color: var(--border-color);
+}
+
+[data-theme="dark"] .quick-btn {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .quick-btn:hover {
+  background: var(--gray-200);
+}
+
+[data-theme="dark"] .onboarding-tooltip {
+  background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .onboarding-content h3 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .onboarding-content p {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .has-tooltip::after {
+  background: var(--gray-700);
+}

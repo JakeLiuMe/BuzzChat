@@ -1275,6 +1275,38 @@
     </div>
   </div>
 
+  <!-- Quick Actions Bar (Always visible at bottom) -->
+  <div class="quick-actions" id="quickActionsBar">
+    <button id="quickToggle" class="quick-btn primary" title="Turn bot on/off">
+      <span class="quick-icon">&#x26A1;</span>
+      <span class="quick-label">Go Live</span>
+    </button>
+    <button id="quickTemplate" class="quick-btn" title="Send quick message">
+      <span class="quick-icon">&#x1F4AC;</span>
+      <span class="quick-label">Send</span>
+    </button>
+    <button id="quickGiveaway" class="quick-btn" title="Start/manage giveaway">
+      <span class="quick-icon">&#x1F381;</span>
+      <span class="quick-label">Giveaway</span>
+    </button>
+  </div>
+
+  <!-- Onboarding Overlay (First-time users) -->
+  <div class="onboarding-overlay" id="onboardingOverlay" style="display: none;" role="dialog" aria-modal="true">
+    <div class="onboarding-backdrop"></div>
+    <div class="onboarding-tooltip" id="onboardingTooltip">
+      <div class="onboarding-content">
+        <h3 id="onboardingTitle">Welcome to BuzzChat!</h3>
+        <p id="onboardingMessage">Automate your live selling chat in seconds.</p>
+      </div>
+      <div class="onboarding-actions">
+        <span class="onboarding-progress" id="onboardingProgress">1 / 5</span>
+        <button class="onboarding-btn skip" id="onboardingSkip">Skip</button>
+        <button class="onboarding-btn primary" id="onboardingNext">Next</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Spinning Wheel Overlay -->
   <div class="wheel-overlay" id="wheelOverlay" role="dialog" aria-labelledby="wheelStatus" aria-modal="true">
     <div class="wheel-container">
