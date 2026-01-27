@@ -123,9 +123,26 @@ export function getSelectors(platformId) {
 - [ ] TBD
 
 ## Done summary
-TBD
+## What changed
+- Extended SelectorManager with PLATFORM_SELECTORS containing platform-specific CSS selectors for Whatnot, YouTube, eBay, Twitch, and Kick
+- Added setPlatform(), getSelectorsForPlatform(), getSelectorsSync() methods to SelectorManager
+- Updated getSelectors() to be platform-aware with automatic fallback to default selectors
+- Updated init.js to pass detected platform ID to SelectorManager.setPlatform()
 
+## Why
+- Each platform has different DOM structure for chat UI elements
+- YouTube uses web components (yt-live-chat-*), Twitch uses data-a-target attributes, etc.
+- Platform-specific selectors improve reliability and reduce fallback attempts
+- Backward compatible - unknown platforms fall back to generic selectors
+
+## Verification
+- `npm run test:unit` - 132/132 passed (16 new selector tests)
+- `npm test` - 258/265 passed (1 network test failed - expected)
+- `npm run lint` - 8 errors (pre-existing, unchanged)
+
+## Follow-ups
+- Task fn-1-6ya.3: Add self-healing remote selector updates
 ## Evidence
-- Commits:
-- Tests:
+- Commits: 41f330f1e296e9414394745504a043e00b1b64a5
+- Tests: npm test, npm run test:unit
 - PRs:

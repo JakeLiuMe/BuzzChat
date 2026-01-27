@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 BuzzChat. All rights reserved.
 // Unauthorized copying, modification, or distribution is strictly prohibited.
 // Allows updating selectors without releasing a new extension version
+// Supports multiple platforms: Whatnot, YouTube, eBay, Twitch, Kick
 
 // Browser API compatibility - works on both Chrome and Firefox
 const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
@@ -9,6 +10,9 @@ const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
 const SelectorManager = {
   // SECURITY: Verification marker to confirm this is the legitimate extension module
   __BUZZCHAT_VERIFIED: true,
+
+  // Current platform (set by init)
+  currentPlatform: null,
 
   // Configuration - Remote selector updates disabled for initial release
   // To enable: Create a GitHub Gist with selectors.json and set the raw URL below
@@ -18,10 +22,234 @@ const SelectorManager = {
   // Cache duration (24 hours)
   CACHE_DURATION_MS: 24 * 60 * 60 * 1000,
 
-  // Default bundled selectors (fallback)
+  // Platform-specific selectors
+  PLATFORM_SELECTORS: {
+    // Whatnot - Primary platform
+    whatnot: {
+      chatInput: [
+        'textarea[placeholder*="chat"]',
+        'textarea[placeholder*="message"]',
+        'textarea[placeholder*="Send"]',
+        '[data-testid="chat-input"]',
+        '.chat-input textarea',
+        '[class*="ChatInput"] textarea'
+      ],
+      chatContainer: [
+        '[data-testid="chat-messages"]',
+        '[data-testid="chat-container"]',
+        '.chat-messages',
+        '[class*="ChatMessages"]',
+        '[class*="ChatContainer"]',
+        '[class*="LiveChat"]'
+      ],
+      sendButton: [
+        'button[type="submit"]',
+        '[data-testid="send-button"]',
+        '.chat-send-button',
+        '[class*="SendButton"]',
+        'button[aria-label*="send"]'
+      ],
+      messageItem: [
+        '[data-testid="chat-message"]',
+        '.chat-message',
+        '[class*="ChatMessage"]',
+        '[class*="message-item"]'
+      ],
+      username: [
+        '[data-testid="username"]',
+        '.username',
+        '[class*="Username"]',
+        '[class*="user-name"]',
+        'span[class*="name"]'
+      ],
+      messageText: [
+        '[data-testid="message-text"]',
+        '.message-text',
+        '[class*="MessageText"]',
+        '[class*="message-content"]'
+      ],
+      liveIndicator: [
+        '[data-testid="live-indicator"]',
+        '.live-badge',
+        '[class*="LiveBadge"]',
+        '[class*="live-indicator"]'
+      ]
+    },
+
+    // YouTube Live
+    youtube: {
+      chatInput: [
+        '#input[contenteditable="true"]',
+        'yt-live-chat-text-input-field-renderer #input',
+        '[id="input"][contenteditable="true"]',
+        'div[contenteditable="true"][aria-label*="chat"]'
+      ],
+      chatContainer: [
+        'yt-live-chat-item-list-renderer #items',
+        '#chat-messages',
+        'yt-live-chat-renderer #items',
+        '[id="items"]'
+      ],
+      sendButton: [
+        '#send-button button',
+        'yt-live-chat-text-input-field-renderer #send-button',
+        'button[aria-label*="Send"]',
+        '#button[aria-label*="send"]'
+      ],
+      messageItem: [
+        'yt-live-chat-text-message-renderer',
+        'yt-live-chat-paid-message-renderer',
+        '[class*="yt-live-chat"][class*="message"]'
+      ],
+      username: [
+        '#author-name',
+        'yt-live-chat-author-chip #author-name',
+        '[id="author-name"]',
+        'span[class*="author"]'
+      ],
+      messageText: [
+        '#message',
+        'yt-live-chat-text-message-renderer #message',
+        '[id="message"]'
+      ],
+      liveIndicator: [
+        '.ytp-live-badge',
+        '[class*="live-badge"]',
+        'span[class*="live"]'
+      ]
+    },
+
+    // eBay Live
+    ebay: {
+      chatInput: [
+        'textarea[placeholder*="comment"]',
+        'textarea[placeholder*="message"]',
+        'input[placeholder*="comment"]',
+        '[class*="comment-input"]',
+        '[class*="chat-input"]'
+      ],
+      chatContainer: [
+        '[class*="chat-container"]',
+        '[class*="comments-list"]',
+        '[class*="live-comments"]',
+        '[class*="ChatContainer"]'
+      ],
+      sendButton: [
+        'button[type="submit"]',
+        '[class*="send-button"]',
+        '[class*="submit-comment"]',
+        'button[aria-label*="send"]'
+      ],
+      messageItem: [
+        '[class*="comment-item"]',
+        '[class*="chat-message"]',
+        '[class*="live-comment"]'
+      ],
+      username: [
+        '[class*="username"]',
+        '[class*="commenter-name"]',
+        '[class*="author"]'
+      ],
+      messageText: [
+        '[class*="comment-text"]',
+        '[class*="message-content"]',
+        '[class*="comment-body"]'
+      ],
+      liveIndicator: [
+        '[class*="live-badge"]',
+        '[class*="live-indicator"]',
+        'span[class*="LIVE"]'
+      ]
+    },
+
+    // Twitch
+    twitch: {
+      chatInput: [
+        'textarea[data-a-target="chat-input"]',
+        '[data-test-selector="chat-input"]',
+        '.chat-input textarea',
+        '[class*="chat-input"] textarea'
+      ],
+      chatContainer: [
+        '[data-test-selector="chat-scrollable-area__message-container"]',
+        '.chat-scrollable-area__message-container',
+        '[class*="chat-list"]',
+        '[class*="ChatList"]'
+      ],
+      sendButton: [
+        'button[data-a-target="chat-send-button"]',
+        '[data-test-selector="chat-send-button"]',
+        'button[aria-label="Send message"]'
+      ],
+      messageItem: [
+        '[data-a-target="chat-line-message"]',
+        '.chat-line__message',
+        '[class*="chat-line"]'
+      ],
+      username: [
+        '[data-a-target="chat-message-username"]',
+        '.chat-author__display-name',
+        '[class*="chat-author"]',
+        '[class*="username"]'
+      ],
+      messageText: [
+        '[data-a-target="chat-message-text"]',
+        '.text-fragment',
+        '[class*="message-text"]'
+      ],
+      liveIndicator: [
+        '[data-a-target="player-state-button"]',
+        '.live-indicator',
+        '[class*="live-indicator"]'
+      ]
+    },
+
+    // Kick
+    kick: {
+      chatInput: [
+        'textarea[placeholder*="Send"]',
+        'textarea[placeholder*="message"]',
+        '[class*="chat-input"] textarea',
+        'div[contenteditable="true"]'
+      ],
+      chatContainer: [
+        '[class*="chat-messages"]',
+        '[class*="chat-container"]',
+        '[class*="ChatMessages"]',
+        '[id="chatroom"]'
+      ],
+      sendButton: [
+        'button[type="submit"]',
+        '[class*="send-button"]',
+        'button[aria-label*="Send"]'
+      ],
+      messageItem: [
+        '[class*="chat-message"]',
+        '[class*="ChatMessage"]',
+        '[class*="message-item"]'
+      ],
+      username: [
+        '[class*="chat-username"]',
+        '[class*="username"]',
+        '[class*="author"]'
+      ],
+      messageText: [
+        '[class*="chat-text"]',
+        '[class*="message-text"]',
+        '[class*="message-content"]'
+      ],
+      liveIndicator: [
+        '[class*="live-badge"]',
+        '[class*="live-indicator"]',
+        '[class*="LIVE"]'
+      ]
+    }
+  },
+
+  // Default/fallback selectors (generic patterns that work across platforms)
   DEFAULT_SELECTORS: {
-    version: '1.0.0',
-    lastUpdated: '2026-01-22T00:00:00Z',
+    version: '2.0.0',
+    lastUpdated: '2026-01-27T00:00:00Z',
     selectors: {
       chatInput: [
         'textarea[placeholder*="chat"]',
@@ -35,7 +263,8 @@ const SelectorManager = {
         '[class*="ChatInput"] textarea',
         '[class*="ChatInput"] input',
         '[class*="chat-input"] textarea',
-        '[class*="chat-input"] input'
+        '[class*="chat-input"] input',
+        'div[contenteditable="true"]'
       ],
       chatContainer: [
         '[data-testid="chat-messages"]',
@@ -88,21 +317,64 @@ const SelectorManager = {
         '.live-badge',
         '[class*="LiveBadge"]',
         '[class*="live-indicator"]',
-        '[class*="live-tag"]',
-        'span:contains("LIVE")'
+        '[class*="live-tag"]'
       ]
     }
   },
 
-  // Get selectors (from cache or fetch new)
-  async getSelectors() {
+  // Set the current platform
+  setPlatform(platformId) {
+    this.currentPlatform = platformId;
+    console.log('[BuzzChat] SelectorManager platform set to:', platformId);
+  },
+
+  // Get selectors for a specific platform
+  getSelectorsForPlatform(platformId) {
+    const platformSelectors = this.PLATFORM_SELECTORS[platformId];
+    if (platformSelectors) {
+      return platformSelectors;
+    }
+    // Fallback to default selectors if platform not found
+    console.log('[BuzzChat] Unknown platform, using default selectors');
+    return this.DEFAULT_SELECTORS.selectors;
+  },
+
+  // Get selectors (platform-aware, from cache or fetch new)
+  async getSelectors(platformId) {
+    // Use provided platform or current platform
+    const platform = platformId || this.currentPlatform;
+
     try {
-      // Check cache first
+      // If we have a known platform, use platform-specific selectors first
+      if (platform && this.PLATFORM_SELECTORS[platform]) {
+        // Try to get remote updates for this platform
+        const cached = await this.getCachedSelectors();
+        if (cached && cached.platforms && cached.platforms[platform] && !this.isCacheExpired(cached)) {
+          console.log('[BuzzChat] Using cached selectors for ' + platform + ' v' + cached.version);
+          return cached.platforms[platform];
+        }
+
+        // Try to fetch remote selectors
+        const remote = await this.fetchRemoteSelectors();
+        if (remote && remote.platforms && remote.platforms[platform]) {
+          if (!cached || this.isNewer(remote.version, cached.version)) {
+            await this.cacheSelectors(remote);
+            console.log('[BuzzChat] Updated to remote selectors for ' + platform + ' v' + remote.version);
+            return remote.platforms[platform];
+          }
+        }
+
+        // Use bundled platform-specific selectors
+        console.log('[BuzzChat] Using bundled selectors for ' + platform);
+        return this.PLATFORM_SELECTORS[platform];
+      }
+
+      // Fallback: generic selector logic (backward compatible)
       const cached = await this.getCachedSelectors();
 
       if (cached && !this.isCacheExpired(cached)) {
         console.log('[BuzzChat] Using cached selectors v' + cached.version);
-        return cached.selectors;
+        return cached.selectors || this.DEFAULT_SELECTORS.selectors;
       }
 
       // Try to fetch remote selectors
@@ -113,13 +385,13 @@ const SelectorManager = {
         if (!cached || this.isNewer(remote.version, cached.version)) {
           await this.cacheSelectors(remote);
           console.log('[BuzzChat] Updated to remote selectors v' + remote.version);
-          return remote.selectors;
+          return remote.selectors || this.DEFAULT_SELECTORS.selectors;
         }
       }
 
       // Return cached or default
       if (cached) {
-        return cached.selectors;
+        return cached.selectors || this.DEFAULT_SELECTORS.selectors;
       }
 
       console.log('[BuzzChat] Using default bundled selectors');
@@ -127,8 +399,21 @@ const SelectorManager = {
 
     } catch (error) {
       console.error('[BuzzChat] Error getting selectors:', error);
+      // Return platform-specific or default
+      if (platform && this.PLATFORM_SELECTORS[platform]) {
+        return this.PLATFORM_SELECTORS[platform];
+      }
       return this.DEFAULT_SELECTORS.selectors;
     }
+  },
+
+  // Synchronous selector getter for when platform is already known
+  getSelectorsSync(platformId) {
+    const platform = platformId || this.currentPlatform;
+    if (platform && this.PLATFORM_SELECTORS[platform]) {
+      return this.PLATFORM_SELECTORS[platform];
+    }
+    return this.DEFAULT_SELECTORS.selectors;
   },
 
   // Get cached selectors from storage

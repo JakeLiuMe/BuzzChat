@@ -282,18 +282,24 @@ export async function init() {
       typeof SelectorManager.getVersion === 'function' &&
       SelectorManager.__BUZZCHAT_VERIFIED === true) {
     try {
-      const loadedSelectors = await SelectorManager.getSelectors();
+      // Set the platform in SelectorManager for platform-specific selectors
+      if (state.platform && state.platform.id) {
+        SelectorManager.setPlatform(state.platform.id);
+      }
+
+      // Load platform-specific selectors
+      const loadedSelectors = await SelectorManager.getSelectors(state.platform?.id);
       // Validate selector structure before using
       if (isValidSelectorObject(loadedSelectors)) {
         state.selectors = loadedSelectors;
         const version = await SelectorManager.getVersion();
-        console.log('[BuzzChat] Loaded selectors v' + version);
+        console.log('[BuzzChat] Loaded selectors for ' + (state.platform?.name || 'unknown') + ' v' + version);
       } else {
         console.warn('[BuzzChat] Invalid selector format, using fallback');
         state.selectors = FALLBACK_SELECTORS;
       }
     } catch (e) {
-      console.warn('[BuzzChat] Failed to load remote selectors, using fallback');
+      console.warn('[BuzzChat] Failed to load selectors, using fallback:', e);
       state.selectors = FALLBACK_SELECTORS;
     }
   } else {
