@@ -31,9 +31,16 @@ Buttons that trigger async operations (API calls, storage) don't show loading fe
 - [ ] Unit tests for loading state behavior
 
 ## Done summary
-TBD
+- Added Loading.show/hide to startTrial function (only button missing loading state)
+- Added 10 unit tests for loading state behavior
+- Verified all other async buttons already have loading states
 
+- Users now see feedback when clicking Start Trial button
+- Prevents double-clicks during trial activation
+
+- 273 unit tests passing (10 new tests)
+- All existing lint warnings unchanged
 ## Evidence
-- Commits:
-- Tests:
+- Commits: d6287e9
+- Tests: npm run test:unit
 - PRs:

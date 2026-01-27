@@ -126,14 +126,16 @@ export async function subscribe(plan, isAnnual = false) {
 
 // Start free trial
 export async function startTrial() {
-  const canTrial = await ExtensionPay.canStartTrial();
-
-  if (!canTrial) {
-    Toast.warning('You have already used your free trial.');
-    return;
-  }
+  Loading.show(elements.startTrialBtn);
 
   try {
+    const canTrial = await ExtensionPay.canStartTrial();
+
+    if (!canTrial) {
+      Toast.warning('You have already used your free trial.');
+      return;
+    }
+
     await ExtensionPay.startTrial();
     Toast.success('7-day Pro trial activated!');
     elements.upgradeModal.classList.remove('active');
@@ -142,6 +144,8 @@ export async function startTrial() {
   } catch (error) {
     console.error('[BuzzChat] Failed to start trial:', error);
     Toast.error('Failed to start trial. Please try again.');
+  } finally {
+    Loading.hide(elements.startTrialBtn);
   }
 }
 
