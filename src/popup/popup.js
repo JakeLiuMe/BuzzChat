@@ -385,12 +385,14 @@ const Loading = {
     if (!button) return;
     button.classList.add('loading');
     button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
   },
 
   hide(button) {
     if (!button) return;
     button.classList.remove('loading');
     button.disabled = false;
+    button.setAttribute('aria-busy', 'false');
   }
 };
 
@@ -3907,6 +3909,7 @@ function createEmptyState(icon, title, description, ctaText, ctaCallback) {
   const iconDiv = document.createElement('div');
   iconDiv.className = 'empty-state-icon';
   iconDiv.textContent = icon;
+  iconDiv.setAttribute('aria-hidden', 'true');
 
   const h4 = document.createElement('h4');
   h4.textContent = title;

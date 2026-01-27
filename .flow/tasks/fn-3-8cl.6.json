@@ -1,14 +1,19 @@
 {
-  "assignee": null,
+  "assignee": "147540282+JakeLiuMe@users.noreply.github.com",
   "claim_note": "",
-  "claimed_at": null,
+  "claimed_at": "2026-01-27T11:15:53.758311Z",
   "created_at": "2026-01-27T10:29:56.543675Z",
   "depends_on": [],
   "epic": "fn-3-8cl",
+  "evidence": {
+    "commits": [],
+    "prs": [],
+    "tests": []
+  },
   "id": "fn-3-8cl.6",
   "priority": null,
   "spec_path": ".flow/tasks/fn-3-8cl.6.md",
-  "status": "todo",
+  "status": "done",
   "title": "Add Empty States and Accessibility Polish",
-  "updated_at": "2026-01-27T10:29:56.543691Z"
+  "updated_at": "2026-01-27T11:21:30.662039Z"
 }

@@ -279,13 +279,13 @@ body {
 }
 
 .tier-usage {
-  color: var(--gray-500);
+  color: var(--gray-600);
   flex: 1;
 }
 
 .member-since {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.95);
   margin-left: auto;
 }
 

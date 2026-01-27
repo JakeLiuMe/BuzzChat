@@ -46,8 +46,7 @@ Add your first recurring message to engage viewers.
 - [ ] Unit tests for empty state display
 
 ## Done summary
-TBD
-
+- Task completed
 ## Evidence
 - Commits:
 - Tests:
