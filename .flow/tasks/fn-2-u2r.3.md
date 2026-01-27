@@ -38,8 +38,7 @@ Standardize on **"Max"** tier name because:
 - [ ] Search codebase confirms no stray "business" tier references
 
 ## Done summary
-TBD
-
+Updated user-visible tier naming: Business → Max in extensionpay.js display name, theme.js tier labels/badges. Added 18 tier naming unit tests. 'business' kept as legacy tier ID for backward compatibility.
 ## Evidence
 - Commits:
 - Tests:

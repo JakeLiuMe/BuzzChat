@@ -280,9 +280,9 @@ const Loading = {
 const VALIDATION = {
   MAX_MESSAGE_LENGTH: 500,
   MAX_TIMER_MESSAGES: 10,
-  MAX_FAQ_RULES: 20, // Pro/Business limit
+  MAX_FAQ_RULES: 20, // Pro/Max limit
   MAX_FAQ_RULES_FREE: 3, // Free tier limit (research: 3 rules to show value, upgrade path)
-  MAX_COMMANDS: 50, // Pro/Business limit
+  MAX_COMMANDS: 50, // Pro/Max limit
   MAX_COMMANDS_FREE: 5, // Free tier limit (research: 5 commands to show value)
   MAX_TEMPLATES: 20,
   MAX_FAQ_TRIGGERS: 10,
@@ -619,7 +619,7 @@ const ApiKeyManager = {
 
 // State
 let settings = { ...DEFAULT_SETTINGS };
-let useAccountManager = false; // True if Business tier
+let useAccountManager = false; // True if Max tier
 
 // DOM Elements
 const elements = {
@@ -748,7 +748,7 @@ const elements = {
   redeemCodeBtn: document.getElementById('redeemCodeBtn'),
   referralRedeemedMsg: document.getElementById('referralRedeemedMsg'),
 
-  // Account Selector (Business tier)
+  // Account Selector (Max tier)
   accountSelectorContainer: document.getElementById('accountSelectorContainer'),
   accountSelect: document.getElementById('accountSelect'),
   newAccountBtn: document.getElementById('newAccountBtn'),
@@ -764,7 +764,7 @@ const elements = {
   confirmCreateAccountBtn: document.getElementById('confirmCreateAccountBtn'),
   cancelCreateAccountBtn: document.getElementById('cancelCreateAccountBtn'),
 
-  // API Access (Business tier)
+  // API Access (Max tier)
   apiSection: document.getElementById('apiSection'),
   apiLocked: document.getElementById('apiLocked'),
   apiKeysList: document.getElementById('apiKeysList'),

@@ -46,7 +46,7 @@ export async function updateTierBanner() {
     if (vipBadge) {
       vipBadge.style.display = 'inline-flex';
       if (vipTierText) {
-        vipTierText.textContent = settings.tier === 'business' ? 'BIZ' : 'PRO';
+        vipTierText.textContent = settings.tier === 'business' ? 'MAX' : 'PRO';
       }
       // Use diamond icon for business tier
       const vipIcon = vipBadge.querySelector('.vip-icon');
@@ -69,7 +69,7 @@ export async function updateTierBanner() {
       memberSince.style.display = 'none';
     }
 
-    tierLabel.textContent = settings.tier === 'business' ? 'Business' : 'Pro';
+    tierLabel.textContent = settings.tier === 'business' ? 'Max' : 'Pro';
     tierUsage.textContent = 'Unlimited features + Analytics';
   } else {
     // Free tier

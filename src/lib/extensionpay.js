@@ -18,8 +18,8 @@ const ExtensionPay = {
       features: ['unlimited_messages', 'unlimited_templates', 'unlimited_faq', 'analytics', 'priority_support']
     },
     business: {
-      id: 'business',
-      name: 'Business',
+      id: 'business', // Legacy tier ID - kept for backward compatibility
+      name: 'Max', // Display name updated from 'Business' to 'Max'
       price: 19.99, // $19.99/month
       annualPrice: 149, // $149/year (38% savings)
       features: ['unlimited_messages', 'unlimited_templates', 'unlimited_faq', 'analytics', 'priority_support', 'multi_account', 'api_access', 'advanced_analytics']

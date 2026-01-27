@@ -20,7 +20,7 @@
           <span class="platform-icon" id="platformIcon"></span>
           <span class="platform-name" id="platformName">Detecting...</span>
         </div>
-        <!-- Account Selector (Business tier only) -->
+        <!-- Account Selector (Max tier only) -->
         <div class="account-selector" id="accountSelectorContainer" style="display: none;">
           <select id="accountSelect" aria-label="Select configuration">
             <!-- Populated dynamically -->
@@ -810,7 +810,7 @@
           </div>
         </template>
 
-        <!-- API Access Section (Business tier only) -->
+        <!-- API Access Section (Max tier only) -->
         <hr class="section-divider">
         <div class="api-section" id="apiSection" style="display: none;">
           <h4>API Access</h4>
@@ -876,10 +876,10 @@
         <div class="api-locked" id="apiLocked">
           <div class="locked-badge">
             <span class="locked-icon">🔒</span>
-            <span class="locked-text">Business Feature</span>
+            <span class="locked-text">Max Feature</span>
           </div>
           <p>API access lets you control BuzzChat from external tools, automation scripts, or AI assistants like Claude.</p>
-          <button class="btn btn-primary btn-sm" id="unlockApiBtn">Upgrade to Business</button>
+          <button class="btn btn-primary btn-sm" id="unlockApiBtn">Upgrade to Max</button>
         </div>
 
         <!-- Referral Section -->
@@ -983,10 +983,10 @@
             <button class="btn btn-primary btn-lg" id="subscribePro">Start Free Trial</button>
           </div>
 
-          <!-- BUSINESS - Best Value -->
+          <!-- MAX - Best Value -->
           <div class="pricing-card featured">
             <div class="tier-badge value">Best Value</div>
-            <h3>Business</h3>
+            <h3>Max</h3>
             <div class="price" id="businessPrice">$19.99<span>/month</span></div>
             <div class="price-annual" id="businessPriceAnnual" style="display: none;">$149<span>/year</span></div>
             <p class="price-note" id="businessPriceNote" style="display: none;">$12.42/month billed annually</p>
@@ -1011,7 +1011,7 @@
                 <th>Feature</th>
                 <th>Free</th>
                 <th>Pro</th>
-                <th>Business</th>
+                <th>Max</th>
               </tr>
             </thead>
             <tbody>
@@ -1070,7 +1070,7 @@
     </div>
   </div>
 
-  <!-- Account Manager Modal (Business tier only) -->
+  <!-- Account Manager Modal (Max tier only) -->
   <div class="modal" id="accountManagerModal" role="dialog" aria-labelledby="account-manager-title" aria-modal="true">
     <div class="modal-content">
       <div class="modal-header">
@@ -1155,7 +1155,7 @@
           <ul>
             <li>Anonymous usage analytics (message counts, feature usage)</li>
             <li>Your settings (stored locally in your browser)</li>
-            <li>Payment information for Pro/Business (via ExtensionPay)</li>
+            <li>Payment information for Pro/Max (via ExtensionPay)</li>
           </ul>
           <p style="margin-top: 8px; font-size: 12px;">
             <a href="https://buzzchat.app/privacy" target="_blank" rel="noopener noreferrer" style="color: var(--primary);">Read our full Privacy Policy</a>
