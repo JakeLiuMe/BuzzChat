@@ -4,6 +4,8 @@
 // Allows updating selectors without releasing a new extension version
 // Supports multiple platforms: Whatnot, YouTube, eBay, Twitch, Kick
 
+/* global BuzzChatAnalytics */
+
 // Browser API compatibility - works on both Chrome and Firefox
 const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
 
@@ -549,6 +551,255 @@ const SelectorManager = {
   async getVersion() {
     const cached = await this.getCachedSelectors();
     return cached?.version || this.DEFAULT_SELECTORS.version;
+  },
+
+  // ============================================
+  // SELF-HEALING SELECTOR SYSTEM
+  // ============================================
+
+  // Track selector health status
+  healthStatus: {},
+  lastHealthCheck: 0,
+  HEALTH_CHECK_INTERVAL: 30000, // 30 seconds between health checks
+
+  /**
+   * Check health of all selectors for a platform
+   * Returns which selectors are working and which are broken
+   */
+  checkSelectorHealth(platformId) {
+    const selectors = this.getSelectorsSync(platformId);
+    const health = {};
+    const broken = [];
+
+    for (const [selectorType, selectorList] of Object.entries(selectors)) {
+      const element = this.findElement(selectorList);
+      health[selectorType] = {
+        found: !!element,
+        workingSelector: element ? this.findWorkingSelector(selectorList) : null,
+        timestamp: Date.now()
+      };
+
+      if (!element) {
+        broken.push(selectorType);
+      }
+    }
+
+    this.healthStatus[platformId] = health;
+    this.lastHealthCheck = Date.now();
+
+    // Log broken selectors
+    if (broken.length > 0) {
+      console.warn('[BuzzChat] Broken selectors for ' + platformId + ':', broken.join(', '));
+    } else {
+      console.log('[BuzzChat] All selectors healthy for ' + platformId);
+    }
+
+    return { health, broken };
+  },
+
+  /**
+   * Find which specific selector in a list works
+   */
+  findWorkingSelector(selectorList) {
+    for (const selector of selectorList) {
+      try {
+        if (document.querySelector(selector)) {
+          return selector;
+        }
+      } catch (e) {
+        // Invalid selector, continue
+      }
+    }
+    return null;
+  },
+
+  /**
+   * Auto-discover selectors using heuristics when standard selectors fail
+   * This is the "self-healing" part - tries to find elements by common patterns
+   */
+  discoverSelectors() {
+    const discoveries = {};
+
+    // Discover chat container
+    const chatContainerCandidates = document.querySelectorAll(
+      '[class*="chat"], [class*="Chat"], [class*="message"], [class*="Message"], [id*="chat"]'
+    );
+    for (const el of chatContainerCandidates) {
+      // Look for scrollable container with multiple children (chat messages)
+      if (el.children.length > 3 &&
+          (el.scrollHeight > el.clientHeight || el.style.overflowY === 'scroll' || el.style.overflowY === 'auto')) {
+        discoveries.chatContainer = this.generateSelector(el);
+        console.log('[BuzzChat] Discovered chat container:', discoveries.chatContainer);
+        break;
+      }
+    }
+
+    // Discover chat input
+    const inputCandidates = document.querySelectorAll(
+      'textarea, input[type="text"], [contenteditable="true"]'
+    );
+    for (const el of inputCandidates) {
+      const placeholder = (el.placeholder || el.getAttribute('aria-label') || '').toLowerCase();
+      const isInChatContext = el.closest('[class*="chat"], [class*="Chat"], [id*="chat"]');
+
+      if (placeholder.includes('chat') ||
+          placeholder.includes('message') ||
+          placeholder.includes('send') ||
+          placeholder.includes('comment') ||
+          isInChatContext) {
+        discoveries.chatInput = this.generateSelector(el);
+        console.log('[BuzzChat] Discovered chat input:', discoveries.chatInput);
+        break;
+      }
+    }
+
+    // Discover send button
+    const buttonCandidates = document.querySelectorAll(
+      'button[type="submit"], button[aria-label*="send" i], button[aria-label*="Send"], [class*="send"], [class*="Send"]'
+    );
+    for (const el of buttonCandidates) {
+      const isInChatContext = el.closest('[class*="chat"], [class*="Chat"], [id*="chat"]');
+      if (isInChatContext) {
+        discoveries.sendButton = this.generateSelector(el);
+        console.log('[BuzzChat] Discovered send button:', discoveries.sendButton);
+        break;
+      }
+    }
+
+    return discoveries;
+  },
+
+  /**
+   * Generate a CSS selector for an element
+   * Tries to create a unique, stable selector
+   */
+  generateSelector(element) {
+    // Try ID first (most stable)
+    if (element.id) {
+      return '#' + element.id;
+    }
+
+    // Try data-testid or similar test attributes
+    const testId = element.getAttribute('data-testid') ||
+                   element.getAttribute('data-test') ||
+                   element.getAttribute('data-a-target');
+    if (testId) {
+      return '[data-testid="' + testId + '"]';
+    }
+
+    // Build a class-based selector
+    if (element.className && typeof element.className === 'string') {
+      const classes = element.className.split(' ')
+        .filter(c => c && !c.match(/^[0-9]/) && c.length < 50)
+        .slice(0, 2);
+      if (classes.length > 0) {
+        return element.tagName.toLowerCase() + '.' + classes.join('.');
+      }
+    }
+
+    // Fall back to tag with parent context
+    const parent = element.parentElement;
+    if (parent && parent.className && typeof parent.className === 'string') {
+      const parentClass = parent.className.split(' ')[0];
+      if (parentClass) {
+        return '.' + parentClass + ' > ' + element.tagName.toLowerCase();
+      }
+    }
+
+    // Last resort: just the tag name
+    return element.tagName.toLowerCase();
+  },
+
+  /**
+   * Self-heal: try to recover when selectors are broken
+   * Returns patched selectors with discoveries merged in
+   */
+  selfHeal(platformId) {
+    console.log('[BuzzChat] Attempting self-heal for ' + platformId);
+
+    // Check current health
+    const { health, broken } = this.checkSelectorHealth(platformId);
+
+    if (broken.length === 0) {
+      console.log('[BuzzChat] No broken selectors, self-heal not needed');
+      return null;
+    }
+
+    // Discover missing selectors
+    const discoveries = this.discoverSelectors();
+
+    if (Object.keys(discoveries).length === 0) {
+      console.log('[BuzzChat] Self-heal failed - could not discover any selectors');
+      return null;
+    }
+
+    // Merge discoveries into current selectors
+    const currentSelectors = this.getSelectorsSync(platformId);
+    const healedSelectors = { ...currentSelectors };
+
+    for (const [selectorType, discoveredSelector] of Object.entries(discoveries)) {
+      if (broken.includes(selectorType)) {
+        // Prepend discovered selector to the list
+        healedSelectors[selectorType] = [discoveredSelector, ...currentSelectors[selectorType]];
+        console.log('[BuzzChat] Healed ' + selectorType + ' with: ' + discoveredSelector);
+      }
+    }
+
+    // Cache the healed selectors temporarily
+    this.healedSelectors = this.healedSelectors || {};
+    this.healedSelectors[platformId] = healedSelectors;
+
+    return healedSelectors;
+  },
+
+  /**
+   * Get selectors with self-healing applied
+   */
+  getHealedSelectors(platformId) {
+    if (this.healedSelectors && this.healedSelectors[platformId]) {
+      return this.healedSelectors[platformId];
+    }
+    return this.getSelectorsSync(platformId);
+  },
+
+  /**
+   * Report selector health to analytics (if enabled)
+   */
+  reportSelectorHealth(platformId, health) {
+    // Only report if analytics is available
+    if (typeof BuzzChatAnalytics !== 'undefined' && BuzzChatAnalytics.trackEvent) {
+      const broken = Object.entries(health)
+        .filter(([_, h]) => !h.found)
+        .map(([key]) => key);
+
+      if (broken.length > 0) {
+        BuzzChatAnalytics.trackEvent('selector_health', {
+          platform: platformId,
+          broken: broken,
+          total: Object.keys(health).length
+        });
+      }
+    }
+  },
+
+  /**
+   * Run periodic health check and self-heal if needed
+   */
+  runHealthCheck(platformId) {
+    // Don't run too frequently
+    if (Date.now() - this.lastHealthCheck < this.HEALTH_CHECK_INTERVAL) {
+      return;
+    }
+
+    const { health, broken } = this.checkSelectorHealth(platformId);
+
+    // Report health
+    this.reportSelectorHealth(platformId, health);
+
+    // Self-heal if needed
+    if (broken.length > 0) {
+      this.selfHeal(platformId);
+    }
   }
 };
 
