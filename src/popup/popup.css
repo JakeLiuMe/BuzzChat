@@ -137,8 +137,11 @@ body {
   line-height: 1.5;
   color: var(--text-primary);
   background: var(--bg-secondary);
-  width: 380px;
-  min-height: 500px;
+  /* Responsive width: 320px minimum, 500px maximum */
+  width: clamp(320px, 100vw, 500px);
+  min-width: 320px;
+  max-width: 500px;
+  min-height: 400px;
   max-height: 600px;
   overflow-y: auto;
   transition: background-color 0.3s, color 0.3s;
@@ -431,6 +434,22 @@ body {
   background: white;
   border-bottom: 1px solid var(--gray-200);
   overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbar but keep functionality */
+.tabs::-webkit-scrollbar {
+  height: 3px;
+}
+
+.tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tabs::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: 3px;
 }
 
 .tab-btn {
@@ -1633,7 +1652,7 @@ body {
    Onboarding Modal - 3-Step Wizard
    =========================================== */
 .onboarding-modal {
-  max-width: 380px;
+  max-width: min(380px, calc(100vw - 32px));
   max-height: 95vh;
 }
 
@@ -4200,4 +4219,56 @@ body {
 
 [data-theme="dark"] .has-tooltip::after {
   background: var(--gray-700);
+}
+
+/* ===========================================
+   Responsive Layout - Narrow Width Support
+   =========================================== */
+@media (max-width: 360px) {
+  /* Compact header for narrow widths */
+  .header {
+    padding: var(--space-md);
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .header h1 {
+    font-size: 16px;
+  }
+
+  .platform-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+  }
+
+  /* Compact tabs for narrow widths */
+  .tab-btn {
+    min-width: 56px;
+    padding: var(--space-xs);
+  }
+
+  .tab-btn .tab-label {
+    font-size: 9px;
+  }
+
+  .tab-btn .tab-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Tighter padding in panels */
+  .tab-panel {
+    padding: var(--space-md);
+  }
+
+  /* Compact form groups */
+  .form-group {
+    margin-bottom: var(--space-md);
+  }
+
+  /* Smaller buttons */
+  .btn {
+    padding: var(--space-sm) var(--space-md);
+    font-size: 12px;
+  }
 }

@@ -1,0 +1,14 @@
+{
+  "assignee": null,
+  "claim_note": "",
+  "claimed_at": null,
+  "created_at": "2026-01-27T10:29:53.435412Z",
+  "depends_on": [],
+  "epic": "fn-3-8cl",
+  "id": "fn-3-8cl.5",
+  "priority": null,
+  "spec_path": ".flow/tasks/fn-3-8cl.5.md",
+  "status": "todo",
+  "title": "Add Dynamic Message Variables",
+  "updated_at": "2026-01-27T10:29:53.435431Z"
+}
