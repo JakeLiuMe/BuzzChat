@@ -198,7 +198,7 @@ export function handleMessage(message, sender, sendResponse, { startBot, stopBot
   console.log('[BuzzChat] Received message:', message.type);
 
   switch (message.type) {
-    case 'SETTINGS_UPDATED':
+    case 'SETTINGS_UPDATED': {
       // SECURITY: Validate and sanitize settings object
       const validatedSettings = validateSettingsObject(message.settings);
       if (!validatedSettings) {
@@ -217,6 +217,7 @@ export function handleMessage(message, sender, sendResponse, { startBot, stopBot
       }
       sendResponse({ success: true });
       break;
+    }
 
     case 'SEND_TEMPLATE':
       if (message.text) {

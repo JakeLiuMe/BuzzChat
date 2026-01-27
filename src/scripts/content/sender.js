@@ -67,7 +67,9 @@ export function sendChatMessage(message) {
     if (state.settings?.settings?.chatSelector) {
       try {
         state.chatInput = document.querySelector(state.settings.settings.chatSelector) || state.chatInput;
-      } catch (e) {}
+      } catch (_e) {
+        // Invalid selector - ignore and use default
+      }
     }
   }
 

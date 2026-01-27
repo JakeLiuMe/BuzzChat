@@ -1322,7 +1322,7 @@
     console.log('[BuzzChat] Received message:', message.type);
 
     switch (message.type) {
-      case 'SETTINGS_UPDATED':
+      case 'SETTINGS_UPDATED': {
         // SECURITY: Validate and sanitize settings object
         const validatedSettings = validateSettingsObject(message.settings);
         if (!validatedSettings) {
@@ -1341,6 +1341,7 @@
         }
         sendResponse({ success: true });
         break;
+      }
 
       case 'SEND_TEMPLATE':
         if (message.text) {
@@ -1418,7 +1419,7 @@
         break;
 
       // 10/10 Features: Viewer Tracking
-      case 'GET_TOP_VIEWERS':
+      case 'GET_TOP_VIEWERS': {
         const limit = typeof message.limit === 'number' ? Math.min(message.limit, 50) : 10;
         sendResponse({
           success: true,
@@ -1426,6 +1427,7 @@
           totalViewers: state.viewers.size
         });
         break;
+      }
 
       case 'RESET_VIEWERS':
         state.viewers.clear();
@@ -1434,7 +1436,7 @@
         break;
 
       // 10/10 Features: Chat Export
-      case 'GET_CHAT_HISTORY':
+      case 'GET_CHAT_HISTORY': {
         const historyLimit = typeof message.limit === 'number' ? Math.min(message.limit, 500) : 100;
         sendResponse({
           success: true,
@@ -1442,8 +1444,9 @@
           totalMessages: state.chatHistory.length
         });
         break;
+      }
 
-      case 'EXPORT_CHAT_CSV':
+      case 'EXPORT_CHAT_CSV': {
         const csvData = exportChatCSV();
         sendResponse({
           success: csvData !== null,
@@ -1451,6 +1454,7 @@
           messageCount: state.chatHistory.length
         });
         break;
+      }
 
       case 'CLEAR_CHAT_HISTORY':
         state.chatHistory = [];

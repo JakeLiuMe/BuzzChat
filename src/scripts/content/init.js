@@ -1,5 +1,6 @@
 // BuzzChat - Initialization & Lifecycle
 // Copyright (c) 2024-2026 BuzzChat. All rights reserved.
+/* global BuzzChatPlatform, BuzzChatSecurity */
 
 import { browserAPI, debounce } from './config.js';
 import { state, FALLBACK_SELECTORS, getSelectors } from './state.js';
