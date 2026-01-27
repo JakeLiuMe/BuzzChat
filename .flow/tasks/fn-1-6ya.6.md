@@ -253,8 +253,7 @@ export function showActionFeedback(action, success) {
 - [ ] TBD
 
 ## Done summary
-TBD
-
+- Task completed
 ## Evidence
 - Commits:
 - Tests:
