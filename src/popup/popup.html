@@ -1341,6 +1341,22 @@
   <!-- Confetti Canvas -->
   <canvas id="confettiCanvas"></canvas>
 
+  <!-- Confirmation Dialog Modal -->
+  <div class="modal" id="confirmModal" role="alertdialog" aria-labelledby="confirm-title" aria-describedby="confirm-message" aria-modal="true">
+    <div class="modal-content confirm-modal">
+      <div class="modal-header confirm-header">
+        <h2 id="confirm-title">Confirm Action</h2>
+      </div>
+      <div class="modal-body confirm-body">
+        <p id="confirm-message">Are you sure you want to proceed?</p>
+      </div>
+      <div class="modal-footer confirm-footer">
+        <button class="btn btn-secondary" id="confirmCancelBtn">Cancel</button>
+        <button class="btn btn-danger" id="confirmOkBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
   <script src="popup.js" type="module"></script>
 </body>
 </html>

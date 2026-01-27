@@ -548,6 +548,120 @@ const FormValidator = {
   }
 };
 
+// Confirmation dialog helper
+const ConfirmDialog = {
+  modal: null,
+  titleEl: null,
+  messageEl: null,
+  okBtn: null,
+  cancelBtn: null,
+  resolvePromise: null,
+  previousActiveElement: null,
+
+  /**
+   * Initialize the confirmation dialog
+   */
+  init() {
+    this.modal = document.getElementById('confirmModal');
+    this.titleEl = document.getElementById('confirm-title');
+    this.messageEl = document.getElementById('confirm-message');
+    this.okBtn = document.getElementById('confirmOkBtn');
+    this.cancelBtn = document.getElementById('confirmCancelBtn');
+
+    if (!this.modal) return;
+
+    // Cancel button closes without action
+    this.cancelBtn?.addEventListener('click', () => this.close(false));
+
+    // OK button confirms
+    this.okBtn?.addEventListener('click', () => this.close(true));
+
+    // Click outside closes
+    this.modal.addEventListener('click', (e) => {
+      if (e.target === this.modal) this.close(false);
+    });
+
+    // Keyboard support
+    this.modal.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        this.close(false);
+      } else if (e.key === 'Enter' && document.activeElement === this.okBtn) {
+        e.preventDefault();
+        this.close(true);
+      } else if (e.key === 'Tab') {
+        // Focus trap
+        const focusableElements = this.modal.querySelectorAll('button:not([disabled])');
+        const first = focusableElements[0];
+        const last = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    });
+  },
+
+  /**
+   * Show confirmation dialog and return promise
+   * @param {Object} options - Dialog options
+   * @param {string} options.title - Dialog title (default: "Confirm")
+   * @param {string} options.message - Dialog message
+   * @param {string} options.confirmText - OK button text (default: "Delete")
+   * @param {string} options.cancelText - Cancel button text (default: "Cancel")
+   * @returns {Promise<boolean>} - True if confirmed, false if cancelled
+   */
+  show({ title = 'Confirm', message, confirmText = 'Delete', cancelText = 'Cancel' } = {}) {
+    return new Promise((resolve) => {
+      if (!this.modal) {
+        // Fallback to browser confirm if modal not initialized
+        resolve(window.confirm(message));
+        return;
+      }
+
+      this.resolvePromise = resolve;
+      this.previousActiveElement = document.activeElement;
+
+      // Update content
+      if (this.titleEl) this.titleEl.textContent = title;
+      if (this.messageEl) this.messageEl.textContent = message;
+      if (this.okBtn) this.okBtn.textContent = confirmText;
+      if (this.cancelBtn) this.cancelBtn.textContent = cancelText;
+
+      // Show modal
+      this.modal.classList.add('active');
+
+      // Focus the cancel button (safer default)
+      setTimeout(() => this.cancelBtn?.focus(), 50);
+    });
+  },
+
+  /**
+   * Close the dialog and resolve promise
+   * @param {boolean} result - Whether user confirmed
+   */
+  close(result) {
+    if (!this.modal) return;
+
+    this.modal.classList.remove('active');
+
+    // Restore focus
+    if (this.previousActiveElement) {
+      this.previousActiveElement.focus();
+    }
+
+    // Resolve the promise
+    if (this.resolvePromise) {
+      this.resolvePromise(result);
+      this.resolvePromise = null;
+    }
+  }
+};
+
 // Input validation limits
 const VALIDATION = {
   MAX_MESSAGE_LENGTH: 500,
@@ -1177,6 +1291,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   init10x10Features(); // 10/10 Features initialization
   initReferral();
   checkOnboarding();
+  ConfirmDialog.init(); // Initialize confirmation dialog
 
   // Initialize AI error handler to show user-friendly error messages
   AIErrorHandler.init({
@@ -1936,7 +2051,12 @@ function initEventListeners() {
 
   if (elements.resetGiveawayBtn) {
     elements.resetGiveawayBtn.addEventListener('click', async () => {
-      if (!confirm('Reset all giveaway entries? This cannot be undone.')) return;
+      const confirmed = await ConfirmDialog.show({
+        title: 'Reset Giveaway',
+        message: 'Reset all giveaway entries? This cannot be undone.',
+        confirmText: 'Reset'
+      });
+      if (!confirmed) return;
       await sendMessageToContent('RESET_GIVEAWAY');
       loadGiveawayData();
       Toast.success('Giveaway entries reset');
@@ -2282,7 +2402,11 @@ function createTimerMessageItem(msg, index) {
   });
 
   removeBtn.addEventListener('click', async () => {
-    if (!confirm('Delete this timer message? This cannot be undone.')) return;
+    const confirmed = await ConfirmDialog.show({
+      title: 'Delete Timer Message',
+      message: 'Delete this timer message? This cannot be undone.'
+    });
+    if (!confirmed) return;
     settings.timer.messages.splice(index, 1);
     renderTimerMessages();
     await saveSettings();
@@ -2373,7 +2497,11 @@ function createFaqItem(rule, index) {
   });
 
   removeBtn.addEventListener('click', async () => {
-    if (!confirm('Delete this FAQ rule? This cannot be undone.')) return;
+    const confirmed = await ConfirmDialog.show({
+      title: 'Delete FAQ Rule',
+      message: 'Delete this FAQ rule? This cannot be undone.'
+    });
+    if (!confirmed) return;
     settings.faq.rules.splice(index, 1);
     renderFaqRules();
     await saveSettings();
@@ -2448,7 +2576,11 @@ function createTemplateItem(template, index) {
   });
 
   removeBtn.addEventListener('click', async () => {
-    if (!confirm('Delete this template? This cannot be undone.')) return;
+    const confirmed = await ConfirmDialog.show({
+      title: 'Delete Template',
+      message: 'Delete this template? This cannot be undone.'
+    });
+    if (!confirmed) return;
     settings.templates.splice(index, 1);
     renderTemplates();
     await saveSettings();
@@ -2528,7 +2660,11 @@ function createCommandItem(cmd, index) {
   });
 
   removeBtn.addEventListener('click', async () => {
-    if (!confirm('Delete this command? This cannot be undone.')) return;
+    const confirmed = await ConfirmDialog.show({
+      title: 'Delete Command',
+      message: 'Delete this command? This cannot be undone.'
+    });
+    if (!confirmed) return;
     settings.commands.list.splice(index, 1);
     renderCommands();
     await saveSettings();
@@ -3193,7 +3329,12 @@ async function exportChatHistory() {
 }
 
 async function clearChatHistory() {
-  if (!confirm('Clear all captured chat messages? This cannot be undone.')) return;
+  const confirmed = await ConfirmDialog.show({
+    title: 'Clear Chat History',
+    message: 'Clear all captured chat messages? This cannot be undone.',
+    confirmText: 'Clear'
+  });
+  if (!confirmed) return;
 
   try {
     const tabs = await browserAPI.tabs.query({ active: true, currentWindow: true });
@@ -3286,7 +3427,12 @@ function init10x10Features() {
 
   if (elements.resetViewersBtn) {
     elements.resetViewersBtn.addEventListener('click', async () => {
-      if (!confirm('Reset viewer tracking? This cannot be undone.')) return;
+      const confirmed = await ConfirmDialog.show({
+        title: 'Reset Viewer Tracking',
+        message: 'Reset viewer tracking? This cannot be undone.',
+        confirmText: 'Reset'
+      });
+      if (!confirmed) return;
       try {
         const tabs = await browserAPI.tabs.query({ active: true, currentWindow: true });
         if (tabs.length > 0) {
@@ -3307,7 +3453,12 @@ function init10x10Features() {
 
   if (elements.resetBidsBtn) {
     elements.resetBidsBtn.addEventListener('click', async () => {
-      if (!confirm('Clear all detected bids? This cannot be undone.')) return;
+      const confirmed = await ConfirmDialog.show({
+        title: 'Clear Bids',
+        message: 'Clear all detected bids? This cannot be undone.',
+        confirmText: 'Clear'
+      });
+      if (!confirmed) return;
       try {
         const tabs = await browserAPI.tabs.query({ active: true, currentWindow: true });
         if (tabs.length > 0) {
@@ -4845,7 +4996,11 @@ async function refreshAccountsList() {
   elements.accountsList.querySelectorAll('.delete-account-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
       const accountId = btn.dataset.id;
-      if (!confirm('Delete this setup? All settings will be lost. This cannot be undone.')) return;
+      const confirmed = await ConfirmDialog.show({
+        title: 'Delete Setup',
+        message: 'Delete this setup? All settings will be lost. This cannot be undone.'
+      });
+      if (!confirmed) return;
 
       try {
         await AccountManager.deleteAccount(accountId);
@@ -4929,7 +5084,12 @@ async function refreshApiKeysList() {
   elements.apiKeysList.querySelectorAll('.revoke-key-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
       const keyId = btn.dataset.id;
-      if (!confirm('Revoke this API key? Any applications using it will stop working.')) return;
+      const confirmed = await ConfirmDialog.show({
+        title: 'Revoke API Key',
+        message: 'Revoke this API key? Any applications using it will stop working.',
+        confirmText: 'Revoke'
+      });
+      if (!confirmed) return;
 
       try {
         Loading.show(btn);

@@ -40,9 +40,18 @@ Delete and reset operations happen immediately without confirmation. Users can a
 - [ ] Unit tests for confirmation flow
 
 ## Done summary
-TBD
+- Added ConfirmDialog component with promise-based show() API
+- Replaced 11 browser confirm() calls with styled modal dialogs
+- Added keyboard support (Escape, Enter, Tab focus trap)
+- Added aria-labelledby, aria-describedby for accessibility
 
+- Users now see consistent, styled confirmation dialogs
+- Modal focuses cancel button by default (safer)
+- All destructive actions protected by confirmation
+
+- 327 unit tests passing (33 new tests)
+- Lint check unchanged
 ## Evidence
-- Commits:
-- Tests:
+- Commits: 6f5043c
+- Tests: npm run test:unit
 - PRs:

@@ -941,6 +941,50 @@ body {
   padding: 16px;
 }
 
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border-top: 1px solid var(--gray-200);
+}
+
+/* Confirmation Dialog Modal */
+.confirm-modal {
+  max-width: 340px;
+}
+
+.confirm-header {
+  background: var(--danger);
+  color: white;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.confirm-header h2 {
+  font-size: 16px;
+}
+
+.confirm-body {
+  padding: var(--space-lg);
+  text-align: center;
+}
+
+.confirm-body p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.confirm-footer {
+  justify-content: center;
+  background: var(--bg-secondary);
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.confirm-footer .btn {
+  min-width: 100px;
+}
+
 /* Pricing Cards */
 .pricing-card {
   padding: 20px;

@@ -1,14 +1,23 @@
 {
-  "assignee": null,
+  "assignee": "147540282+JakeLiuMe@users.noreply.github.com",
   "claim_note": "",
-  "claimed_at": null,
+  "claimed_at": "2026-01-27T10:54:54.136973Z",
   "created_at": "2026-01-27T10:29:49.971849Z",
   "depends_on": [],
   "epic": "fn-3-8cl",
+  "evidence": {
+    "commits": [
+      "6f5043c"
+    ],
+    "prs": [],
+    "tests": [
+      "npm run test:unit"
+    ]
+  },
   "id": "fn-3-8cl.4",
   "priority": null,
   "spec_path": ".flow/tasks/fn-3-8cl.4.md",
-  "status": "todo",
+  "status": "done",
   "title": "Add Confirmation Dialogs for Delete Actions",
-  "updated_at": "2026-01-27T10:29:49.971864Z"
+  "updated_at": "2026-01-27T11:06:11.719124Z"
 }
