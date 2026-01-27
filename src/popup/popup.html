@@ -154,7 +154,7 @@
         <div class="form-group">
           <label for="welcomeMessage">Welcome Message</label>
           <textarea id="welcomeMessage" rows="3" placeholder="Hey {username}! Welcome to the stream! Drop a comment to enter our giveaway!" aria-describedby="welcomeMessage-help"></textarea>
-          <small id="welcomeMessage-help" class="help-text">Use {username} to include the viewer's name</small>
+          <small id="welcomeMessage-help" class="help-text">Variables: {username}, {time}, {date}, {uptime}, {platform}, {viewers}</small>
         </div>
 
         <div class="form-group">
@@ -205,7 +205,8 @@
           <div class="timer-message-item">
             <div class="form-group">
               <label>Message</label>
-              <textarea class="timer-text" rows="2" placeholder="Shipping deal ends in 5 minutes! Don't miss out!"></textarea>
+              <textarea class="timer-text" rows="2" placeholder="Stream has been live for {uptime}! Thanks for watching!"></textarea>
+              <small class="help-text">Variables: {time}, {date}, {uptime}, {platform}, {viewers}</small>
             </div>
             <div class="form-row">
               <div class="form-group">
@@ -263,7 +264,8 @@
             </div>
             <div class="form-group">
               <label>Auto-Reply</label>
-              <textarea class="faq-reply" rows="2" placeholder="We ship worldwide! US orders ship within 2 business days."></textarea>
+              <textarea class="faq-reply" rows="2" placeholder="Thanks for asking, {username}! We ship worldwide!"></textarea>
+              <small class="help-text">Variables: {username}, {count}, {time}, {date}, {platform}</small>
             </div>
             <!-- AI Toggle (Max tier only) -->
             <div class="form-group faq-ai-toggle-group" style="display: none;">
@@ -334,7 +336,8 @@
             </div>
             <div class="form-group">
               <label>Response</label>
-              <textarea class="command-response" rows="2" placeholder="We ship within 2-3 business days! 📦" maxlength="500"></textarea>
+              <textarea class="command-response" rows="2" placeholder="Thanks {username}! Used {count} times. We ship within 2-3 business days!" maxlength="500"></textarea>
+              <small class="help-text">Variables: {username}, {count}, {time}, {date}, {platform}</small>
             </div>
             <div class="form-row">
               <div class="form-group">

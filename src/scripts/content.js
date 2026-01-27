@@ -232,6 +232,7 @@
     initialized: false,
     isStartingTimers: false, // Guard flag for timer duplication
     selectors: null, // Will be loaded from SelectorManager
+    sessionStartTime: Date.now(), // For {uptime} variable calculation
     // Rate limiting state
     messageTimestamps: [],
     lastMessageTime: 0,
@@ -331,6 +332,73 @@
     for (const key in selectorCache) {
       selectorCache[key] = null;
     }
+  }
+
+  // Message variable replacement
+  // Replaces dynamic variables like {username}, {time}, {date}, {viewers} in messages
+  function replaceVariables(text, context = {}) {
+    if (!text || typeof text !== 'string') return text;
+
+    // Safe string replacement - no regex to avoid injection
+    let result = text;
+
+    // {username} - triggering user (most common)
+    if (context.username) {
+      result = result.split('{username}').join(context.username);
+    }
+
+    // {count} - command/rule usage count
+    if (typeof context.count === 'number') {
+      result = result.split('{count}').join(String(context.count));
+    }
+
+    // {time} - current time (e.g., "3:45 PM")
+    const now = new Date();
+    result = result.split('{time}').join(now.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    }));
+
+    // {date} - current date (e.g., "Jan 27, 2026")
+    result = result.split('{date}').join(now.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    }));
+
+    // {uptime} - stream duration (if available)
+    if (context.uptime) {
+      result = result.split('{uptime}').join(context.uptime);
+    } else {
+      // Calculate uptime from session start
+      const uptimeMs = Date.now() - (state.sessionStartTime || Date.now());
+      const hours = Math.floor(uptimeMs / 3600000);
+      const minutes = Math.floor((uptimeMs % 3600000) / 60000);
+      const uptimeStr = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+      result = result.split('{uptime}').join(uptimeStr);
+    }
+
+    // {platform} - current platform
+    const platform = detectPlatform();
+    result = result.split('{platform}').join(platform || 'Live');
+
+    // {viewers} - current viewer count (from chat metrics)
+    const viewerCount = state.chatMetrics?.uniqueChattersThisSession?.size || 0;
+    result = result.split('{viewers}').join(String(viewerCount));
+
+    return result;
+  }
+
+  // Detect current platform from URL
+  function detectPlatform() {
+    const hostname = window.location.hostname.toLowerCase();
+    if (hostname.includes('whatnot.com')) return 'Whatnot';
+    if (hostname.includes('tiktok.com')) return 'TikTok';
+    if (hostname.includes('facebook.com')) return 'Facebook';
+    if (hostname.includes('instagram.com')) return 'Instagram';
+    if (hostname.includes('youtube.com')) return 'YouTube';
+    return null;
   }
 
   // SECURITY: Safe analytics tracking wrapper
@@ -805,16 +873,21 @@
     // Update cooldown
     commandCooldowns.set(commandTrigger, now);
 
-    // Replace {username} placeholder (safe string replacement - no regex to avoid injection)
-    const response = command.response.split('{username}').join(username);
+    // Update usage count before variable replacement
+    command.usageCount = (command.usageCount || 0) + 1;
+
+    // Replace variables with context (includes {username}, {count}, {time}, etc.)
+    const response = replaceVariables(command.response, {
+      username,
+      count: command.usageCount
+    });
 
     sendChatMessage(response);
 
     // Track analytics
     safeTrackAnalytics('command', { trigger: commandTrigger });
 
-    // Update usage count (persist to storage)
-    command.usageCount = (command.usageCount || 0) + 1;
+    // Persist updated usage count to storage
     StorageWriter.queue('whatnotBotSettings', state.settings);
 
     // Notify popup of command usage update (popup may not be open)
@@ -945,7 +1018,7 @@
     state.welcomedUsers.add(username);
     // LRUSet automatically handles size limits - no manual cleanup needed
 
-    const message = state.settings.welcome.message.split('{username}').join(username);
+    const message = replaceVariables(state.settings.welcome.message, { username });
 
     // Add delay to avoid spam
     setTimeout(() => {
@@ -976,8 +1049,13 @@
           console.log(`[BuzzChat] FAQ trigger matched: ${trigger}`);
 
           if (canSendMessage()) {
-            // Safe string replacement - no regex to avoid injection
-            const reply = rule.reply.split('{username}').join(username);
+            // Track usage count for {count} variable
+            rule.usageCount = (rule.usageCount || 0) + 1;
+            // Replace variables with context
+            const reply = replaceVariables(rule.reply, {
+              username,
+              count: rule.usageCount
+            });
             sendChatMessage(reply);
             // Track analytics with trigger keyword
             safeTrackAnalytics('faq', { trigger: trigger.toLowerCase() });
@@ -1013,7 +1091,9 @@
 
       const intervalId = setInterval(() => {
         if (canSendMessage()) {
-          sendChatMessage(msg.text);
+          // Replace variables (timer messages support {time}, {date}, {uptime}, {platform}, {viewers})
+          const processedText = replaceVariables(msg.text, {});
+          sendChatMessage(processedText);
           // Track analytics
           safeTrackAnalytics('timer');
           console.log(`[BuzzChat] Timer message #${index + 1} sent`);

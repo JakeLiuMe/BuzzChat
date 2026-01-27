@@ -40,8 +40,7 @@ Competitors like Nightbot support dynamic variables in messages. BuzzChat only h
 - [ ] Unit tests for variable replacement
 
 ## Done summary
-TBD
-
+- Task completed
 ## Evidence
 - Commits:
 - Tests:

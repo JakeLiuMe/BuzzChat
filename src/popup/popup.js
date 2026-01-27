@@ -368,7 +368,7 @@ const StorageErrorHandler = {
 
     // Only notify user after repeated failures
     if (this.errorCount >= this.MAX_ERRORS_BEFORE_NOTIFY) {
-      Toast.error(`Settings may not be saving. Please refresh and try again.`);
+      Toast.error('Settings may not be saving. Please refresh and try again.');
       this.errorCount = 0; // Reset counter
     }
   },
