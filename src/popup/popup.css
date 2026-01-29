@@ -241,7 +241,7 @@ body {
 .header-right {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-sm); /* Tighter grouping for action buttons */
 }
 
 .status-badge {
@@ -289,6 +289,7 @@ body {
 }
 
 .member-since {
+  display: none !important; /* Hidden - date shown in tooltip on tier label */
   font-size: 11px;
   color: rgba(255, 255, 255, 0.95);
   margin-left: auto;
@@ -482,6 +483,14 @@ body {
   stroke: currentColor;
   fill: none;
   stroke-width: 1.5;
+}
+
+.tab-btn span {
+  font-size: 12px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tab-btn:hover {
@@ -770,6 +779,31 @@ body {
 .btn-lg {
   padding: 14px 24px;
   font-size: 14px;
+}
+
+/* Ghost button - low-emphasis secondary actions */
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+}
+
+.btn-ghost:hover {
+  background: var(--bg-tertiary);
+}
+
+.btn-ghost:active {
+  background: var(--bg-secondary);
+  transform: scale(0.98);
+}
+
+.btn-ghost:disabled {
+  opacity: 0.5;
+}
+
+.btn-ghost:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 /* Timer Messages */

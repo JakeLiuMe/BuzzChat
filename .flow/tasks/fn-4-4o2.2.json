@@ -1,14 +1,21 @@
 {
-  "assignee": null,
+  "assignee": "147540282+JakeLiuMe@users.noreply.github.com",
   "claim_note": "",
-  "claimed_at": null,
+  "claimed_at": "2026-01-29T23:45:57.789066Z",
   "created_at": "2026-01-29T23:08:07.481232Z",
   "depends_on": [],
   "epic": "fn-4-4o2",
+  "evidence": {
+    "commits": [
+      "24fba0f1ba143ec4c705518947601a8b78c57220"
+    ],
+    "prs": [],
+    "tests": []
+  },
   "id": "fn-4-4o2.2",
   "priority": null,
   "spec_path": ".flow/tasks/fn-4-4o2.2.md",
-  "status": "todo",
+  "status": "done",
   "title": "Improve visual hierarchy: tabs, tier banner, button importance",
-  "updated_at": "2026-01-29T23:10:20.255044Z"
+  "updated_at": "2026-01-29T23:49:22.262837Z"
 }

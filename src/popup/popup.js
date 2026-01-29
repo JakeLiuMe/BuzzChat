@@ -1677,19 +1677,18 @@ async function updateTierBanner() {
       }
     }
 
-    // Show membership date if available
-    if (memberSince && settings.memberSince) {
+    // Initialize memberSince for new Pro users if not set
+    if (!settings.memberSince) {
+      settings.memberSince = new Date().toISOString();
+      saveSettings();
+    }
+
+    // Add tooltip showing member date (element hidden via CSS)
+    if (settings.memberSince) {
       const date = new Date(settings.memberSince);
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      memberSince.textContent = `Member since ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
-      memberSince.style.display = 'inline';
-    } else if (memberSince) {
-      // If no memberSince date, set it now for new Pro users
-      if (!settings.memberSince) {
-        settings.memberSince = new Date().toISOString();
-        saveSettings();
+      if (!isNaN(date)) {
+        tierLabel.title = 'Member since ' + date.toLocaleDateString();
       }
-      memberSince.style.display = 'none';
     }
 
     tierLabel.textContent = isMaxTier ? 'Max' : 'Pro';
