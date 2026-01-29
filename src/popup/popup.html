@@ -671,54 +671,60 @@
         <button class="modal-close" id="closeSettingsBtn" aria-label="Close modal">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="form-group">
-          <label class="toggle-label dark-mode-toggle">
-            <span>Dark Mode</span>
-            <input type="checkbox" id="darkModeToggle" aria-label="Enable dark mode" role="switch">
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-        <div class="form-group">
-          <label for="chatSelector">Chat Input Selector (Advanced)</label>
-          <input type="text" id="chatSelector" placeholder="Auto-detect" aria-describedby="chatSelector-help" title="Custom CSS selector for chat input field">
-          <small id="chatSelector-help" class="help-text">Leave blank for auto-detection</small>
-        </div>
-        <div class="form-group">
-          <label class="toggle-label">
-            <span>Sound Notifications</span>
-            <input type="checkbox" id="soundNotifications" checked aria-label="Enable sound notifications" role="switch">
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-        <div class="form-group">
-          <label class="toggle-label">
-            <span>Show Message Count</span>
-            <input type="checkbox" id="showMessageCount" checked aria-label="Show message count" role="switch">
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-        <div class="form-group watermark-setting">
-          <label class="toggle-label">
-            <span>Powered by BuzzChat</span>
-            <input type="checkbox" id="watermarkToggle" aria-label="Add BuzzChat watermark to messages" role="switch" title="Adds '- BuzzChat' to the end of your messages">
-            <span class="toggle-slider"></span>
-          </label>
-          <small id="watermark-help" class="help-text watermark-bonus">Add "- BuzzChat" to your messages to help spread the word</small>
-        </div>
-        <div class="form-group">
-          <h4>Export / Import</h4>
-          <div class="form-row">
-            <button class="btn btn-secondary" id="exportSettingsBtn" title="Download all settings as JSON file">Export All</button>
-            <button class="btn btn-secondary" id="importSettingsBtn" title="Restore settings from JSON file">Import</button>
+        <!-- General Settings Section -->
+        <details class="settings-section" open>
+          <summary>General</summary>
+          <div class="settings-section-content">
+            <div class="form-group">
+              <label class="toggle-label dark-mode-toggle">
+                <span>Dark Mode</span>
+                <input type="checkbox" id="darkModeToggle" aria-label="Enable dark mode" role="switch">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label for="chatSelector">Chat Input Selector (Advanced)</label>
+              <input type="text" id="chatSelector" placeholder="Auto-detect" aria-describedby="chatSelector-help" title="Custom CSS selector for chat input field">
+              <small id="chatSelector-help" class="help-text">Leave blank for auto-detection</small>
+            </div>
+            <div class="form-group">
+              <label class="toggle-label">
+                <span>Sound Notifications</span>
+                <input type="checkbox" id="soundNotifications" checked aria-label="Enable sound notifications" role="switch">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label class="toggle-label">
+                <span>Show Message Count</span>
+                <input type="checkbox" id="showMessageCount" checked aria-label="Show message count" role="switch">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="form-group watermark-setting">
+              <label class="toggle-label">
+                <span>Powered by BuzzChat</span>
+                <input type="checkbox" id="watermarkToggle" aria-label="Add BuzzChat watermark to messages" role="switch" title="Adds '- BuzzChat' to the end of your messages">
+                <span class="toggle-slider"></span>
+              </label>
+              <small id="watermark-help" class="help-text watermark-bonus">Add "- BuzzChat" to your messages to help spread the word</small>
+            </div>
+            <div class="form-group">
+              <h4>Export / Import</h4>
+              <div class="form-row">
+                <button class="btn btn-secondary" id="exportSettingsBtn" title="Download all settings as JSON file">Export All</button>
+                <button class="btn btn-secondary" id="importSettingsBtn" title="Restore settings from JSON file">Import</button>
+              </div>
+              <input type="file" id="importFile" accept=".json" style="display: none;">
+            </div>
           </div>
-          <input type="file" id="importFile" accept=".json" style="display: none;">
-        </div>
+        </details>
 
-        <!-- Quick Reply Settings -->
-        <hr class="section-divider">
-        <div class="quick-reply-settings">
-          <h4>Quick Reply Buttons</h4>
-          <p class="help-text">These buttons appear on the live stream page for fast messaging.</p>
+        <!-- Quick Reply Settings Section -->
+        <details class="settings-section">
+          <summary>Quick Reply Buttons</summary>
+          <div class="settings-section-content">
+            <p class="help-text">These buttons appear on the live stream page for fast messaging.</p>
           <div class="form-group">
             <label class="toggle-label">
               <span>Show Quick Reply Bar</span>
@@ -726,27 +732,30 @@
               <span class="toggle-slider"></span>
             </label>
           </div>
-          <div class="quick-reply-buttons-list" id="quickReplyButtonsList">
-            <!-- Buttons rendered by JS -->
+            <div class="quick-reply-buttons-list" id="quickReplyButtonsList">
+              <!-- Buttons rendered by JS -->
+            </div>
+            <button class="btn btn-secondary btn-sm" id="addQuickReplyBtn">+ Add Button</button>
           </div>
-          <button class="btn btn-secondary btn-sm" id="addQuickReplyBtn">+ Add Button</button>
-        </div>
+        </details>
 
-        <!-- Quick Reply Hotkeys -->
-        <hr class="section-divider">
-        <div class="hotkey-settings">
-          <h4>Quick Reply Hotkeys</h4>
-          <p class="help-text">Use Ctrl+1 through Ctrl+9 to instantly send messages while on a live stream.</p>
-          <div class="hotkey-list" id="hotkeyList">
-            <!-- Hotkey slots rendered by JS -->
+        <!-- Hotkeys Section -->
+        <details class="settings-section">
+          <summary>Hotkeys</summary>
+          <div class="settings-section-content">
+            <p class="help-text">Use Ctrl+1 through Ctrl+9 to instantly send messages while on a live stream.</p>
+            <div class="hotkey-list" id="hotkeyList">
+              <!-- Hotkey slots rendered by JS -->
+            </div>
           </div>
-        </div>
+        </details>
 
-        <!-- Keyword Alerts -->
-        <hr class="section-divider">
-        <div class="keyword-alerts-settings">
-          <h4>Keyword Mention Alerts</h4>
-          <p class="help-text">Get notified when specific words appear in chat.</p>
+        <!-- Alerts Section -->
+        <details class="settings-section">
+          <summary>Alerts</summary>
+          <div class="settings-section-content">
+            <h4>Keyword Mention Alerts</h4>
+            <p class="help-text">Get notified when specific words appear in chat.</p>
           <div class="form-group">
             <label class="toggle-label">
               <span>Enable Keyword Alerts</span>
@@ -759,40 +768,37 @@
             <input type="text" id="keywordAlertsList" placeholder="shipping, returns, discount">
             <small class="help-text">You'll be alerted when these words appear in chat</small>
           </div>
-          <div class="form-group">
-            <label class="toggle-label">
-              <span>Sound Notification</span>
-              <input type="checkbox" id="keywordAlertsSoundToggle" checked aria-label="Enable sound for keyword alerts" role="switch">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
+            <div class="form-group">
+              <label class="toggle-label">
+                <span>Sound Notification</span>
+                <input type="checkbox" id="keywordAlertsSoundToggle" checked aria-label="Enable sound for keyword alerts" role="switch">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
 
-        <!-- Bid Alerts -->
-        <hr class="section-divider">
-        <div class="bid-alerts-settings">
-          <h4>Bid Alerts</h4>
-          <p class="help-text">Get notified when viewers place bids (detects $XX, "bid $XX", etc.)</p>
-          <div class="form-group">
-            <label class="toggle-label">
-              <span>Enable Bid Alerts</span>
-              <input type="checkbox" id="bidAlertsToggle" aria-label="Enable bid alerts" role="switch">
-              <span class="toggle-slider"></span>
-            </label>
+            <h4 style="margin-top: var(--space-lg);">Bid Alerts</h4>
+            <p class="help-text">Get notified when viewers place bids (detects $XX, "bid $XX", etc.)</p>
+            <div class="form-group">
+              <label class="toggle-label">
+                <span>Enable Bid Alerts</span>
+                <input type="checkbox" id="bidAlertsToggle" aria-label="Enable bid alerts" role="switch">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label for="bidAlertsMinAmount">Minimum Bid Amount ($)</label>
+              <input type="number" id="bidAlertsMinAmount" value="0" min="0" max="10000" step="1">
+              <small class="help-text">Only alert for bids at or above this amount</small>
+            </div>
+            <div class="form-group">
+              <label class="toggle-label">
+                <span>Sound Notification</span>
+                <input type="checkbox" id="bidAlertsSoundToggle" checked aria-label="Enable sound for bid alerts" role="switch">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="bidAlertsMinAmount">Minimum Bid Amount ($)</label>
-            <input type="number" id="bidAlertsMinAmount" value="0" min="0" max="10000" step="1">
-            <small class="help-text">Only alert for bids at or above this amount</small>
-          </div>
-          <div class="form-group">
-            <label class="toggle-label">
-              <span>Sound Notification</span>
-              <input type="checkbox" id="bidAlertsSoundToggle" checked aria-label="Enable sound for bid alerts" role="switch">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
+        </details>
 
         <!-- Quick Reply Button Template -->
         <template id="quickReplyTemplate">
@@ -813,10 +819,11 @@
           </div>
         </template>
 
-        <!-- API Access Section (Max tier only) -->
-        <hr class="section-divider">
-        <div class="api-section" id="apiSection" style="display: none;">
-          <h4>API Access</h4>
+        <!-- API Access Section -->
+        <details class="settings-section">
+          <summary>API Access</summary>
+          <div class="settings-section-content">
+            <div class="api-section" id="apiSection" style="display: none;">
           <p class="api-description">Control BuzzChat externally via MCP server or REST API.</p>
 
           <!-- API Keys List -->
@@ -871,24 +878,26 @@
                 <pre>curl -X POST http://localhost:3847/bot/enable \
   -H "Authorization: Bearer your-api-key"</pre>
               </div>
-            </details>
+              </details>
+            </div>
           </div>
-        </div>
 
-        <!-- API Access Locked (Free/Pro tier) -->
-        <div class="api-locked" id="apiLocked">
-          <div class="locked-badge">
-            <span class="locked-icon">🔒</span>
-            <span class="locked-text">Max Feature</span>
+          <!-- API Access Locked (Free/Pro tier) -->
+          <div class="api-locked" id="apiLocked">
+            <div class="locked-badge">
+              <span class="locked-icon">🔒</span>
+              <span class="locked-text">Max Feature</span>
+            </div>
+            <p>API access lets you control BuzzChat from external tools, automation scripts, or AI assistants like Claude.</p>
+            <button class="btn btn-primary btn-sm" id="unlockApiBtn">Upgrade to Max</button>
           </div>
-          <p>API access lets you control BuzzChat from external tools, automation scripts, or AI assistants like Claude.</p>
-          <button class="btn btn-primary btn-sm" id="unlockApiBtn">Upgrade to Max</button>
-        </div>
+          </div>
+        </details>
 
         <!-- Referral Section -->
-        <hr class="section-divider">
-        <div class="referral-section" id="referralSection">
-          <h4>Invite Friends, Earn Rewards</h4>
+        <details class="settings-section">
+          <summary>Referrals</summary>
+          <div class="settings-section-content">
           <p class="referral-description">Share BuzzChat with other Whatnot sellers. You both get +10 bonus messages when they join!</p>
 
           <div class="referral-link-container">
@@ -916,9 +925,10 @@
               <input type="text" id="redeemCode" placeholder="Enter code" class="redeem-code-input">
               <button class="btn btn-secondary btn-sm" id="redeemCodeBtn">Redeem</button>
             </div>
-            <small class="help-text referral-redeemed" id="referralRedeemedMsg" style="display: none;">You've already redeemed a referral code</small>
+              <small class="help-text referral-redeemed" id="referralRedeemedMsg" style="display: none;">You've already redeemed a referral code</small>
+            </div>
           </div>
-        </div>
+        </details>
       </div>
     </div>
   </div>

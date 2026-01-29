@@ -988,6 +988,58 @@ body {
   border-top: 1px solid var(--gray-200);
 }
 
+/* Settings Section - Collapsible accordions (scoped to settings modal) */
+.settings-section {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-md);
+  background: var(--bg-secondary);
+}
+
+.settings-section summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md);
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-primary);
+  list-style: none;
+}
+
+.settings-section summary::-webkit-details-marker {
+  display: none;
+}
+
+.settings-section summary::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--text-secondary);
+  border-bottom: 2px solid var(--text-secondary);
+  transform: rotate(-45deg);
+  transition: transform 0.2s ease;
+}
+
+.settings-section[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.settings-section summary:hover {
+  background: var(--bg-tertiary);
+}
+
+.settings-section summary:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.settings-section-content {
+  padding: var(--space-md);
+  padding-top: 0;
+  border-top: 1px solid var(--border-color);
+}
+
 /* Confirmation Dialog Modal */
 .confirm-modal {
   max-width: 340px;
