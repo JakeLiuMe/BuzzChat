@@ -1,14 +1,21 @@
 {
-  "assignee": null,
+  "assignee": "147540282+JakeLiuMe@users.noreply.github.com",
   "claim_note": "",
-  "claimed_at": null,
+  "claimed_at": "2026-01-29T23:55:37.389520Z",
   "created_at": "2026-01-29T23:08:11.794012Z",
   "depends_on": [],
   "epic": "fn-4-4o2",
+  "evidence": {
+    "commits": [
+      "4563e57c1a04baaaea9fcc03db924f6db78283f2"
+    ],
+    "prs": [],
+    "tests": []
+  },
   "id": "fn-4-4o2.4",
   "priority": null,
   "spec_path": ".flow/tasks/fn-4-4o2.4.md",
-  "status": "todo",
+  "status": "done",
   "title": "Reorganize Giveaway tab with visual separators and grouping",
-  "updated_at": "2026-01-29T23:10:57.455758Z"
+  "updated_at": "2026-01-29T23:58:25.970324Z"
 }

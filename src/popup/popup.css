@@ -2522,6 +2522,78 @@ body {
 /* ===========================================
    Giveaway & Moderation Tabs
    =========================================== */
+
+/* Giveaway Section Groups - visual grouping per Gestalt principles */
+.giveaway-group {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.giveaway-group-header {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.giveaway-group-primary {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.05), rgba(124, 58, 237, 0.02));
+  border-color: rgba(124, 58, 237, 0.2);
+}
+
+/* Giveaway Analytics as collapsible details */
+.giveaway-analytics {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  margin-top: var(--space-md);
+}
+
+.giveaway-analytics summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md);
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  list-style: none;
+}
+
+.giveaway-analytics summary::-webkit-details-marker {
+  display: none;
+}
+
+.giveaway-analytics summary::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--text-secondary);
+  border-bottom: 2px solid var(--text-secondary);
+  transform: rotate(-45deg);
+  transition: transform 0.2s ease;
+}
+
+.giveaway-analytics[open] summary {
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.giveaway-analytics[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.giveaway-analytics-content {
+  padding: var(--space-md);
+}
+
 .giveaway-stats {
   display: flex;
   justify-content: center;
