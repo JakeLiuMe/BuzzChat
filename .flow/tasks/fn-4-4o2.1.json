@@ -1,0 +1,14 @@
+{
+  "assignee": null,
+  "claim_note": "",
+  "claimed_at": null,
+  "created_at": "2026-01-29T23:07:55.469770Z",
+  "depends_on": [],
+  "epic": "fn-4-4o2",
+  "id": "fn-4-4o2.1",
+  "priority": null,
+  "spec_path": ".flow/tasks/fn-4-4o2.1.md",
+  "status": "todo",
+  "title": "Consolidate duplicate CSS and standardize button patterns",
+  "updated_at": "2026-01-29T23:10:12.648728Z"
+}

@@ -1,0 +1,13 @@
+{
+  "branch_name": "fn-4-4o2",
+  "created_at": "2026-01-29T23:06:58.149895Z",
+  "depends_on_epics": [],
+  "id": "fn-4-4o2",
+  "next_task": 1,
+  "plan_review_status": "ship",
+  "plan_reviewed_at": "2026-01-29T23:38:15.806956Z",
+  "spec_path": ".flow/specs/fn-4-4o2.md",
+  "status": "open",
+  "title": "Chrome Extension UX Polish: Academic Design Principles Audit",
+  "updated_at": "2026-01-29T23:38:15.807349Z"
+}

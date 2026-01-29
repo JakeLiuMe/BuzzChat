@@ -147,6 +147,12 @@
   background: #e5e7eb;
 }
 
+.whatnot-bot-quick-btn:active {
+  transform: scale(0.96);
+  background: #7c3aed;
+  color: white;
+}
+
 .whatnot-bot-quick-btn.active {
   background: #7c3aed;
   color: white;

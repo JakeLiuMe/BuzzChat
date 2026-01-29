@@ -1,0 +1,16 @@
+{
+  "assignee": null,
+  "claim_note": "",
+  "claimed_at": null,
+  "created_at": "2026-01-29T23:08:16.010830Z",
+  "depends_on": [
+    "fn-4-4o2.1"
+  ],
+  "epic": "fn-4-4o2",
+  "id": "fn-4-4o2.6",
+  "priority": null,
+  "spec_path": ".flow/tasks/fn-4-4o2.6.md",
+  "status": "todo",
+  "title": "Replace hardcoded values with CSS variables",
+  "updated_at": "2026-01-29T23:11:24.314654Z"
+}

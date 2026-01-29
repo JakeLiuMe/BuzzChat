@@ -1,0 +1,14 @@
+{
+  "assignee": null,
+  "claim_note": "",
+  "claimed_at": null,
+  "created_at": "2026-01-29T23:08:07.481232Z",
+  "depends_on": [],
+  "epic": "fn-4-4o2",
+  "id": "fn-4-4o2.2",
+  "priority": null,
+  "spec_path": ".flow/tasks/fn-4-4o2.2.md",
+  "status": "todo",
+  "title": "Improve visual hierarchy: tabs, tier banner, button importance",
+  "updated_at": "2026-01-29T23:10:20.255044Z"
+}
