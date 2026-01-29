@@ -3,8 +3,13 @@
   /* Colors */
   --primary: #7c3aed;
   --primary-hover: #6d28d9;
+  --primary-active: #5b21b6;
   --success: #10b981;
+  --success-hover: #059669;
+  --success-active: #047857;
   --danger: #ef4444;
+  --danger-hover: #dc2626;
+  --danger-active: #b91c1c;
   --warning: #f59e0b;
   --gray-50: #f9fafb;
   --gray-100: #f3f4f6;
@@ -734,7 +739,7 @@ body {
 }
 
 .btn-success:hover {
-  background: #059669;
+  background: var(--success-hover);
 }
 
 .btn-danger {
@@ -744,7 +749,7 @@ body {
 }
 
 .btn-danger:hover {
-  background: #dc2626;
+  background: var(--danger-hover);
 }
 
 .btn-link {
@@ -1354,6 +1359,22 @@ body {
 /* Button press effect */
 .btn:active {
   transform: scale(0.97);
+}
+
+/* Variant-specific active states - placed after .btn:active for proper specificity */
+.btn-primary:active:not(:disabled) {
+  background: var(--primary-active);
+  transform: scale(0.98);
+}
+
+.btn-danger:active:not(:disabled) {
+  background: var(--danger-active);
+  transform: scale(0.98);
+}
+
+.btn-success:active:not(:disabled) {
+  background: var(--success-active);
+  transform: scale(0.98);
 }
 
 /* Toggle bounce effect */

@@ -1,14 +1,21 @@
 {
-  "assignee": null,
+  "assignee": "147540282+JakeLiuMe@users.noreply.github.com",
   "claim_note": "",
-  "claimed_at": null,
+  "claimed_at": "2026-01-29T23:43:17.237684Z",
   "created_at": "2026-01-29T23:07:55.469770Z",
   "depends_on": [],
   "epic": "fn-4-4o2",
+  "evidence": {
+    "commits": [
+      "c71bd32d270072900df6dcea8f67e3e2af2ea10e"
+    ],
+    "prs": [],
+    "tests": []
+  },
   "id": "fn-4-4o2.1",
   "priority": null,
   "spec_path": ".flow/tasks/fn-4-4o2.1.md",
-  "status": "todo",
+  "status": "done",
   "title": "Consolidate duplicate CSS and standardize button patterns",
-  "updated_at": "2026-01-29T23:10:12.648728Z"
+  "updated_at": "2026-01-29T23:45:15.247486Z"
 }
