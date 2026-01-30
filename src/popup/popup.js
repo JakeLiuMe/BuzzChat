@@ -1746,10 +1746,12 @@ async function updateTierBanner() {
     }
   }
 
-  // Hide credits section for non-max tiers
+  // Hide credits section and badge for non-max tiers
   const creditsSection = document.getElementById('aiCreditsSection');
-  if (creditsSection && !isMaxTier) {
-    creditsSection.style.display = 'none';
+  const creditsBadge = document.getElementById('aiCreditsBadge');
+  if (!isMaxTier) {
+    if (creditsSection) creditsSection.style.display = 'none';
+    if (creditsBadge) creditsBadge.style.display = 'none';
   }
 }
 
@@ -1759,6 +1761,9 @@ async function updateAICreditsDisplay() {
   const creditsFill = document.getElementById('creditsFill');
   const creditsRemaining = document.getElementById('creditsRemaining');
   const creditsResetDate = document.getElementById('creditsResetDate');
+  // Compact badge in tier banner
+  const creditsBadge = document.getElementById('aiCreditsBadge');
+  const creditsCount = document.getElementById('aiCreditsCount');
 
   if (!creditsSection) return;
 
@@ -1773,6 +1778,9 @@ async function updateAICreditsDisplay() {
       creditsSection.style.display = 'block';
       if (creditsFill) creditsFill.style.width = '100%';
       if (creditsRemaining) creditsRemaining.textContent = '500';
+      // Show compact badge with defaults
+      if (creditsBadge) creditsBadge.style.display = 'inline-flex';
+      if (creditsCount) creditsCount.textContent = '500';
       return;
     }
 
@@ -1790,6 +1798,20 @@ async function updateAICreditsDisplay() {
     // Update remaining count
     if (creditsRemaining) {
       creditsRemaining.textContent = remaining;
+    }
+
+    // Update compact badge in tier banner
+    if (creditsBadge) {
+      creditsBadge.style.display = 'inline-flex';
+      creditsBadge.classList.remove('warning', 'critical');
+      if (remaining <= 10) {
+        creditsBadge.classList.add('critical');
+      } else if (remaining <= 50) {
+        creditsBadge.classList.add('warning');
+      }
+    }
+    if (creditsCount) {
+      creditsCount.textContent = remaining;
     }
 
     // Update reset date
@@ -1810,6 +1832,7 @@ async function updateAICreditsDisplay() {
     console.error('[BuzzChat] Failed to update credits display:', error);
     // Show section with defaults on error
     creditsSection.style.display = 'block';
+    if (creditsBadge) creditsBadge.style.display = 'inline-flex';
   }
 }
 

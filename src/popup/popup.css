@@ -385,6 +385,38 @@ body {
   color: var(--success);
 }
 
+/* Compact AI Credits Badge (Max tier) */
+.ai-credits-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success);
+  margin-left: 8px;
+}
+
+.ai-credits-badge.warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--warning);
+}
+
+.ai-credits-badge.critical {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+}
+
+.ai-credits-icon {
+  font-size: 11px;
+}
+
+.ai-credits-count {
+  font-variant-numeric: tabular-nums;
+}
+
 /* Master Toggle */
 .master-toggle {
   padding: 12px 16px;
