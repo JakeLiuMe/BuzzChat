@@ -383,10 +383,13 @@ const StorageErrorHandler = {
 const Loading = {
   show(button) {
     if (!button) return;
-    // Store prior disabled state to restore later
-    if (!button.hasAttribute('data-prev-disabled')) {
+    // Use refcount to handle overlapping async calls
+    const count = parseInt(button.getAttribute('data-loading-count') || '0', 10);
+    if (count === 0) {
+      // First show: store prior disabled state
       button.setAttribute('data-prev-disabled', button.disabled ? 'true' : 'false');
     }
+    button.setAttribute('data-loading-count', String(count + 1));
     button.classList.add('loading');
     button.disabled = true;
     button.setAttribute('aria-busy', 'true');
@@ -395,13 +398,24 @@ const Loading = {
 
   hide(button) {
     if (!button) return;
-    button.classList.remove('loading');
-    // Restore prior disabled state
-    const wasDisabled = button.getAttribute('data-prev-disabled') === 'true';
-    button.disabled = wasDisabled;
-    button.setAttribute('aria-busy', 'false');
-    button.setAttribute('aria-disabled', wasDisabled ? 'true' : 'false');
-    button.removeAttribute('data-prev-disabled');
+    const count = parseInt(button.getAttribute('data-loading-count') || '0', 10);
+    if (count <= 1) {
+      // Last hide: restore state
+      button.classList.remove('loading');
+      const wasDisabled = button.getAttribute('data-prev-disabled') === 'true';
+      button.disabled = wasDisabled;
+      button.removeAttribute('aria-busy');
+      if (wasDisabled) {
+        button.setAttribute('aria-disabled', 'true');
+      } else {
+        button.removeAttribute('aria-disabled');
+      }
+      button.removeAttribute('data-prev-disabled');
+      button.removeAttribute('data-loading-count');
+    } else {
+      // Decrement count, keep loading
+      button.setAttribute('data-loading-count', String(count - 1));
+    }
   }
 };
 
@@ -1694,14 +1708,14 @@ async function updateTierBanner() {
     }
 
     // Add tooltip showing member date (element hidden via CSS)
-    if (settings.memberSince) {
+    if (tierLabel && settings.memberSince) {
       const date = new Date(settings.memberSince);
-      if (!isNaN(date)) {
+      if (!Number.isNaN(date.getTime())) {
         tierLabel.title = 'Member since ' + date.toLocaleDateString();
       }
     }
 
-    tierLabel.textContent = isMaxTier ? 'Max' : 'Pro';
+    if (tierLabel) tierLabel.textContent = isMaxTier ? 'Max' : 'Pro';
     tierUsage.textContent = isMaxTier ? 'AI-powered + Unlimited features' : 'Unlimited features + Analytics';
 
     // Show AI credits for Max tier
@@ -2781,7 +2795,9 @@ function updateGiveawayEntryCount(count, animate = false) {
   const counter = elements.giveawayEntryCount;
   if (!counter) return;
 
-  const safeCount = Math.max(0, Math.floor(count));
+  // Validate input and coerce to safe integer
+  const n = Number(count);
+  const safeCount = Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
 
   // Pulse animation when count increases (after initial load)
   if (animate && giveawayCountInitialized && safeCount > previousGiveawayEntryCount) {
