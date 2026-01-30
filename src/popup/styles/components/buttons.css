@@ -56,11 +56,11 @@
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: #dc2626;
+  background: var(--danger-hover);
 }
 
 .btn-danger:active:not(:disabled) {
-  background: #b91c1c;
+  background: var(--danger-active);
   transform: scale(0.98);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
 }
@@ -71,11 +71,11 @@
 }
 
 .btn-success:hover:not(:disabled) {
-  background: #059669;
+  background: var(--success-hover);
 }
 
 .btn-success:active:not(:disabled) {
-  background: #047857;
+  background: var(--success-active);
   transform: scale(0.98);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
 }
@@ -116,7 +116,7 @@
 }
 
 .icon-btn.danger:hover {
-  background: #fee2e2;
+  background: var(--danger-light);
   color: var(--danger);
 }
 
@@ -126,7 +126,7 @@
 }
 
 .icon-btn.danger:active {
-  background: #fecaca;
+  background: var(--danger-light-active);
 }
 
 .icon-btn svg {

@@ -1,7 +1,7 @@
 {
-  "assignee": null,
+  "assignee": "147540282+JakeLiuMe@users.noreply.github.com",
   "claim_note": "",
-  "claimed_at": null,
+  "claimed_at": "2026-01-30T00:02:47.086439Z",
   "created_at": "2026-01-29T23:08:16.010830Z",
   "depends_on": [
     "fn-4-4o2.1"
@@ -10,7 +10,7 @@
   "id": "fn-4-4o2.6",
   "priority": null,
   "spec_path": ".flow/tasks/fn-4-4o2.6.md",
-  "status": "todo",
+  "status": "in_progress",
   "title": "Replace hardcoded values with CSS variables",
-  "updated_at": "2026-01-29T23:11:24.314654Z"
+  "updated_at": "2026-01-30T00:02:47.086451Z"
 }

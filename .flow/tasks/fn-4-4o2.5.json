@@ -5,10 +5,15 @@
   "created_at": "2026-01-29T23:08:13.920010Z",
   "depends_on": [],
   "epic": "fn-4-4o2",
+  "evidence": {
+    "commits": [],
+    "prs": [],
+    "tests": []
+  },
   "id": "fn-4-4o2.5",
   "priority": null,
   "spec_path": ".flow/tasks/fn-4-4o2.5.md",
-  "status": "in_progress",
+  "status": "done",
   "title": "Add micro-interaction polish: loading states, animations",
-  "updated_at": "2026-01-29T23:58:41.040494Z"
+  "updated_at": "2026-01-30T00:02:30.399836Z"
 }
