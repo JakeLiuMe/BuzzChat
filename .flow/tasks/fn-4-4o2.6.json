@@ -7,10 +7,15 @@
     "fn-4-4o2.1"
   ],
   "epic": "fn-4-4o2",
+  "evidence": {
+    "commits": [],
+    "prs": [],
+    "tests": []
+  },
   "id": "fn-4-4o2.6",
   "priority": null,
   "spec_path": ".flow/tasks/fn-4-4o2.6.md",
-  "status": "in_progress",
+  "status": "done",
   "title": "Replace hardcoded values with CSS variables",
-  "updated_at": "2026-01-30T00:02:47.086451Z"
+  "updated_at": "2026-01-30T00:04:48.773619Z"
 }

@@ -383,6 +383,10 @@ const StorageErrorHandler = {
 const Loading = {
   show(button) {
     if (!button) return;
+    // Store prior disabled state to restore later
+    if (!button.hasAttribute('data-prev-disabled')) {
+      button.setAttribute('data-prev-disabled', button.disabled ? 'true' : 'false');
+    }
     button.classList.add('loading');
     button.disabled = true;
     button.setAttribute('aria-busy', 'true');
@@ -392,9 +396,12 @@ const Loading = {
   hide(button) {
     if (!button) return;
     button.classList.remove('loading');
-    button.disabled = false;
+    // Restore prior disabled state
+    const wasDisabled = button.getAttribute('data-prev-disabled') === 'true';
+    button.disabled = wasDisabled;
     button.setAttribute('aria-busy', 'false');
-    button.setAttribute('aria-disabled', 'false');
+    button.setAttribute('aria-disabled', wasDisabled ? 'true' : 'false');
+    button.removeAttribute('data-prev-disabled');
   }
 };
 
@@ -1679,10 +1686,11 @@ async function updateTierBanner() {
       }
     }
 
-    // Initialize memberSince for new Pro users if not set
+    // Initialize memberSince for new premium users if not set
+    // Note: We set this in-memory during render but don't persist here
+    // to avoid write operations in UI refresh. The value persists on next user action.
     if (!settings.memberSince) {
       settings.memberSince = new Date().toISOString();
-      saveSettings();
     }
 
     // Add tooltip showing member date (element hidden via CSS)
@@ -2766,6 +2774,7 @@ async function importCommands(event) {
 let currentWinners = [];
 let giveawayEntries = [];
 let previousGiveawayEntryCount = 0;
+let giveawayCountInitialized = false;
 
 // Update giveaway entry count with optional animation
 function updateGiveawayEntryCount(count, animate = false) {
@@ -2774,8 +2783,8 @@ function updateGiveawayEntryCount(count, animate = false) {
 
   const safeCount = Math.max(0, Math.floor(count));
 
-  // Pulse animation when count increases (only if enabled and not first load)
-  if (animate && safeCount > previousGiveawayEntryCount && previousGiveawayEntryCount > 0) {
+  // Pulse animation when count increases (after initial load)
+  if (animate && giveawayCountInitialized && safeCount > previousGiveawayEntryCount) {
     // Respect reduced motion preference
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       counter.classList.add('pulse-animation');
@@ -2785,6 +2794,7 @@ function updateGiveawayEntryCount(count, animate = false) {
 
   counter.textContent = safeCount;
   previousGiveawayEntryCount = safeCount;
+  giveawayCountInitialized = true;
 }
 
 // Spin the giveaway wheel (or random pick for free tier)

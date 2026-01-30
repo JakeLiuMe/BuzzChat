@@ -460,6 +460,7 @@ body {
 
 .tab-btn {
   flex: 1;
+  min-width: 0; /* Allow flex items to shrink for text truncation */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -486,8 +487,10 @@ body {
 }
 
 .tab-btn span {
+  display: block;
   font-size: 12px;
   max-width: 100%;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
