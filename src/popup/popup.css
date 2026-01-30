@@ -1530,6 +1530,24 @@ body {
   }
 }
 
+/* Giveaway counter pulse animation */
+@keyframes counter-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.pulse-animation {
+  animation: counter-pulse 0.2s ease-out;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .pulse-animation {
+    animation: none;
+  }
+}
+
 /* Modal entrance animation */
 .modal.active {
   animation: modalFadeIn 0.2s ease;
@@ -3737,6 +3755,17 @@ body {
 
 .spin-wheel-btn:active {
   transform: scale(0.98);
+}
+
+/* Spin wheel loading state */
+.spin-wheel-btn.loading {
+  opacity: 0.7;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.spin-wheel-btn.loading .wheel-icon {
+  animation: spin 0.75s linear infinite;
 }
 
 .wheel-icon {

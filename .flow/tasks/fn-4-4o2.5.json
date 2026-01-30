@@ -1,14 +1,14 @@
 {
-  "assignee": null,
+  "assignee": "147540282+JakeLiuMe@users.noreply.github.com",
   "claim_note": "",
-  "claimed_at": null,
+  "claimed_at": "2026-01-29T23:58:41.040477Z",
   "created_at": "2026-01-29T23:08:13.920010Z",
   "depends_on": [],
   "epic": "fn-4-4o2",
   "id": "fn-4-4o2.5",
   "priority": null,
   "spec_path": ".flow/tasks/fn-4-4o2.5.md",
-  "status": "todo",
+  "status": "in_progress",
   "title": "Add micro-interaction polish: loading states, animations",
-  "updated_at": "2026-01-29T23:11:04.983255Z"
+  "updated_at": "2026-01-29T23:58:41.040494Z"
 }

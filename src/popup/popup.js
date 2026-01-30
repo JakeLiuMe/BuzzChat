@@ -386,6 +386,7 @@ const Loading = {
     button.classList.add('loading');
     button.disabled = true;
     button.setAttribute('aria-busy', 'true');
+    button.setAttribute('aria-disabled', 'true');
   },
 
   hide(button) {
@@ -393,6 +394,7 @@ const Loading = {
     button.classList.remove('loading');
     button.disabled = false;
     button.setAttribute('aria-busy', 'false');
+    button.setAttribute('aria-disabled', 'false');
   }
 };
 
@@ -2337,9 +2339,9 @@ function initEventListeners() {
         }
       }
     } else if (message.type === 'GIVEAWAY_ENTRY') {
-      // Update giveaway count live (validate totalEntries is a number)
-      if (elements.giveawayEntryCount && typeof message.totalEntries === 'number') {
-        elements.giveawayEntryCount.textContent = Math.max(0, Math.floor(message.totalEntries));
+      // Update giveaway count live with animation (validate totalEntries is a number)
+      if (typeof message.totalEntries === 'number') {
+        updateGiveawayEntryCount(message.totalEntries, true);
       }
       // Refresh full list
       loadGiveawayData();
@@ -2763,6 +2765,27 @@ async function importCommands(event) {
 // Store current winners for announce/reroll
 let currentWinners = [];
 let giveawayEntries = [];
+let previousGiveawayEntryCount = 0;
+
+// Update giveaway entry count with optional animation
+function updateGiveawayEntryCount(count, animate = false) {
+  const counter = elements.giveawayEntryCount;
+  if (!counter) return;
+
+  const safeCount = Math.max(0, Math.floor(count));
+
+  // Pulse animation when count increases (only if enabled and not first load)
+  if (animate && safeCount > previousGiveawayEntryCount && previousGiveawayEntryCount > 0) {
+    // Respect reduced motion preference
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      counter.classList.add('pulse-animation');
+      setTimeout(() => counter.classList.remove('pulse-animation'), 200);
+    }
+  }
+
+  counter.textContent = safeCount;
+  previousGiveawayEntryCount = safeCount;
+}
 
 // Spin the giveaway wheel (or random pick for free tier)
 async function spinGiveawayWheel() {
@@ -4344,10 +4367,8 @@ async function loadGiveawayData() {
     });
 
     if (response?.success) {
-      // Update entry count (safe - textContent)
-      if (elements.giveawayEntryCount) {
-        elements.giveawayEntryCount.textContent = response.totalEntries || 0;
-      }
+      // Update entry count (no animation for initial load)
+      updateGiveawayEntryCount(response.totalEntries || 0, false);
 
       // Update entries list using safe DOM methods (no innerHTML)
       if (elements.giveawayEntriesList) {
