@@ -1,8 +1,25 @@
-// BuzzChat - Content Script
+// BuzzChat - Content Script (Legacy Monolithic Version)
 // Copyright (c) 2024-2026 BuzzChat. All rights reserved.
 // Unauthorized copying, modification, or distribution is strictly prohibited.
 // This software is protected by copyright law and international treaties.
 // Handles all chat automation on live selling platforms
+//
+// ============================================================================
+// DEPRECATION NOTICE
+// ============================================================================
+// This monolithic file is maintained for backwards compatibility.
+// New development should use the modular architecture:
+//   - Entry point: src/scripts/content-entry.js
+//   - Modules: src/scripts/content/
+//   - Build: npm run build:bundle
+//
+// To switch to modular version:
+//   1. Run: npm run build:bundle
+//   2. Update manifest.json content_scripts to use dist/scripts/content.js
+//   3. Test thoroughly before deploying
+//
+// See docs/ARCHITECTURE.md for details on the modular structure.
+// ============================================================================
 
 (function() {
   'use strict';
