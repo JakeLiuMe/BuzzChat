@@ -6,6 +6,8 @@
 
 The BuzzChat API allows you to programmatically control extension features, retrieve analytics data, and integrate with external tools like MCP servers, automation platforms, and custom dashboards.
 
+> **OpenAPI Specification**: For a machine-readable API definition, see [`openapi.yaml`](./openapi.yaml). This can be imported into tools like Swagger UI, Postman, or used to generate client SDKs.
+
 ## Authentication
 
 All API requests require authentication using an API key.

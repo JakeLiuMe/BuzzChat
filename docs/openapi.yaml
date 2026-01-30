@@ -1,0 +1,550 @@
+openapi: 3.0.3
+info:
+  title: BuzzChat API
+  description: |
+    REST API for BuzzChat Chrome Extension.
+
+    Allows programmatic control of extension features, analytics retrieval,
+    and integration with external tools like MCP servers and automation platforms.
+
+    **Note:** API access requires Business tier subscription.
+  version: 1.0.0
+  contact:
+    email: api-support@buzzchat.app
+  license:
+    name: Proprietary
+    url: https://buzzchat.app/terms
+
+servers:
+  - url: https://api.buzzchat.app/v1
+    description: Production API
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Analytics
+    description: Session analytics and metrics
+  - name: Messages
+    description: Send chat messages
+  - name: Giveaways
+    description: Manage giveaway entries and winners
+  - name: Settings
+    description: Bot configuration
+  - name: Accounts
+    description: Multi-account management (Max tier)
+
+paths:
+  /analytics:
+    get:
+      tags:
+        - Analytics
+      summary: Get session analytics
+      description: Retrieve analytics data for chat sessions
+      parameters:
+        - name: period
+          in: query
+          description: Time period for analytics
+          schema:
+            type: string
+            enum: [day, week, month, all]
+            default: week
+        - name: account
+          in: query
+          description: Account ID for multi-account users
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Analytics data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /analytics/faq-triggers:
+    get:
+      tags:
+        - Analytics
+      summary: Get top FAQ triggers
+      description: Retrieve most frequently matched FAQ keywords
+      responses:
+        '200':
+          description: FAQ trigger statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaqTriggersResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /messages/send:
+    post:
+      tags:
+        - Messages
+      summary: Send a chat message
+      description: Send a message to the active chat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+      responses:
+        '200':
+          description: Message sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendMessageResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /giveaway/entries:
+    get:
+      tags:
+        - Giveaways
+      summary: Get current entries
+      description: Retrieve list of giveaway entries
+      responses:
+        '200':
+          description: Entry list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GiveawayEntriesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      tags:
+        - Giveaways
+      summary: Clear all entries
+      description: Remove all giveaway entries
+      responses:
+        '200':
+          description: Entries cleared
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /giveaway/pick-winner:
+    post:
+      tags:
+        - Giveaways
+      summary: Pick random winner
+      description: Randomly select winner(s) from entries
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PickWinnerRequest'
+      responses:
+        '200':
+          description: Winner selected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PickWinnerResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /settings:
+    get:
+      tags:
+        - Settings
+      summary: Get current settings
+      description: Retrieve bot configuration
+      responses:
+        '200':
+          description: Settings object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    patch:
+      tags:
+        - Settings
+      summary: Update settings
+      description: Partially update bot configuration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SettingsUpdate'
+      responses:
+        '200':
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /accounts:
+    get:
+      tags:
+        - Accounts
+      summary: List accounts
+      description: Get all configured accounts (Max tier)
+      responses:
+        '200':
+          description: Account list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/InsufficientTier'
+
+  /accounts/switch:
+    post:
+      tags:
+        - Accounts
+      summary: Switch active account
+      description: Change the currently active account configuration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SwitchAccountRequest'
+      responses:
+        '200':
+          description: Account switched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: API key from Settings > API Access
+
+  schemas:
+    AnalyticsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            totalMessages:
+              type: integer
+              example: 1250
+            welcomeMessages:
+              type: integer
+              example: 450
+            faqReplies:
+              type: integer
+              example: 320
+            timerMessages:
+              type: integer
+              example: 480
+            period:
+              type: string
+              example: week
+            breakdown:
+              type: object
+              properties:
+                welcome:
+                  type: number
+                  example: 36
+                faq:
+                  type: number
+                  example: 25.6
+                timer:
+                  type: number
+                  example: 38.4
+
+    FaqTriggersResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            triggers:
+              type: array
+              items:
+                type: object
+                properties:
+                  keyword:
+                    type: string
+                  count:
+                    type: integer
+
+    SendMessageRequest:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          maxLength: 500
+          example: "Thanks for joining! Use code SAVE10 for 10% off!"
+        delay:
+          type: integer
+          minimum: 0
+          default: 0
+          description: Delay in milliseconds before sending
+
+    SendMessageResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            messageId:
+              type: string
+              example: msg_abc123
+            sentAt:
+              type: string
+              format: date-time
+
+    GiveawayEntriesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            entries:
+              type: array
+              items:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+            count:
+              type: integer
+
+    PickWinnerRequest:
+      type: object
+      properties:
+        count:
+          type: integer
+          minimum: 1
+          maximum: 10
+          default: 1
+
+    PickWinnerResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            winners:
+              type: array
+              items:
+                type: string
+            timestamp:
+              type: string
+              format: date-time
+
+    SettingsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            botActive:
+              type: boolean
+            welcomeEnabled:
+              type: boolean
+            welcomeMessage:
+              type: string
+            welcomeDelay:
+              type: integer
+            timerMessages:
+              type: array
+              items:
+                type: object
+            faqRules:
+              type: array
+              items:
+                type: object
+
+    SettingsUpdate:
+      type: object
+      properties:
+        welcomeEnabled:
+          type: boolean
+        welcomeMessage:
+          type: string
+        welcomeDelay:
+          type: integer
+        timerEnabled:
+          type: boolean
+        faqEnabled:
+          type: boolean
+
+    AccountsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            accounts:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  isActive:
+                    type: boolean
+
+    SwitchAccountRequest:
+      type: object
+      required:
+        - accountId
+      properties:
+        accountId:
+          type: string
+
+    SuccessMessage:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+                - INVALID_API_KEY
+                - RATE_LIMIT_EXCEEDED
+                - INSUFFICIENT_TIER
+                - VALIDATION_ERROR
+                - BOT_INACTIVE
+                - NOT_FOUND
+            message:
+              type: string
+
+  responses:
+    Unauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: INVALID_API_KEY
+              message: The provided API key is invalid or expired
+
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: VALIDATION_ERROR
+              message: Message cannot be empty
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: NOT_FOUND
+              message: Account not found
+
+    InsufficientTier:
+      description: Feature requires higher tier
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: INSUFFICIENT_TIER
+              message: This feature requires Business tier
+
+    RateLimited:
+      description: Rate limit exceeded
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+          description: Requests allowed per minute
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+          description: Requests remaining
+        X-RateLimit-Reset:
+          schema:
+            type: integer
+          description: Unix timestamp when limit resets
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: RATE_LIMIT_EXCEEDED
+              message: Too many requests
