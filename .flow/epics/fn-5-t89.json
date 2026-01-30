@@ -1,0 +1,13 @@
+{
+  "branch_name": "feat/a-plus-upgrade",
+  "created_at": "2026-01-30T00:49:42.287619Z",
+  "depends_on_epics": [],
+  "id": "fn-5-t89",
+  "next_task": 1,
+  "plan_review_status": "unknown",
+  "plan_reviewed_at": null,
+  "spec_path": ".flow/specs/fn-5-t89.md",
+  "status": "open",
+  "title": "BuzzChat A+ Upgrade: Accessibility, API Docs, and Code Quality",
+  "updated_at": "2026-01-30T00:49:42.287643Z"
+}

@@ -1,0 +1,14 @@
+{
+  "assignee": "147540282+JakeLiuMe@users.noreply.github.com",
+  "claim_note": "",
+  "claimed_at": "2026-01-30T00:54:35.838337Z",
+  "created_at": "2026-01-30T00:49:51.376683Z",
+  "depends_on": [],
+  "epic": "fn-5-t89",
+  "id": "fn-5-t89.1",
+  "priority": 1,
+  "spec_path": ".flow/tasks/fn-5-t89.1.md",
+  "status": "in_progress",
+  "title": "Add aria-labels to all inline SVGs",
+  "updated_at": "2026-01-30T00:54:35.838351Z"
+}
