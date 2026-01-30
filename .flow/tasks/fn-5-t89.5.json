@@ -8,7 +8,7 @@
   "id": "fn-5-t89.5",
   "priority": 5,
   "spec_path": ".flow/tasks/fn-5-t89.5.md",
-  "status": "todo",
+  "status": "in_progress",
   "title": "Implement webhook system for external integrations",
   "updated_at": "2026-01-30T00:49:56.185562Z"
 }

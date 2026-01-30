@@ -341,14 +341,134 @@ X-RateLimit-Remaining: 58
 X-RateLimit-Reset: 1706093400
 ```
 
-## Webhooks (Coming Soon)
+## Webhooks
 
-Configure webhooks to receive real-time notifications:
+Configure webhooks to receive real-time event notifications. Webhooks are available to Business tier subscribers.
 
-- New giveaway entry
-- Winner selected
-- Message sent
-- Bot status changed
+### Supported Events
+
+| Event | Description |
+|-------|-------------|
+| `giveaway.entry` | New user entered the giveaway |
+| `giveaway.winner` | Winner(s) selected |
+| `message.sent` | Bot sent a message |
+| `message.received` | Chat message received (matching FAQ/command) |
+| `bot.started` | Bot was activated |
+| `bot.stopped` | Bot was deactivated |
+
+### Register a Webhook
+
+```http
+POST /api/v1/webhooks
+```
+
+**Request Body:**
+
+```json
+{
+  "url": "https://example.com/webhooks/buzzchat",
+  "events": ["giveaway.entry", "giveaway.winner"]
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "wh_abc123",
+    "url": "https://example.com/webhooks/buzzchat",
+    "events": ["giveaway.entry", "giveaway.winner"],
+    "secret": "whsec_xyz789...",
+    "active": true,
+    "createdAt": "2025-01-24T10:00:00Z"
+  }
+}
+```
+
+> **Important**: Save the `secret` immediately - it won't be shown again. Use it to verify webhook signatures.
+
+### Webhook Payload Format
+
+All webhook events are delivered as POST requests with this structure:
+
+```json
+{
+  "id": "evt_xyz789",
+  "type": "giveaway.entry",
+  "timestamp": "2025-01-24T10:30:00Z",
+  "data": {
+    "username": "viewer123",
+    "entryTime": "2025-01-24T10:30:00Z"
+  }
+}
+```
+
+### Signature Verification
+
+Webhooks include an HMAC-SHA256 signature in the `X-BuzzChat-Signature` header. Verify it using your webhook secret:
+
+```javascript
+const crypto = require('crypto');
+
+function verifyWebhookSignature(payload, signature, secret) {
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex');
+  return crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from(expected)
+  );
+}
+```
+
+### List Webhooks
+
+```http
+GET /api/v1/webhooks
+```
+
+### Update Webhook
+
+```http
+PATCH /api/v1/webhooks/{webhookId}
+```
+
+```json
+{
+  "events": ["giveaway.entry", "giveaway.winner", "bot.started"],
+  "active": true
+}
+```
+
+### Delete Webhook
+
+```http
+DELETE /api/v1/webhooks/{webhookId}
+```
+
+### Test Webhook
+
+Send a test event to verify your endpoint is receiving webhooks correctly:
+
+```http
+POST /api/v1/webhooks/{webhookId}/test
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "delivered": true,
+    "responseCode": 200,
+    "responseTime": 150
+  }
+}
+```
 
 ## Code Examples
 
