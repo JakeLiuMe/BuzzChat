@@ -175,6 +175,7 @@ export const elements = {
 
   // Quick Reply Settings
   quickReplyToggle: null,
+  quickReplyPosition: null,
   quickReplyButtonsList: null,
   addQuickReplyBtn: null,
   quickReplyTemplate: null
@@ -354,6 +355,7 @@ export function initElements() {
 
   // Quick Reply Settings
   elements.quickReplyToggle = document.getElementById('quickReplyToggle');
+  elements.quickReplyPosition = document.getElementById('quickReplyPosition');
   elements.quickReplyButtonsList = document.getElementById('quickReplyButtonsList');
   elements.addQuickReplyBtn = document.getElementById('addQuickReplyBtn');
   elements.quickReplyTemplate = document.getElementById('quickReplyTemplate');

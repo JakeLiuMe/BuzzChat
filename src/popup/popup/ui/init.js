@@ -8,7 +8,7 @@ import { renderTimerMessages } from '../features/timers.js';
 import { renderFaqRules } from '../features/faq.js';
 import { renderTemplates } from '../features/templates.js';
 import { renderCommands } from '../features/commands.js';
-import { renderQuickReplyButtons } from '../features/quickReply.js';
+import { renderQuickReplyButtons, initQuickReplyPosition } from '../features/quickReply.js';
 import { loadGiveawayData, loadChatMetrics } from '../features/giveaway.js';
 import { initAnalytics } from '../features/analytics.js';
 import { initBusinessFeatures } from './businessUI.js';
@@ -49,6 +49,7 @@ export function initUI() {
     elements.quickReplyToggle.checked = settings.quickReply?.enabled !== false;
   }
   renderQuickReplyButtons();
+  initQuickReplyPosition();
 
   // Moderation
   if (elements.moderationToggle) {

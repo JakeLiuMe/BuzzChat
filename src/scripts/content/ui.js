@@ -159,13 +159,27 @@ export function showQuickReplyBar() {
       style.textContent = `
         #buzzchat-quick-reply {
           position: fixed;
-          bottom: 80px;
-          right: 20px;
           display: flex;
           flex-direction: column;
           gap: 8px;
           z-index: 9999;
           transition: all 0.3s ease;
+        }
+        #buzzchat-quick-reply[data-position="bottom-right"] {
+          bottom: 80px;
+          right: 20px;
+        }
+        #buzzchat-quick-reply[data-position="bottom-left"] {
+          bottom: 80px;
+          left: 20px;
+        }
+        #buzzchat-quick-reply[data-position="top-right"] {
+          top: 80px;
+          right: 20px;
+        }
+        #buzzchat-quick-reply[data-position="top-left"] {
+          top: 80px;
+          left: 20px;
         }
         #buzzchat-quick-reply.minimized .quick-reply-buttons {
           display: none;
@@ -238,6 +252,10 @@ export function showQuickReplyBar() {
       document.head.appendChild(style);
     }
   }
+
+  // Set position from settings (default: bottom-right)
+  const position = quickReply.position || 'bottom-right';
+  bar.setAttribute('data-position', position);
 
   // Clear bar safely - remove all children to avoid memory leaks
   while (bar.firstChild) {

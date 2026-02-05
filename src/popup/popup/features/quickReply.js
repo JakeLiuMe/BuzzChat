@@ -85,3 +85,22 @@ export function addQuickReplyButton() {
   renderQuickReplyButtons();
   saveSettings();
 }
+
+// Initialize quick reply position selector
+export function initQuickReplyPosition() {
+  if (!elements.quickReplyPosition) return;
+
+  // Set initial value from settings
+  const position = settings.quickReply?.position || 'bottom-right';
+  elements.quickReplyPosition.value = position;
+
+  // Listen for changes
+  elements.quickReplyPosition.addEventListener('change', async () => {
+    if (!settings.quickReply) {
+      settings.quickReply = { enabled: true, minimized: false, buttons: [], position: 'bottom-right' };
+    }
+    settings.quickReply.position = elements.quickReplyPosition.value;
+    await saveSettings();
+    Toast.success('Position updated');
+  });
+}
