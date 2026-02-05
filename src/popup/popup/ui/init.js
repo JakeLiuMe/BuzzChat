@@ -3,7 +3,7 @@
 
 import { settings } from '../core/state.js';
 import { elements, initElements } from './elements.js';
-import { applyDarkMode, updateStatusBadge, updateTierBanner } from './theme.js';
+import { applyDarkMode, updateStatusBadge, updateTierBanner, initDarkModeListener } from './theme.js';
 import { renderTimerMessages } from '../features/timers.js';
 import { renderFaqRules } from '../features/faq.js';
 import { renderTemplates } from '../features/templates.js';
@@ -84,11 +84,14 @@ export function initUI() {
   elements.soundNotifications.checked = settings.settings.soundNotifications;
   elements.showMessageCount.checked = settings.settings.showMessageCount;
 
-  // Dark mode
+  // Dark mode - supports 'auto' (system preference), true, or false
   if (elements.darkModeToggle) {
-    elements.darkModeToggle.checked = settings.settings.darkMode;
+    elements.darkModeToggle.checked = settings.settings.darkMode === true ||
+      (settings.settings.darkMode === 'auto' && window.matchMedia?.('(prefers-color-scheme: dark)').matches);
     applyDarkMode(settings.settings.darkMode);
   }
+  // Listen for system dark mode changes
+  initDarkModeListener();
 
   // Watermark toggle
   if (elements.watermarkToggle) {

@@ -6,13 +6,37 @@ import { VALIDATION } from '../core/config.js';
 import { saveSettings } from '../core/storage.js';
 import { elements } from './elements.js';
 
+// Check if system prefers dark mode
+export function getSystemDarkMode() {
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
 // Apply dark mode to the document
 export function applyDarkMode(enabled) {
-  if (enabled) {
+  // If 'auto' or undefined, use system preference
+  const shouldBeDark = enabled === 'auto' || enabled === undefined
+    ? getSystemDarkMode()
+    : enabled;
+
+  if (shouldBeDark) {
     document.documentElement.setAttribute('data-theme', 'dark');
   } else {
     document.documentElement.removeAttribute('data-theme');
   }
+}
+
+// Listen for system dark mode changes and auto-apply
+export function initDarkModeListener() {
+  if (!window.matchMedia) return;
+
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  mediaQuery.addEventListener('change', (e) => {
+    // Only auto-apply if user hasn't set a manual preference
+    // or if they've explicitly chosen 'auto'
+    if (settings.settings?.darkMode === 'auto' || settings.settings?.darkMode === undefined) {
+      applyDarkMode(e.matches);
+    }
+  });
 }
 
 // Update status badge
