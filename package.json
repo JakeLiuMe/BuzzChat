@@ -48,7 +48,7 @@
     "eslint": "^8.56.0",
     "playwright": "^1.57.0",
     "rollup": "^4.9.6",
-    "sharp": "^0.33.2",
+    "sharp": "^0.34.5",
     "terser": "^5.31.0"
   },
   "engines": {
