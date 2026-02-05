@@ -1,1103 +1,2386 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BuzzChat — AI-Powered Live Selling Chat Automation</title>
-    <meta name="description" content="Automate your live selling chat on Whatnot, YouTube, eBay, Twitch & Kick. AI-powered responses, auto-welcome, giveaway tracking & more. Free Chrome extension.">
-    <meta name="theme-color" content="#6C3AED">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        /* ===== RESET & BASE ===== */
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            color: #1a1a2e;
-            background: #ffffff;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-        img, svg { display: block; max-width: 100%; }
-        a { color: inherit; text-decoration: none; }
-        button { font-family: inherit; cursor: pointer; border: none; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BuzzChat — Live Selling Chat Automation for Whatnot, YouTube, eBay & More</title>
+<meta name="description" content="Automate your live selling chat with AI-powered responses, auto-welcome messages, FAQ replies, and giveaway tracking. Works on Whatnot, YouTube, eBay, Twitch, and Kick.">
+<meta property="og:title" content="BuzzChat — Live Selling Chat Automation">
+<meta property="og:description" content="Automate your live selling chat with AI-powered responses. Auto-welcome, FAQ replies, timer messages, giveaway tracking. Free Chrome extension.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://buzzchat.live">
+<meta property="og:image" content="https://buzzchat.live/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="BuzzChat — Live Selling Chat Automation">
+<meta name="twitter:description" content="Automate your live selling chat with AI-powered responses. Free Chrome extension.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "BuzzChat",
+  "applicationCategory": "BrowserApplication",
+  "operatingSystem": "Chrome",
+  "offers": [
+    { "@type": "Offer", "price": "0", "priceCurrency": "USD", "name": "Free" },
+    { "@type": "Offer", "price": "9.99", "priceCurrency": "USD", "name": "Pro" },
+    { "@type": "Offer", "price": "24.99", "priceCurrency": "USD", "name": "Max" }
+  ],
+  "description": "AI-powered live selling chat automation Chrome extension for Whatnot, YouTube, eBay, Twitch, and Kick.",
+  "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.9", "ratingCount": "312" }
+}
+</script>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES — LIGHT & DARK THEMES
+   ============================================ */
+:root {
+  /* Primary palette */
+  --purple-50: #f5f3ff;
+  --purple-100: #ede9fe;
+  --purple-200: #ddd6fe;
+  --purple-300: #c4b5fd;
+  --purple-400: #a78bfa;
+  --purple-500: #8b5cf6;
+  --purple-600: #6C3AED;
+  --purple-700: #5b21b6;
+  --purple-800: #4c1d95;
+  --purple-900: #3b0f7a;
 
-        /* ===== UTILITIES ===== */
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-        .section-label {
-            display: inline-flex; align-items: center; gap: 6px;
-            font-size: 13px; font-weight: 600; letter-spacing: 0.08em;
-            text-transform: uppercase; color: #7c3aed;
-            background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(99,102,241,0.08));
-            padding: 6px 14px; border-radius: 100px;
-            margin-bottom: 16px;
-        }
-        .section-title {
-            font-size: clamp(32px, 5vw, 48px);
-            font-weight: 800; line-height: 1.15;
-            letter-spacing: -0.03em;
-            color: #0f0a1a;
-        }
-        .section-subtitle {
-            font-size: 18px; line-height: 1.7;
-            color: #64618a; max-width: 600px;
-            margin: 16px auto 0;
-        }
-        .text-center { text-align: center; }
-        .text-gradient {
-            background: linear-gradient(135deg, #7c3aed 0%, #6366f1 50%, #3b82f6 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+  --indigo-500: #6366f1;
+  --indigo-600: #4f46e5;
 
-        /* ===== BUTTONS ===== */
-        .btn {
-            display: inline-flex; align-items: center; gap: 10px;
-            font-size: 16px; font-weight: 600;
-            padding: 14px 28px; border-radius: 12px;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
-            color: #fff;
-            box-shadow: 0 4px 24px rgba(124,58,237,0.3), 0 1px 2px rgba(0,0,0,0.06);
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 32px rgba(124,58,237,0.4), 0 2px 4px rgba(0,0,0,0.08);
-        }
-        .btn-secondary {
-            background: #fff;
-            color: #1a1a2e;
-            border: 1.5px solid #e2e0ea;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        }
-        .btn-secondary:hover {
-            border-color: #c4c0d8;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-        }
-        .btn-chrome-icon {
-            width: 20px; height: 20px;
-        }
+  /* Semantic tokens — light mode */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f7ff;
+  --bg-tertiary: #f1f0fb;
+  --bg-card: #ffffff;
+  --bg-card-hover: #faf9ff;
+  --bg-code: #f3f2fc;
+  --bg-nav: rgba(255,255,255,0.82);
+  --bg-footer: #0f0a1e;
 
-        /* ===== NAV ===== */
-        nav {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-            background: rgba(255,255,255,0.85);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-        }
-        nav .container {
-            display: flex; align-items: center; justify-content: space-between;
-            height: 64px;
-        }
-        .nav-logo {
-            display: flex; align-items: center; gap: 10px;
-            font-size: 20px; font-weight: 800; letter-spacing: -0.02em;
-        }
-        .nav-logo-icon {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, #7c3aed, #6366f1);
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px; line-height: 1;
-        }
-        .nav-links { display: flex; align-items: center; gap: 32px; }
-        .nav-links a {
-            font-size: 14px; font-weight: 500; color: #64618a;
-            transition: color 0.2s;
-        }
-        .nav-links a:hover { color: #7c3aed; }
-        .nav-cta .btn { padding: 10px 20px; font-size: 14px; border-radius: 10px; }
-        .mobile-toggle { display: none; background: none; padding: 8px; }
-        .mobile-toggle span {
-            display: block; width: 20px; height: 2px;
-            background: #1a1a2e; margin: 5px 0;
-            transition: all 0.3s;
-        }
+  --text-primary: #1a1135;
+  --text-secondary: #4a4164;
+  --text-tertiary: #7c7394;
+  --text-on-purple: #ffffff;
+  --text-footer: #c4b5fd;
+  --text-footer-dim: #8b7fad;
 
-        /* ===== HERO ===== */
-        .hero {
-            padding: 140px 0 100px;
-            position: relative;
-            overflow: hidden;
-        }
-        .hero::before {
-            content: '';
-            position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
-            width: 900px; height: 900px;
-            background: radial-gradient(circle, rgba(124,58,237,0.06) 0%, rgba(99,102,241,0.03) 40%, transparent 70%);
-            pointer-events: none;
-        }
-        .hero-content { position: relative; z-index: 1; text-align: center; }
-        .hero-badge {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(59,130,246,0.06));
-            border: 1px solid rgba(124,58,237,0.12);
-            padding: 8px 18px; border-radius: 100px;
-            font-size: 14px; font-weight: 500; color: #6d28d9;
-            margin-bottom: 32px;
-            animation: fadeInUp 0.6s ease;
-        }
-        .hero h1 {
-            font-size: clamp(40px, 6.5vw, 72px);
-            font-weight: 900; line-height: 1.05;
-            letter-spacing: -0.04em;
-            max-width: 800px; margin: 0 auto 24px;
-            animation: fadeInUp 0.6s ease 0.1s both;
-        }
-        .hero p {
-            font-size: clamp(17px, 2vw, 20px);
-            color: #64618a; line-height: 1.7;
-            max-width: 560px; margin: 0 auto 40px;
-            animation: fadeInUp 0.6s ease 0.2s both;
-        }
-        .hero-buttons {
-            display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
-            animation: fadeInUp 0.6s ease 0.3s both;
-        }
-        .hero-stats {
-            display: flex; gap: 48px; justify-content: center; flex-wrap: wrap;
-            margin-top: 72px; padding-top: 48px;
-            border-top: 1px solid #f0eef5;
-            animation: fadeInUp 0.6s ease 0.4s both;
-        }
-        .hero-stat { text-align: center; }
-        .hero-stat-value {
-            font-size: 36px; font-weight: 800; letter-spacing: -0.03em;
-        }
-        .hero-stat-label {
-            font-size: 14px; color: #9896a8; margin-top: 4px; font-weight: 500;
-        }
+  --border-primary: #e9e5f5;
+  --border-secondary: #d4cfe6;
 
-        /* ===== PLATFORMS ===== */
-        .platforms {
-            padding: 60px 0 80px;
-            background: #faf9fc;
-            border-top: 1px solid #f0eef5;
-            border-bottom: 1px solid #f0eef5;
-        }
-        .platforms-label {
-            text-align: center; font-size: 14px; font-weight: 500;
-            color: #9896a8; margin-bottom: 32px;
-            letter-spacing: 0.04em; text-transform: uppercase;
-        }
-        .platforms-grid {
-            display: flex; justify-content: center; align-items: center;
-            gap: 48px; flex-wrap: wrap;
-        }
-        .platform-item {
-            display: flex; align-items: center; gap: 12px;
-            font-size: 18px; font-weight: 600; color: #3d3a50;
-            opacity: 0.7; transition: opacity 0.2s;
-        }
-        .platform-item:hover { opacity: 1; }
-        .platform-icon {
-            width: 44px; height: 44px;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 22px;
-            background: #fff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
+  --shadow-sm: 0 1px 2px rgba(107,58,237,0.05);
+  --shadow-md: 0 4px 16px rgba(107,58,237,0.08);
+  --shadow-lg: 0 8px 32px rgba(107,58,237,0.10);
+  --shadow-xl: 0 16px 48px rgba(107,58,237,0.12);
+  --shadow-glow: 0 0 40px rgba(108,58,237,0.15);
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(107,58,237,0.06);
 
-        /* ===== FEATURES ===== */
-        .features { padding: 120px 0; }
-        .features-header { text-align: center; margin-bottom: 72px; }
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-        }
-        .feature-card {
-            padding: 36px;
-            border-radius: 20px;
-            border: 1px solid #f0eef5;
-            background: #fff;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .feature-card:hover {
-            border-color: #e0daf0;
-            box-shadow: 0 8px 40px rgba(124,58,237,0.06);
-            transform: translateY(-4px);
-        }
-        .feature-card::after {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(135deg, #7c3aed, #6366f1, #3b82f6);
-            opacity: 0; transition: opacity 0.3s;
-        }
-        .feature-card:hover::after { opacity: 1; }
-        .feature-icon {
-            width: 52px; height: 52px;
-            border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        .feature-icon-ai { background: linear-gradient(135deg, #ede9fe, #e0e7ff); }
-        .feature-icon-welcome { background: linear-gradient(135deg, #fce7f3, #fce4ec); }
-        .feature-icon-timer { background: linear-gradient(135deg, #e0f2fe, #dbeafe); }
-        .feature-icon-faq { background: linear-gradient(135deg, #d1fae5, #dcfce7); }
-        .feature-icon-giveaway { background: linear-gradient(135deg, #fef3c7, #fef9c3); }
-        .feature-icon-multi { background: linear-gradient(135deg, #f3e8ff, #ede9fe); }
-        .feature-card h3 {
-            font-size: 18px; font-weight: 700;
-            margin-bottom: 10px; letter-spacing: -0.01em;
-        }
-        .feature-card p {
-            font-size: 15px; color: #64618a; line-height: 1.65;
-        }
-        .feature-badge {
-            display: inline-block;
-            font-size: 11px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.06em;
-            color: #7c3aed; background: rgba(124,58,237,0.08);
-            padding: 3px 10px; border-radius: 6px;
-            margin-bottom: 16px;
-        }
+  --gradient-hero: linear-gradient(135deg, #f8f7ff 0%, #ede9fe 50%, #e0e7ff 100%);
+  --gradient-cta: linear-gradient(135deg, #6C3AED, #4f46e5);
+  --gradient-glow: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(108,58,237,0.06), transparent 40%);
 
-        /* ===== AI SPOTLIGHT ===== */
-        .ai-spotlight {
-            padding: 120px 0;
-            background: #0f0a1a;
-            position: relative;
-            overflow: hidden;
-        }
-        .ai-spotlight::before {
-            content: '';
-            position: absolute; top: -300px; right: -200px;
-            width: 700px; height: 700px;
-            background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 60%);
-            pointer-events: none;
-        }
-        .ai-spotlight::after {
-            content: '';
-            position: absolute; bottom: -200px; left: -150px;
-            width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 60%);
-            pointer-events: none;
-        }
-        .ai-content {
-            position: relative; z-index: 1;
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 80px; align-items: center;
-        }
-        .ai-text .section-label { color: #a78bfa; background: rgba(167,139,250,0.1); }
-        .ai-text .section-title { color: #fff; }
-        .ai-text .section-subtitle { color: #a5a2c0; margin: 16px 0 0; }
-        .ai-features-list { margin-top: 36px; display: flex; flex-direction: column; gap: 16px; }
-        .ai-feature-item {
-            display: flex; align-items: flex-start; gap: 14px;
-            color: #c4c0e0; font-size: 15px;
-        }
-        .ai-feature-check {
-            flex-shrink: 0;
-            width: 24px; height: 24px; border-radius: 8px;
-            background: rgba(124,58,237,0.2);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 13px; margin-top: 2px;
-        }
-        .ai-visual {
-            background: linear-gradient(145deg, #1a1530, #16112a);
-            border: 1px solid rgba(124,58,237,0.2);
-            border-radius: 20px;
-            padding: 32px;
-            position: relative;
-        }
-        .ai-chat-demo { display: flex; flex-direction: column; gap: 16px; }
-        .ai-chat-bubble {
-            padding: 14px 18px;
-            border-radius: 14px;
-            font-size: 14px;
-            line-height: 1.6;
-            max-width: 90%;
-            animation: fadeInUp 0.4s ease both;
-        }
-        .ai-chat-viewer {
-            background: rgba(255,255,255,0.06);
-            color: #a5a2c0;
-            align-self: flex-start;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-        .ai-chat-bot {
-            background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(99,102,241,0.15));
-            color: #e0daf0;
-            align-self: flex-end;
-            border: 1px solid rgba(124,58,237,0.2);
-        }
-        .ai-chat-label {
-            font-size: 11px; font-weight: 600;
-            text-transform: uppercase; letter-spacing: 0.08em;
-            margin-bottom: 6px; opacity: 0.5;
-        }
+  /* Chat demo */
+  --chat-bg: #f8f7ff;
+  --chat-msg-bg: #ffffff;
+  --chat-msg-bot: #ede9fe;
+  --chat-header: #1a1135;
+  --chat-border: #e9e5f5;
 
-        /* ===== HOW IT WORKS ===== */
-        .how-it-works { padding: 120px 0; background: #faf9fc; }
-        .steps {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 40px; margin-top: 72px;
-        }
-        .step {
-            text-align: center; padding: 0 16px;
-            position: relative;
-        }
-        .step-number {
-            width: 56px; height: 56px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, #7c3aed, #6366f1);
-            color: #fff;
-            font-size: 22px; font-weight: 800;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 24px;
-            box-shadow: 0 4px 20px rgba(124,58,237,0.25);
-        }
-        .step h3 {
-            font-size: 20px; font-weight: 700;
-            margin-bottom: 10px; letter-spacing: -0.01em;
-        }
-        .step p { font-size: 15px; color: #64618a; line-height: 1.65; }
-        .step-connector {
-            display: none;
-        }
+  /* Pricing */
+  --pricing-popular-bg: linear-gradient(135deg, #6C3AED, #4f46e5);
 
-        /* ===== SOCIAL PROOF ===== */
-        .social-proof { padding: 120px 0; }
-        .testimonials {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 24px; margin-top: 72px;
-        }
-        .testimonial {
-            padding: 32px;
-            border-radius: 20px;
-            border: 1px solid #f0eef5;
-            background: #fff;
-            transition: all 0.3s;
-        }
-        .testimonial:hover {
-            box-shadow: 0 8px 32px rgba(0,0,0,0.05);
-            transform: translateY(-2px);
-        }
-        .testimonial-stars {
-            font-size: 16px; letter-spacing: 2px;
-            margin-bottom: 16px;
-        }
-        .testimonial-text {
-            font-size: 15px; line-height: 1.7;
-            color: #3d3a50; margin-bottom: 20px;
-        }
-        .testimonial-author {
-            display: flex; align-items: center; gap: 12px;
-        }
-        .testimonial-avatar {
-            width: 40px; height: 40px;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px;
-            background: linear-gradient(135deg, #ede9fe, #e0e7ff);
-        }
-        .testimonial-name { font-size: 14px; font-weight: 600; }
-        .testimonial-role { font-size: 13px; color: #9896a8; }
+  /* Misc */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-        /* ===== PRICING ===== */
-        .pricing {
-            padding: 120px 0;
-            background: #0f0a1a;
-            position: relative;
-            overflow: hidden;
-        }
-        .pricing::before {
-            content: '';
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 1000px; height: 600px;
-            background: radial-gradient(ellipse, rgba(124,58,237,0.08) 0%, transparent 60%);
-            pointer-events: none;
-        }
-        .pricing .section-label { color: #a78bfa; background: rgba(167,139,250,0.1); }
-        .pricing .section-title { color: #fff; }
-        .pricing .section-subtitle { color: #a5a2c0; }
-        .pricing-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 24px; margin-top: 72px;
-            position: relative; z-index: 1;
-        }
-        .pricing-card {
-            padding: 40px 32px;
-            border-radius: 20px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
-            transition: all 0.3s;
-        }
-        .pricing-card:hover {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(255,255,255,0.1);
-            transform: translateY(-4px);
-        }
-        .pricing-card.featured {
-            background: linear-gradient(145deg, rgba(124,58,237,0.12), rgba(99,102,241,0.08));
-            border-color: rgba(124,58,237,0.3);
-            position: relative;
-        }
-        .pricing-card.featured::before {
-            content: 'Most Popular';
-            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-            background: linear-gradient(135deg, #7c3aed, #6366f1);
-            color: #fff; font-size: 12px; font-weight: 700;
-            padding: 4px 16px; border-radius: 100px;
-            text-transform: uppercase; letter-spacing: 0.06em;
-        }
-        .pricing-name {
-            font-size: 18px; font-weight: 600; color: #e0daf0;
-            margin-bottom: 8px;
-        }
-        .pricing-desc {
-            font-size: 14px; color: #8884a8; line-height: 1.6;
-            margin-bottom: 24px;
-        }
-        .pricing-amount {
-            display: flex; align-items: baseline; gap: 4px;
-            margin-bottom: 32px;
-        }
-        .pricing-currency { font-size: 24px; font-weight: 700; color: #a5a2c0; }
-        .pricing-value {
-            font-size: 52px; font-weight: 800; color: #fff;
-            letter-spacing: -0.04em; line-height: 1;
-        }
-        .pricing-period { font-size: 16px; color: #8884a8; margin-left: 4px; }
-        .pricing-features {
-            list-style: none; display: flex; flex-direction: column; gap: 14px;
-            margin-bottom: 36px;
-        }
-        .pricing-features li {
-            display: flex; align-items: center; gap: 10px;
-            font-size: 14px; color: #c4c0e0;
-        }
-        .pricing-features li::before {
-            content: '✓';
-            flex-shrink: 0;
-            width: 20px; height: 20px;
-            border-radius: 6px;
-            background: rgba(124,58,237,0.15);
-            color: #a78bfa;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px; font-weight: 700;
-        }
-        .pricing-btn {
-            width: 100%; padding: 14px; border-radius: 12px;
-            font-size: 15px; font-weight: 600;
-            text-align: center;
-            transition: all 0.2s;
-        }
-        .pricing-btn-default {
-            background: rgba(255,255,255,0.06);
-            color: #e0daf0;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .pricing-btn-default:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        .pricing-btn-featured {
-            background: linear-gradient(135deg, #7c3aed, #6366f1);
-            color: #fff;
-            box-shadow: 0 4px 20px rgba(124,58,237,0.3);
-        }
-        .pricing-btn-featured:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 28px rgba(124,58,237,0.4);
-        }
+[data-theme="dark"] {
+  --bg-primary: #0c0a13;
+  --bg-secondary: #13111c;
+  --bg-tertiary: #1a1726;
+  --bg-card: #171421;
+  --bg-card-hover: #1e1a2e;
+  --bg-code: #1e1a2e;
+  --bg-nav: rgba(12,10,19,0.88);
+  --bg-footer: #080610;
 
-        /* ===== FAQ ===== */
-        .faq { padding: 120px 0; }
-        .faq-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr);
-            gap: 24px; margin-top: 72px; max-width: 900px; margin-left: auto; margin-right: auto;
-        }
-        .faq-item {
-            padding: 28px;
-            border-radius: 16px;
-            border: 1px solid #f0eef5;
-            background: #fff;
-            transition: all 0.2s;
-        }
-        .faq-item:hover {
-            border-color: #e0daf0;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.03);
-        }
-        .faq-item h4 {
-            font-size: 15px; font-weight: 700;
-            margin-bottom: 8px; color: #1a1a2e;
-        }
-        .faq-item p {
-            font-size: 14px; color: #64618a; line-height: 1.65;
-        }
+  --text-primary: #f0ecfa;
+  --text-secondary: #b8b0cc;
+  --text-tertiary: #8a80a4;
+  --text-footer: #c4b5fd;
+  --text-footer-dim: #6b6088;
 
-        /* ===== CTA ===== */
-        .final-cta {
-            padding: 120px 0;
-            background: linear-gradient(180deg, #faf9fc, #fff);
-            text-align: center;
-        }
-        .cta-box {
-            background: linear-gradient(145deg, #0f0a1a, #1a1530);
-            border-radius: 28px;
-            padding: 80px 60px;
-            position: relative;
-            overflow: hidden;
-        }
-        .cta-box::before {
-            content: '';
-            position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
-            width: 700px; height: 500px;
-            background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 60%);
-            pointer-events: none;
-        }
-        .cta-box .section-title { color: #fff; position: relative; z-index: 1; }
-        .cta-box p {
-            color: #a5a2c0; font-size: 18px;
-            max-width: 500px; margin: 16px auto 40px;
-            position: relative; z-index: 1;
-        }
-        .cta-box .hero-buttons { position: relative; z-index: 1; }
+  --border-primary: #2a2440;
+  --border-secondary: #3a3356;
 
-        /* ===== FOOTER ===== */
-        footer {
-            background: #0f0a1a;
-            padding: 64px 0 32px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-        }
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 48px;
-            margin-bottom: 48px;
-        }
-        .footer-brand p {
-            font-size: 14px; color: #8884a8; line-height: 1.7;
-            margin-top: 12px; max-width: 280px;
-        }
-        .footer-col h4 {
-            font-size: 13px; font-weight: 600;
-            text-transform: uppercase; letter-spacing: 0.08em;
-            color: #a5a2c0; margin-bottom: 20px;
-        }
-        .footer-col a {
-            display: block; font-size: 14px; color: #8884a8;
-            padding: 5px 0; transition: color 0.2s;
-        }
-        .footer-col a:hover { color: #c4c0e0; }
-        .footer-bottom {
-            display: flex; justify-content: space-between; align-items: center;
-            padding-top: 32px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            font-size: 13px; color: #5a577a;
-        }
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
+  --shadow-xl: 0 16px 48px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 60px rgba(108,58,237,0.2);
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.2), 0 4px 12px rgba(0,0,0,0.15);
 
-        /* ===== ANIMATIONS ===== */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in {
-            opacity: 0; transform: translateY(24px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
-        }
-        .fade-in.visible {
-            opacity: 1; transform: translateY(0);
-        }
+  --gradient-hero: linear-gradient(135deg, #0c0a13 0%, #1a1135 50%, #0f172a 100%);
+  --gradient-glow: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(108,58,237,0.08), transparent 40%);
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 1024px) {
-            .features-grid { grid-template-columns: repeat(2, 1fr); }
-            .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-            .pricing-card:last-child { grid-column: span 2; max-width: 420px; margin: 0 auto; }
-            .ai-content { grid-template-columns: 1fr; gap: 48px; }
-            .footer-grid { grid-template-columns: 2fr 1fr 1fr; }
-            .footer-grid > :last-child { grid-column: span 3; }
-        }
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .mobile-toggle { display: block; }
-            .hero { padding: 120px 0 80px; }
-            .hero h1 { font-size: 36px; }
-            .hero-stats { gap: 32px; }
-            .features-grid,
-            .pricing-grid,
-            .testimonials,
-            .steps { grid-template-columns: 1fr; }
-            .pricing-card:last-child { grid-column: span 1; max-width: none; }
-            .faq-grid { grid-template-columns: 1fr; }
-            .footer-grid { grid-template-columns: 1fr; gap: 32px; }
-            .footer-grid > :last-child { grid-column: span 1; }
-            .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
-            .cta-box { padding: 48px 28px; border-radius: 20px; }
-            .section-title { font-size: 32px; }
-            .platforms-grid { gap: 24px; }
-            .ai-visual { padding: 24px; }
-        }
-        @media (max-width: 480px) {
-            .container { padding: 0 16px; }
-            .hero-buttons { flex-direction: column; align-items: center; }
-            .hero-buttons .btn { width: 100%; justify-content: center; }
-            .hero h1 { font-size: 32px; }
-        }
-    </style>
+  --chat-bg: #13111c;
+  --chat-msg-bg: #1e1a2e;
+  --chat-msg-bot: #251f3a;
+  --chat-header: #f0ecfa;
+  --chat-border: #2a2440;
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+  transition: background var(--transition), color var(--transition);
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+img { max-width: 100%; display: block; }
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ============================================
+   NAVIGATION
+   ============================================ */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--bg-nav);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-primary);
+  transition: background var(--transition), border var(--transition);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.nav-logo-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--gradient-cta);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-logo-icon svg { width: 18px; height: 18px; }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: color var(--transition);
+}
+
+.nav-links a:hover { color: var(--text-primary); }
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.theme-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: all var(--transition);
+  background: var(--bg-tertiary);
+}
+
+.theme-toggle:hover {
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
+}
+
+.theme-toggle .icon-sun,
+.theme-toggle .icon-moon { width: 18px; height: 18px; }
+
+[data-theme="light"] .theme-toggle .icon-moon { display: none; }
+[data-theme="dark"] .theme-toggle .icon-sun { display: none; }
+
+.btn-nav-cta {
+  padding: 8px 20px;
+  background: var(--gradient-cta);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.btn-nav-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(108,58,237,0.35);
+}
+
+.mobile-menu-btn {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  padding: 4px;
+}
+
+.mobile-menu-btn span {
+  width: 22px;
+  height: 2px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transition: var(--transition);
+}
+
+/* Mobile nav */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .btn-nav-cta { display: none; }
+  .mobile-menu-btn { display: flex; }
+  
+  .nav-links.open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 64px;
+    left: 0;
+    right: 0;
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-primary);
+    padding: 24px;
+    gap: 20px;
+  }
+}
+
+/* ============================================
+   HERO SECTION
+   ============================================ */
+.hero {
+  position: relative;
+  padding: 140px 0 100px;
+  background: var(--gradient-hero);
+  overflow: hidden;
+  transition: background var(--transition);
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -20%;
+  width: 140%;
+  height: 140%;
+  background: radial-gradient(ellipse at 30% 50%, rgba(108,58,237,0.08) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 30%, rgba(99,102,241,0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+[data-theme="dark"] .hero::before {
+  background: radial-gradient(ellipse at 30% 50%, rgba(108,58,237,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 30%, rgba(99,102,241,0.08) 0%, transparent 50%);
+}
+
+.hero-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-full);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.hero-badge-dot {
+  width: 6px;
+  height: 6px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.3); }
+}
+
+.hero h1 {
+  font-size: clamp(2.5rem, 5vw, 3.75rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.hero h1 .gradient-text {
+  background: linear-gradient(135deg, var(--purple-600), var(--indigo-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="dark"] .hero h1 .gradient-text {
+  background: linear-gradient(135deg, var(--purple-400), var(--purple-300));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 16px;
+  max-width: 520px;
+}
+
+.hero-platforms {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.platform-tag {
+  padding: 4px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  letter-spacing: 0.02em;
+}
+
+.hero-ctas {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  background: var(--gradient-cta);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  transition: transform var(--transition), box-shadow var(--transition);
+  box-shadow: 0 4px 16px rgba(108,58,237,0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(108,58,237,0.4);
+}
+
+.btn-primary svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-primary);
+  transition: all var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover {
+  border-color: var(--purple-400);
+  background: var(--bg-card-hover);
+  transform: translateY(-1px);
+}
+
+/* ---- Hero Chat Animation ---- */
+.hero-visual {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.chat-window {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  transition: background var(--transition), border var(--transition), box-shadow var(--transition);
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--bg-tertiary);
+  transition: background var(--transition), border var(--transition);
+}
+
+.chat-header-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dot-red { background: #ef4444; }
+.dot-yellow { background: #f59e0b; }
+.dot-green { background: #10b981; }
+
+.chat-header-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--chat-header);
+  margin-left: 6px;
+}
+
+.chat-live-badge {
+  margin-left: auto;
+  padding: 2px 10px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  animation: pulse-badge 2s ease-in-out infinite;
+}
+
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.chat-messages {
+  padding: 16px;
+  min-height: 280px;
+  max-height: 320px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--chat-bg);
+  transition: background var(--transition);
+}
+
+.chat-msg {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: msg-in 0.4s ease-out forwards;
+}
+
+.chat-msg-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.chat-msg-content {
+  padding: 8px 14px;
+  border-radius: 12px 12px 12px 4px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  max-width: 85%;
+}
+
+.chat-msg.user .chat-msg-content {
+  background: var(--chat-msg-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--chat-border);
+}
+
+.chat-msg.bot .chat-msg-content {
+  background: var(--chat-msg-bot);
+  color: var(--text-primary);
+  border: 1px solid transparent;
+}
+
+.chat-msg.bot .chat-msg-avatar { background: var(--purple-600); }
+
+.chat-msg-label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  display: inline-block;
+}
+
+.label-welcome { background: #d1fae5; color: #065f46; }
+.label-faq { background: #dbeafe; color: #1e40af; }
+.label-timer { background: #fef3c7; color: #92400e; }
+.label-ai { background: #ede9fe; color: #5b21b6; }
+
+[data-theme="dark"] .label-welcome { background: #064e3b; color: #6ee7b7; }
+[data-theme="dark"] .label-faq { background: #1e3a5f; color: #93c5fd; }
+[data-theme="dark"] .label-timer { background: #78350f; color: #fcd34d; }
+[data-theme="dark"] .label-ai { background: #3b0f7a; color: #c4b5fd; }
+
+@keyframes msg-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-primary);
+  background: var(--bg-card);
+  transition: background var(--transition), border var(--transition);
+}
+
+.chat-input-bar input {
+  flex: 1;
+  padding: 8px 14px;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-full);
+  font-size: 0.8125rem;
+  background: var(--bg-tertiary);
+  color: var(--text-tertiary);
+  outline: none;
+  transition: all var(--transition);
+}
+
+.chat-input-send {
+  width: 32px;
+  height: 32px;
+  background: var(--purple-600);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-input-send svg { width: 14px; height: 14px; color: #fff; }
+
+@media (max-width: 900px) {
+  .hero-inner { grid-template-columns: 1fr; text-align: center; }
+  .hero-sub { margin-left: auto; margin-right: auto; }
+  .hero-platforms { justify-content: center; }
+  .hero-ctas { justify-content: center; }
+  .hero-visual { margin-top: 40px; }
+  .hero-badge { margin-left: auto; margin-right: auto; }
+}
+
+/* ============================================
+   SECTION SHARED STYLES
+   ============================================ */
+section {
+  padding: 100px 0;
+  transition: background var(--transition);
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--purple-600);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+
+[data-theme="dark"] .section-label { color: var(--purple-400); }
+
+.section-title {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.section-sub {
+  font-size: 1.0625rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  line-height: 1.7;
+}
+
+.text-center { text-align: center; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+/* Fade-in on scroll */
+.fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================
+   HOW IT WORKS
+   ============================================ */
+.how-it-works { background: var(--bg-secondary); }
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  margin-top: 60px;
+}
+
+.step-card {
+  text-align: center;
+  position: relative;
+}
+
+.step-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition);
+}
+
+.step-icon svg {
+  width: 36px;
+  height: 36px;
+  color: var(--purple-600);
+}
+
+[data-theme="dark"] .step-icon svg { color: var(--purple-400); }
+
+.step-number {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(24px);
+  width: 28px;
+  height: 28px;
+  background: var(--purple-600);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(108,58,237,0.3);
+}
+
+.step-card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.step-card p {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Step connector arrows */
+.step-card:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 40px;
+  right: -24px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--border-secondary);
+  border-top: 2px solid var(--border-secondary);
+  transform: rotate(45deg);
+}
+
+@media (max-width: 768px) {
+  .steps-grid { grid-template-columns: 1fr; gap: 48px; }
+  .step-card:not(:last-child)::after { display: none; }
+}
+
+/* ============================================
+   FEATURES GRID
+   ============================================ */
+.features { background: var(--bg-primary); }
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 60px;
+}
+
+.feature-card {
+  padding: 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-cta);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--purple-300);
+}
+
+.feature-card:hover::before { opacity: 1; }
+
+[data-theme="dark"] .feature-card:hover { border-color: var(--purple-700); }
+
+.feature-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.feature-card-icon svg { width: 24px; height: 24px; }
+
+.feature-card h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feature-card p {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* AI card special glow */
+.feature-card.ai-card {
+  border-color: var(--purple-400);
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--purple-50) 100%);
+}
+
+[data-theme="dark"] .feature-card.ai-card {
+  border-color: var(--purple-700);
+  background: linear-gradient(135deg, var(--bg-card) 0%, rgba(108,58,237,0.08) 100%);
+}
+
+.feature-card.ai-card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--purple-500), var(--indigo-500));
+  z-index: -1;
+  opacity: 0.15;
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.25; }
+}
+
+.ai-badge {
+  padding: 2px 8px;
+  background: var(--gradient-cta);
+  color: #fff;
+  font-size: 0.625rem;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.icon-welcome { background: #d1fae5; color: #059669; }
+.icon-timer { background: #fef3c7; color: #d97706; }
+.icon-faq { background: #dbeafe; color: #2563eb; }
+.icon-ai { background: #ede9fe; color: #7c3aed; }
+.icon-giveaway { background: #fce7f3; color: #db2777; }
+.icon-platform { background: #e0e7ff; color: #4338ca; }
+
+[data-theme="dark"] .icon-welcome { background: #064e3b; color: #6ee7b7; }
+[data-theme="dark"] .icon-timer { background: #78350f; color: #fcd34d; }
+[data-theme="dark"] .icon-faq { background: #1e3a5f; color: #93c5fd; }
+[data-theme="dark"] .icon-ai { background: #3b0f7a; color: #c4b5fd; }
+[data-theme="dark"] .icon-giveaway { background: #831843; color: #f9a8d4; }
+[data-theme="dark"] .icon-platform { background: #312e81; color: #a5b4fc; }
+
+@media (max-width: 900px) {
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .features-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================
+   LIVE DEMO SECTION
+   ============================================ */
+.demo { background: var(--bg-secondary); }
+
+.demo-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  margin-top: 60px;
+}
+
+.demo-info h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.demo-info p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+
+.demo-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.demo-features li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+.demo-features li .check {
+  width: 20px;
+  height: 20px;
+  background: #d1fae5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .demo-features li .check { background: #064e3b; }
+
+.demo-features li .check svg { width: 12px; height: 12px; color: #059669; }
+[data-theme="dark"] .demo-features li .check svg { color: #6ee7b7; }
+
+.demo-chat {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.demo-chat .chat-window {
+  max-width: 100%;
+}
+
+@media (max-width: 900px) {
+  .demo-container { grid-template-columns: 1fr; }
+}
+
+/* ============================================
+   PRICING
+   ============================================ */
+.pricing { background: var(--bg-primary); }
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 60px;
+  align-items: start;
+}
+
+.pricing-card {
+  padding: 36px 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-card);
+  position: relative;
+}
+
+.pricing-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.pricing-card.popular {
+  border-color: var(--purple-500);
+  box-shadow: var(--shadow-xl), 0 0 0 1px var(--purple-500);
+  transform: scale(1.04);
+  z-index: 1;
+}
+
+.pricing-card.popular:hover {
+  transform: scale(1.04) translateY(-4px);
+}
+
+.popular-badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 20px;
+  background: var(--gradient-cta);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.pricing-card-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.pricing-card-price {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.pricing-card-price .currency { font-size: 1.5rem; vertical-align: top; line-height: 2; }
+.pricing-card-price .period { font-size: 1rem; font-weight: 500; color: var(--text-tertiary); }
+
+.pricing-card-desc {
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+  margin-top: 8px;
+  margin-bottom: 28px;
+}
+
+.pricing-card-features {
+  list-style: none;
+  text-align: left;
+  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pricing-card-features li {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pricing-card-features li svg {
+  width: 16px;
+  height: 16px;
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+.pricing-card-features li.disabled {
+  color: var(--text-tertiary);
+  opacity: 0.5;
+}
+
+.pricing-card-features li.disabled svg { color: var(--text-tertiary); }
+
+.btn-pricing {
+  width: 100%;
+  padding: 12px 24px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  transition: all var(--transition);
+}
+
+.btn-pricing-primary {
+  background: var(--gradient-cta);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(108,58,237,0.3);
+}
+
+.btn-pricing-primary:hover {
+  box-shadow: 0 6px 24px rgba(108,58,237,0.4);
+  transform: translateY(-1px);
+}
+
+.btn-pricing-outline {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+}
+
+.btn-pricing-outline:hover {
+  border-color: var(--purple-400);
+  background: var(--bg-card-hover);
+}
+
+/* Comparison table */
+.comparison-table {
+  margin-top: 60px;
+  overflow-x: auto;
+}
+
+.comparison-table table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 14px 20px;
+  text-align: left;
+  font-size: 0.875rem;
+  border-bottom: 1px solid var(--border-primary);
+  color: var(--text-secondary);
+}
+
+.comparison-table th {
+  font-weight: 700;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+.comparison-table th:first-child { border-radius: var(--radius-sm) 0 0 0; }
+.comparison-table th:last-child { border-radius: 0 var(--radius-sm) 0 0; }
+
+.comparison-table td:not(:first-child) { text-align: center; }
+.comparison-table th:not(:first-child) { text-align: center; }
+
+.comparison-check { color: #10b981; font-weight: 700; }
+.comparison-x { color: var(--text-tertiary); opacity: 0.4; }
+
+@media (max-width: 768px) {
+  .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin-left: auto; margin-right: auto; }
+  .pricing-card.popular { transform: none; }
+  .pricing-card.popular:hover { transform: translateY(-4px); }
+}
+
+/* ============================================
+   TESTIMONIALS
+   ============================================ */
+.testimonials { background: var(--bg-secondary); }
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 60px;
+}
+
+.testimonial-card {
+  padding: 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition);
+}
+
+.testimonial-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.testimonial-stars {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 16px;
+}
+
+.testimonial-stars svg { width: 16px; height: 16px; color: #f59e0b; fill: #f59e0b; }
+
+.testimonial-text {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.testimonial-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: #fff;
+}
+
+.testimonial-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.testimonial-role {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 768px) {
+  .testimonials-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================
+   FAQ ACCORDION
+   ============================================ */
+.faq-section { background: var(--bg-primary); }
+
+.faq-list {
+  max-width: 720px;
+  margin: 60px auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faq-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.faq-item.open {
+  border-color: var(--purple-300);
+}
+
+[data-theme="dark"] .faq-item.open { border-color: var(--purple-700); }
+
+.faq-question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: left;
+  transition: color var(--transition);
+}
+
+.faq-question:hover { color: var(--purple-600); }
+[data-theme="dark"] .faq-question:hover { color: var(--purple-400); }
+
+.faq-chevron {
+  width: 20px;
+  height: 20px;
+  color: var(--text-tertiary);
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.faq-item.open .faq-chevron { transform: rotate(180deg); }
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+}
+
+.faq-answer-inner {
+  padding: 0 24px 20px;
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* ============================================
+   FINAL CTA
+   ============================================ */
+.final-cta {
+  background: var(--bg-secondary);
+  position: relative;
+  overflow: hidden;
+}
+
+.final-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(108,58,237,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+[data-theme="dark"] .final-cta::before {
+  background: radial-gradient(ellipse at center, rgba(108,58,237,0.1) 0%, transparent 70%);
+}
+
+.final-cta-inner {
+  position: relative;
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.final-cta h2 {
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.final-cta p {
+  font-size: 1.0625rem;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+  line-height: 1.7;
+}
+
+.email-form {
+  display: flex;
+  gap: 12px;
+  max-width: 460px;
+  margin: 0 auto 16px;
+}
+
+.email-form input {
+  flex: 1;
+  padding: 14px 20px;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-full);
+  font-size: 0.9375rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  outline: none;
+  transition: all var(--transition);
+}
+
+.email-form input::placeholder { color: var(--text-tertiary); }
+
+.email-form input:focus {
+  border-color: var(--purple-500);
+  box-shadow: 0 0 0 3px rgba(108,58,237,0.1);
+}
+
+.email-form button {
+  padding: 14px 28px;
+  background: var(--gradient-cta);
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  transition: all var(--transition);
+  box-shadow: 0 4px 16px rgba(108,58,237,0.3);
+}
+
+.email-form button:hover {
+  box-shadow: 0 6px 24px rgba(108,58,237,0.4);
+  transform: translateY(-1px);
+}
+
+.email-note {
+  font-size: 0.8125rem;
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 500px) {
+  .email-form { flex-direction: column; }
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+.footer {
+  background: var(--bg-footer);
+  padding: 60px 0 32px;
+  color: var(--text-footer);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 48px;
+}
+
+.footer-brand p {
+  font-size: 0.875rem;
+  color: var(--text-footer-dim);
+  line-height: 1.7;
+  margin-top: 16px;
+  max-width: 280px;
+}
+
+.footer h4 {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 16px;
+  color: #fff;
+}
+
+.footer-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-links a {
+  font-size: 0.875rem;
+  color: var(--text-footer-dim);
+  transition: color var(--transition);
+}
+
+.footer-links a:hover { color: #fff; }
+
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-bottom p {
+  font-size: 0.8125rem;
+  color: var(--text-footer-dim);
+}
+
+.footer-socials {
+  display: flex;
+  gap: 16px;
+}
+
+.footer-socials a {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-footer-dim);
+  transition: all var(--transition);
+}
+
+.footer-socials a:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+.footer-socials a svg { width: 16px; height: 16px; }
+
+@media (max-width: 768px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+}
+
+@media (max-width: 480px) {
+  .footer-grid { grid-template-columns: 1fr; }
+}
+</style>
 </head>
 <body>
 
-<!-- ===== NAV ===== -->
-<nav>
-    <div class="container">
-        <a href="#" class="nav-logo">
-            <div class="nav-logo-icon">💬</div>
-            BuzzChat
-        </a>
-        <div class="nav-links">
-            <a href="#features">Features</a>
-            <a href="#how-it-works">How It Works</a>
-            <a href="#pricing">Pricing</a>
-            <a href="#faq">FAQ</a>
-        </div>
-        <div class="nav-cta">
-            <a href="#pricing" class="btn btn-primary" style="padding:10px 20px;font-size:14px;border-radius:10px;">Get Started</a>
-        </div>
-        <button class="mobile-toggle" onclick="document.querySelector('.nav-links').classList.toggle('show')" aria-label="Toggle menu">
-            <span></span><span></span><span></span>
-        </button>
+<!-- ===== NAVIGATION ===== -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </div>
+      BuzzChat
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#demo">Demo</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <a href="#" class="btn-nav-cta">Install Free</a>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
+  </div>
 </nav>
 
 <!-- ===== HERO ===== -->
 <section class="hero">
-    <div class="container hero-content">
-        <div class="hero-badge">
-            ✨ Now with AI-powered chat responses
-        </div>
-        <h1>
-            Automate your<br><span class="text-gradient">live selling chat</span>
-        </h1>
-        <p>
-            The Chrome extension that handles your chat so you can focus on selling. Works on Whatnot, YouTube, eBay, Twitch & Kick.
-        </p>
-        <div class="hero-buttons">
-            <a href="#" class="btn btn-primary">
-                <svg class="btn-chrome-icon" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
-                    <circle cx="12" cy="12" r="4" fill="currentColor"/>
-                </svg>
-                Add to Chrome — It's Free
-            </a>
-            <a href="#features" class="btn btn-secondary">See Features</a>
-        </div>
-        <div class="hero-stats">
-            <div class="hero-stat">
-                <div class="hero-stat-value text-gradient">5</div>
-                <div class="hero-stat-label">Platforms Supported</div>
-            </div>
-            <div class="hero-stat">
-                <div class="hero-stat-value text-gradient">10K+</div>
-                <div class="hero-stat-label">Messages Automated</div>
-            </div>
-            <div class="hero-stat">
-                <div class="hero-stat-value text-gradient">100%</div>
-                <div class="hero-stat-label">Free to Start</div>
-            </div>
-        </div>
+  <div class="container hero-inner">
+    <div class="hero-text">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        Now in open beta — Free to try
+      </div>
+      <h1>
+        Automate your<br>
+        <span class="gradient-text">live selling chat</span>
+      </h1>
+      <p class="hero-sub">
+        Welcome viewers, answer FAQs, run giveaways, and send timed promotions — all on autopilot. 
+        The AI-powered Chrome extension that keeps your chat buzzing while you focus on selling.
+      </p>
+      <div class="hero-platforms">
+        <span class="platform-tag">Whatnot</span>
+        <span class="platform-tag">YouTube</span>
+        <span class="platform-tag">eBay</span>
+        <span class="platform-tag">Twitch</span>
+        <span class="platform-tag">Kick</span>
+      </div>
+      <div class="hero-ctas">
+        <a href="#" class="btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/>
+          </svg>
+          Add to Chrome — It's Free
+        </a>
+        <a href="#demo" class="btn-secondary">See it in action ↓</a>
+      </div>
     </div>
+    <div class="hero-visual">
+      <div class="chat-window" id="heroChat">
+        <div class="chat-header">
+          <span class="chat-header-dot dot-red"></span>
+          <span class="chat-header-dot dot-yellow"></span>
+          <span class="chat-header-dot dot-green"></span>
+          <span class="chat-header-title">Live Chat — Sneaker Drop</span>
+          <span class="chat-live-badge">● LIVE</span>
+        </div>
+        <div class="chat-messages" id="heroChatMessages">
+          <!-- Messages injected by JS -->
+        </div>
+        <div class="chat-input-bar">
+          <input type="text" placeholder="BuzzChat is handling this..." disabled>
+          <div class="chat-input-send">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- ===== PLATFORMS ===== -->
-<section class="platforms">
-    <div class="container">
-        <div class="platforms-label">Works everywhere you sell live</div>
-        <div class="platforms-grid">
-            <div class="platform-item">
-                <div class="platform-icon">🟣</div>
-                Whatnot
-            </div>
-            <div class="platform-item">
-                <div class="platform-icon">🔴</div>
-                YouTube
-            </div>
-            <div class="platform-item">
-                <div class="platform-icon">🟡</div>
-                eBay
-            </div>
-            <div class="platform-item">
-                <div class="platform-icon">🟣</div>
-                Twitch
-            </div>
-            <div class="platform-item">
-                <div class="platform-icon">🟢</div>
-                Kick
-            </div>
-        </div>
+<!-- ===== HOW IT WORKS ===== -->
+<section class="how-it-works" id="how">
+  <div class="container">
+    <div class="text-center fade-up">
+      <div class="section-label">How it works</div>
+      <h2 class="section-title">Up and running in 60 seconds</h2>
+      <p class="section-sub mx-auto">No coding, no complicated setup. Install, configure your messages, and go live.</p>
     </div>
+    <div class="steps-grid">
+      <div class="step-card fade-up">
+        <span class="step-number">1</span>
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 2H3a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h7l2 3 2-3h7a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z"/>
+            <line x1="12" y1="11" x2="12" y2="11.01"/>
+            <line x1="8" y1="11" x2="8" y2="11.01"/>
+            <line x1="16" y1="11" x2="16" y2="11.01"/>
+          </svg>
+        </div>
+        <h3>Install the Extension</h3>
+        <p>One click from the Chrome Web Store. Appears as a small icon in your browser toolbar.</p>
+      </div>
+      <div class="step-card fade-up" style="transition-delay: 0.1s;">
+        <span class="step-number">2</span>
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </div>
+        <h3>Set Up Your Messages</h3>
+        <p>Configure welcome greetings, FAQ answers, timer promotions, and giveaway rules in minutes.</p>
+      </div>
+      <div class="step-card fade-up" style="transition-delay: 0.2s;">
+        <span class="step-number">3</span>
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+        </div>
+        <h3>Go Live & Relax</h3>
+        <p>BuzzChat handles the chat automatically while you focus on showcasing products and closing sales.</p>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- ===== FEATURES ===== -->
 <section class="features" id="features">
-    <div class="container">
-        <div class="features-header fade-in">
-            <div class="section-label">⚡ Features</div>
-            <h2 class="section-title">Everything you need to<br><span class="text-gradient">dominate live chat</span></h2>
-            <p class="section-subtitle">From AI-powered responses to giveaway tracking, BuzzChat handles it all while you focus on the sale.</p>
-        </div>
-        <div class="features-grid">
-            <div class="feature-card fade-in">
-                <div class="feature-badge">Only in BuzzChat</div>
-                <div class="feature-icon feature-icon-ai">🤖</div>
-                <h3>AI-Powered Responses</h3>
-                <p>Our AI understands context and crafts natural responses to viewer questions in real-time. No other tool has this — it's your unfair advantage.</p>
-            </div>
-            <div class="feature-card fade-in">
-                <div class="feature-icon feature-icon-welcome">👋</div>
-                <h3>Auto-Welcome Viewers</h3>
-                <p>Greet every new viewer by name automatically. Make everyone feel seen and build loyal repeat buyers from the first message.</p>
-            </div>
-            <div class="feature-card fade-in">
-                <div class="feature-icon feature-icon-timer">⏱️</div>
-                <h3>Timer Messages</h3>
-                <p>Set up rotating promotional messages that fire at custom intervals. Keep your deals, shipping info, and announcements front and center.</p>
-            </div>
-            <div class="feature-card fade-in">
-                <div class="feature-icon feature-icon-faq">💬</div>
-                <h3>FAQ Auto-Replies</h3>
-                <p>Define keyword triggers and let BuzzChat answer common questions instantly. Shipping? Returns? Payment? Handled.</p>
-            </div>
-            <div class="feature-card fade-in">
-                <div class="feature-icon feature-icon-giveaway">🎁</div>
-                <h3>Giveaway Tracking</h3>
-                <p>Run engaging giveaways with automatic entry tracking and winner selection. Boost engagement and keep viewers locked in.</p>
-            </div>
-            <div class="feature-card fade-in">
-                <div class="feature-icon feature-icon-multi">🌐</div>
-                <h3>Multi-Platform</h3>
-                <p>One extension, five platforms. Switch between Whatnot, YouTube, eBay, Twitch, and Kick without missing a beat.</p>
-            </div>
-        </div>
+  <div class="container">
+    <div class="text-center fade-up">
+      <div class="section-label">Features</div>
+      <h2 class="section-title">Everything your live chat needs</h2>
+      <p class="section-sub mx-auto">From welcome messages to AI-powered responses, BuzzChat keeps your audience engaged while you sell.</p>
     </div>
+    <div class="features-grid">
+      <div class="feature-card fade-up">
+        <div class="feature-card-icon icon-welcome">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <h3>Auto-Welcome</h3>
+        <p>Greet every new viewer with personalized messages the moment they join. Make everyone feel like a VIP.</p>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay: 0.05s;">
+        <div class="feature-card-icon icon-timer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <h3>Timer Messages</h3>
+        <p>Schedule recurring promotions — shipping deals, coupon codes, reminders — on any interval you choose.</p>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay: 0.1s;">
+        <div class="feature-card-icon icon-faq">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <h3>FAQ Auto-Replies</h3>
+        <p>Set answers for common questions about shipping, payment, returns, and sizing. Instant replies, zero effort.</p>
+      </div>
+      <div class="feature-card ai-card fade-up" style="transition-delay: 0.15s;">
+        <div class="feature-card-icon icon-ai">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a4 4 0 0 0-4 4v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-2V6a4 4 0 0 0-4-4z"/>
+            <circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/>
+            <path d="M9 18h6"/>
+          </svg>
+        </div>
+        <h3>AI Smart Responses <span class="ai-badge">NEW</span></h3>
+        <p>Our AI understands context and handles questions no FAQ can anticipate. Like having a smart assistant in chat.</p>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay: 0.2s;">
+        <div class="feature-card-icon icon-giveaway">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+          </svg>
+        </div>
+        <h3>Giveaway Tracking</h3>
+        <p>Run keyword-triggered giveaways and let BuzzChat collect entries, pick winners, and announce results.</p>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay: 0.25s;">
+        <div class="feature-card-icon icon-platform">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+        </div>
+        <h3>Multi-Platform</h3>
+        <p>One extension, five platforms. Works seamlessly on Whatnot, YouTube, eBay, Twitch, and Kick.</p>
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- ===== AI SPOTLIGHT ===== -->
-<section class="ai-spotlight">
-    <div class="container">
-        <div class="ai-content">
-            <div class="ai-text fade-in">
-                <div class="section-label">🧠 AI Superpower</div>
-                <h2 class="section-title">Chat AI that<br>actually gets it</h2>
-                <p class="section-subtitle">BuzzChat's AI doesn't just match keywords — it understands what viewers are really asking and responds naturally, like having another team member in chat.</p>
-                <div class="ai-features-list">
-                    <div class="ai-feature-item">
-                        <div class="ai-feature-check">✓</div>
-                        <span>Understands context and nuance in questions</span>
-                    </div>
-                    <div class="ai-feature-item">
-                        <div class="ai-feature-check">✓</div>
-                        <span>Responds in your brand voice and tone</span>
-                    </div>
-                    <div class="ai-feature-item">
-                        <div class="ai-feature-check">✓</div>
-                        <span>Handles multiple questions simultaneously</span>
-                    </div>
-                    <div class="ai-feature-item">
-                        <div class="ai-feature-check">✓</div>
-                        <span>Learns from your products and past answers</span>
-                    </div>
-                </div>
-            </div>
-            <div class="ai-visual fade-in">
-                <div class="ai-chat-demo">
-                    <div class="ai-chat-bubble ai-chat-viewer" style="animation-delay:0.1s">
-                        <div class="ai-chat-label">Viewer</div>
-                        hey is that pokemon card near mint? whats the centering like?
-                    </div>
-                    <div class="ai-chat-bubble ai-chat-bot" style="animation-delay:0.3s">
-                        <div class="ai-chat-label">BuzzChat AI</div>
-                        Great question! 🔥 This card is NM — centering is about 60/40 on the front and 55/45 on the back. Definitely a solid candidate for grading!
-                    </div>
-                    <div class="ai-chat-bubble ai-chat-viewer" style="animation-delay:0.5s">
-                        <div class="ai-chat-label">Viewer</div>
-                        do u guys ship to canada?
-                    </div>
-                    <div class="ai-chat-bubble ai-chat-bot" style="animation-delay:0.7s">
-                        <div class="ai-chat-label">BuzzChat AI</div>
-                        Absolutely! 🇨🇦 We ship worldwide. Canada orders typically arrive in 7-10 business days. Shipping is calculated at checkout!
-                    </div>
-                </div>
-            </div>
-        </div>
+<!-- ===== LIVE DEMO ===== -->
+<section class="demo" id="demo">
+  <div class="container">
+    <div class="text-center fade-up">
+      <div class="section-label">Live Demo</div>
+      <h2 class="section-title">Watch BuzzChat in action</h2>
+      <p class="section-sub mx-auto">See how BuzzChat handles your chat in real-time during a live selling session.</p>
     </div>
-</section>
-
-<!-- ===== HOW IT WORKS ===== -->
-<section class="how-it-works" id="how-it-works">
-    <div class="container">
-        <div class="text-center fade-in">
-            <div class="section-label">🚀 How It Works</div>
-            <h2 class="section-title">Up and running in<br><span class="text-gradient">under 2 minutes</span></h2>
-            <p class="section-subtitle">No complicated setup. No learning curve. Just install and go.</p>
+    <div class="demo-container">
+      <div class="demo-info fade-up">
+        <h3>Your chat on autopilot</h3>
+        <p>While you focus on showing products and engaging with buyers, BuzzChat handles the repetitive chat work automatically. Watch the demo to see it respond to viewers in real-time.</p>
+        <ul class="demo-features">
+          <li>
+            <span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            New viewers greeted instantly
+          </li>
+          <li>
+            <span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            FAQ questions answered automatically
+          </li>
+          <li>
+            <span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Timed promotions sent on schedule
+          </li>
+          <li>
+            <span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            AI handles unexpected questions
+          </li>
+        </ul>
+      </div>
+      <div class="demo-chat fade-up" style="transition-delay: 0.15s;">
+        <div class="chat-window" id="demoChat">
+          <div class="chat-header">
+            <span class="chat-header-dot dot-red"></span>
+            <span class="chat-header-dot dot-yellow"></span>
+            <span class="chat-header-dot dot-green"></span>
+            <span class="chat-header-title">Demo: Vintage Cards Live</span>
+            <span class="chat-live-badge">● LIVE</span>
+          </div>
+          <div class="chat-messages" id="demoChatMessages">
+          </div>
+          <div class="chat-input-bar">
+            <input type="text" placeholder="Watching demo..." disabled>
+            <div class="chat-input-send">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </div>
+          </div>
         </div>
-        <div class="steps">
-            <div class="step fade-in">
-                <div class="step-number">1</div>
-                <h3>Install Extension</h3>
-                <p>Add BuzzChat to Chrome in one click. It's lightweight and won't slow your browser down.</p>
-            </div>
-            <div class="step fade-in">
-                <div class="step-number">2</div>
-                <h3>Configure Your Rules</h3>
-                <p>Set up welcome messages, FAQ replies, timers, and AI behavior. Takes 60 seconds.</p>
-            </div>
-            <div class="step fade-in">
-                <div class="step-number">3</div>
-                <h3>Go Live & Relax</h3>
-                <p>Start your stream and let BuzzChat handle the chat. Focus on selling while we handle engagement.</p>
-            </div>
-        </div>
+      </div>
     </div>
-</section>
-
-<!-- ===== SOCIAL PROOF ===== -->
-<section class="social-proof">
-    <div class="container">
-        <div class="text-center fade-in">
-            <div class="section-label">💜 Loved by Sellers</div>
-            <h2 class="section-title">What sellers are<br><span class="text-gradient">saying about us</span></h2>
-        </div>
-        <div class="testimonials">
-            <div class="testimonial fade-in">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p class="testimonial-text">"BuzzChat's AI feature is a game-changer. It answers questions I'd normally miss while showing items. My engagement went way up and I've seen 30% more bids."</p>
-                <div class="testimonial-author">
-                    <div class="testimonial-avatar">🎴</div>
-                    <div>
-                        <div class="testimonial-name">Sarah M.</div>
-                        <div class="testimonial-role">Whatnot Card Seller</div>
-                    </div>
-                </div>
-            </div>
-            <div class="testimonial fade-in">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p class="testimonial-text">"I sell vintage on eBay Live and this extension saves me so much time. The timer messages keep my promotions running without me remembering to type them."</p>
-                <div class="testimonial-author">
-                    <div class="testimonial-avatar">👗</div>
-                    <div>
-                        <div class="testimonial-name">Marcus T.</div>
-                        <div class="testimonial-role">eBay Live Seller</div>
-                    </div>
-                </div>
-            </div>
-            <div class="testimonial fade-in">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p class="testimonial-text">"The auto-welcome feature makes everyone feel seen. I've built a loyal community and people keep coming back to my streams. Absolute must-have!"</p>
-                <div class="testimonial-author">
-                    <div class="testimonial-avatar">🎮</div>
-                    <div>
-                        <div class="testimonial-name">Jen L.</div>
-                        <div class="testimonial-role">YouTube Live Seller</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+  </div>
 </section>
 
 <!-- ===== PRICING ===== -->
 <section class="pricing" id="pricing">
-    <div class="container">
-        <div class="text-center fade-in">
-            <div class="section-label">💎 Pricing</div>
-            <h2 class="section-title">Start free,<br>upgrade when you're ready</h2>
-            <p class="section-subtitle">No credit card required. No hidden fees. Cancel anytime.</p>
-        </div>
-        <div class="pricing-grid">
-            <!-- FREE -->
-            <div class="pricing-card fade-in">
-                <div class="pricing-name">Free</div>
-                <div class="pricing-desc">Perfect for getting started with live selling automation.</div>
-                <div class="pricing-amount">
-                    <span class="pricing-currency">$</span>
-                    <span class="pricing-value">0</span>
-                    <span class="pricing-period">/mo</span>
-                </div>
-                <ul class="pricing-features">
-                    <li>1 platform</li>
-                    <li>Auto-welcome viewers</li>
-                    <li>3 FAQ auto-replies</li>
-                    <li>1 timer message</li>
-                    <li>Basic giveaway tracking</li>
-                </ul>
-                <a href="#" class="pricing-btn pricing-btn-default">Get Started Free</a>
-            </div>
-            <!-- PRO -->
-            <div class="pricing-card featured fade-in">
-                <div class="pricing-name">Pro</div>
-                <div class="pricing-desc">For serious sellers who want AI power and full automation.</div>
-                <div class="pricing-amount">
-                    <span class="pricing-currency">$</span>
-                    <span class="pricing-value">7.99</span>
-                    <span class="pricing-period">/mo</span>
-                </div>
-                <ul class="pricing-features">
-                    <li>All 5 platforms</li>
-                    <li>AI-powered chat responses</li>
-                    <li>Unlimited FAQ auto-replies</li>
-                    <li>Unlimited timer messages</li>
-                    <li>Advanced giveaway tools</li>
-                    <li>Custom welcome messages</li>
-                    <li>Priority support</li>
-                </ul>
-                <a href="#" class="pricing-btn pricing-btn-featured">Start Pro Trial</a>
-            </div>
-            <!-- BUSINESS -->
-            <div class="pricing-card fade-in">
-                <div class="pricing-name">Business</div>
-                <div class="pricing-desc">For teams and high-volume sellers who need everything.</div>
-                <div class="pricing-amount">
-                    <span class="pricing-currency">$</span>
-                    <span class="pricing-value">19.99</span>
-                    <span class="pricing-period">/mo</span>
-                </div>
-                <ul class="pricing-features">
-                    <li>Everything in Pro</li>
-                    <li>Multi-stream support</li>
-                    <li>Team member accounts</li>
-                    <li>Advanced AI training</li>
-                    <li>Analytics dashboard</li>
-                    <li>Custom AI brand voice</li>
-                    <li>Dedicated account manager</li>
-                </ul>
-                <a href="#" class="pricing-btn pricing-btn-default">Contact Sales</a>
-            </div>
-        </div>
+  <div class="container">
+    <div class="text-center fade-up">
+      <div class="section-label">Pricing</div>
+      <h2 class="section-title">Simple, transparent pricing</h2>
+      <p class="section-sub mx-auto">Start free, upgrade when you're ready. No hidden fees, cancel anytime.</p>
     </div>
+    <div class="pricing-grid">
+      <!-- Free -->
+      <div class="pricing-card fade-up">
+        <div class="pricing-card-name">Free</div>
+        <div class="pricing-card-price"><span class="currency">$</span>0</div>
+        <div class="pricing-card-desc">Perfect for getting started</div>
+        <ul class="pricing-card-features">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>50 messages per show</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Auto-welcome messages</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>3 FAQ auto-replies</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>1 timer message</li>
+          <li class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>AI smart responses</li>
+          <li class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Giveaway tracking</li>
+        </ul>
+        <button class="btn-pricing btn-pricing-outline">Get Started</button>
+      </div>
+      <!-- Pro -->
+      <div class="pricing-card popular fade-up" style="transition-delay: 0.08s;">
+        <div class="popular-badge">Most Popular</div>
+        <div class="pricing-card-name">Pro</div>
+        <div class="pricing-card-price"><span class="currency">$</span>9<span class="period">.99/mo</span></div>
+        <div class="pricing-card-desc">For serious sellers</div>
+        <ul class="pricing-card-features">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Unlimited messages</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Auto-welcome messages</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Unlimited FAQ replies</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Unlimited timers</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Giveaway tracking</li>
+          <li class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>AI smart responses</li>
+        </ul>
+        <button class="btn-pricing btn-pricing-primary">Start Pro Trial</button>
+      </div>
+      <!-- Max -->
+      <div class="pricing-card fade-up" style="transition-delay: 0.16s;">
+        <div class="pricing-card-name">Max</div>
+        <div class="pricing-card-price"><span class="currency">$</span>24<span class="period">.99/mo</span></div>
+        <div class="pricing-card-desc">Full power, AI included</div>
+        <ul class="pricing-card-features">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Everything in Pro</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>AI smart responses</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Priority support</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Custom branding</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Analytics dashboard</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Early access to features</li>
+        </ul>
+        <button class="btn-pricing btn-pricing-outline">Go Max</button>
+      </div>
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="comparison-table fade-up">
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Free</th>
+            <th>Pro</th>
+            <th>Max</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Messages per show</td>
+            <td>50</td>
+            <td>Unlimited</td>
+            <td>Unlimited</td>
+          </tr>
+          <tr>
+            <td>Auto-welcome</td>
+            <td class="comparison-check">✓</td>
+            <td class="comparison-check">✓</td>
+            <td class="comparison-check">✓</td>
+          </tr>
+          <tr>
+            <td>FAQ auto-replies</td>
+            <td>3</td>
+            <td>Unlimited</td>
+            <td>Unlimited</td>
+          </tr>
+          <tr>
+            <td>Timer messages</td>
+            <td>1</td>
+            <td>Unlimited</td>
+            <td>Unlimited</td>
+          </tr>
+          <tr>
+            <td>Giveaway tracking</td>
+            <td class="comparison-x">✗</td>
+            <td class="comparison-check">✓</td>
+            <td class="comparison-check">✓</td>
+          </tr>
+          <tr>
+            <td>AI smart responses</td>
+            <td class="comparison-x">✗</td>
+            <td class="comparison-x">✗</td>
+            <td class="comparison-check">✓</td>
+          </tr>
+          <tr>
+            <td>Analytics</td>
+            <td class="comparison-x">✗</td>
+            <td class="comparison-x">✗</td>
+            <td class="comparison-check">✓</td>
+          </tr>
+          <tr>
+            <td>Custom branding</td>
+            <td class="comparison-x">✗</td>
+            <td class="comparison-x">✗</td>
+            <td class="comparison-check">✓</td>
+          </tr>
+          <tr>
+            <td>Priority support</td>
+            <td class="comparison-x">✗</td>
+            <td class="comparison-x">✗</td>
+            <td class="comparison-check">✓</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section class="testimonials">
+  <div class="container">
+    <div class="text-center fade-up">
+      <div class="section-label">Testimonials</div>
+      <h2 class="section-title">Sellers love BuzzChat</h2>
+      <p class="section-sub mx-auto">Don't just take our word for it — hear from sellers who use BuzzChat every day.</p>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card fade-up">
+        <div class="testimonial-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="testimonial-text">"I used to lose sales because I couldn't keep up with chat during busy streams. BuzzChat handles the FAQ questions and welcomes everyone — my revenue went up 30% in the first month."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar" style="background: var(--purple-600);">MR</div>
+          <div>
+            <div class="testimonial-name">Marcus Rivera</div>
+            <div class="testimonial-role">Sneaker Reseller · Whatnot</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-up" style="transition-delay: 0.08s;">
+        <div class="testimonial-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="testimonial-text">"The timer messages are a game changer. I set up my shipping deal reminder and coupon code on a loop — viewers see it even if they join late. Setup took literally 2 minutes."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar" style="background: #059669;">SC</div>
+          <div>
+            <div class="testimonial-name">Sarah Chen</div>
+            <div class="testimonial-role">Vintage Clothing · YouTube</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-up" style="transition-delay: 0.16s;">
+        <div class="testimonial-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="testimonial-text">"Running giveaways used to be chaotic — tracking entries manually was a nightmare. Now BuzzChat does it all. Plus the AI feature handles weird questions I'd never think to add to FAQ."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar" style="background: #d97706;">JT</div>
+          <div>
+            <div class="testimonial-name">Jordan Torres</div>
+            <div class="testimonial-role">TCG Cards · Twitch & Kick</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- ===== FAQ ===== -->
-<section class="faq" id="faq">
-    <div class="container">
-        <div class="text-center fade-in">
-            <div class="section-label">❓ FAQ</div>
-            <h2 class="section-title">Common questions</h2>
-        </div>
-        <div class="faq-grid">
-            <div class="faq-item fade-in">
-                <h4>Is BuzzChat really free?</h4>
-                <p>Yes! The free tier gives you core automation features on one platform. No credit card required, no time limit.</p>
-            </div>
-            <div class="faq-item fade-in">
-                <h4>Does it slow down my browser?</h4>
-                <p>Not at all. BuzzChat is lightweight and only activates on supported streaming platforms. You won't notice it's there.</p>
-            </div>
-            <div class="faq-item fade-in">
-                <h4>How does the AI work?</h4>
-                <p>Our AI reads incoming chat messages, understands the intent, and generates natural responses based on your product info and configured rules.</p>
-            </div>
-            <div class="faq-item fade-in">
-                <h4>Can I use it on multiple platforms?</h4>
-                <p>Free supports one platform. Pro and Business support all five: Whatnot, YouTube, eBay, Twitch, and Kick.</p>
-            </div>
-            <div class="faq-item fade-in">
-                <h4>Will viewers know it's automated?</h4>
-                <p>Nope. Messages are crafted to sound natural and personal. The AI adapts to your style so it feels authentic.</p>
-            </div>
-            <div class="faq-item fade-in">
-                <h4>Can I cancel anytime?</h4>
-                <p>Absolutely. No contracts, no cancellation fees. Downgrade to Free whenever you want and keep your settings.</p>
-            </div>
-        </div>
+<section class="faq-section" id="faq">
+  <div class="container">
+    <div class="text-center fade-up">
+      <div class="section-label">FAQ</div>
+      <h2 class="section-title">Frequently asked questions</h2>
+      <p class="section-sub mx-auto">Everything you need to know about BuzzChat.</p>
     </div>
+    <div class="faq-list">
+      <div class="faq-item fade-up">
+        <button class="faq-question" aria-expanded="false">
+          Which platforms does BuzzChat work on?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">BuzzChat currently supports Whatnot, YouTube Live, eBay Live, Twitch, and Kick. We're always adding more platforms based on user demand.</div>
+        </div>
+      </div>
+      <div class="faq-item fade-up" style="transition-delay: 0.05s;">
+        <button class="faq-question" aria-expanded="false">
+          Do I need to keep my browser open?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Yes, BuzzChat runs as a Chrome extension and needs the browser tab with your live stream open. However, it works in the background — you don't need to interact with it once it's configured.</div>
+        </div>
+      </div>
+      <div class="faq-item fade-up" style="transition-delay: 0.1s;">
+        <button class="faq-question" aria-expanded="false">
+          What counts as a "message" on the Free plan?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Each automated message BuzzChat sends counts toward your limit — welcome messages, FAQ replies, and timer messages. The counter resets at the start of every new live session.</div>
+        </div>
+      </div>
+      <div class="faq-item fade-up" style="transition-delay: 0.15s;">
+        <button class="faq-question" aria-expanded="false">
+          How does the AI smart response feature work?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">AI smart responses use advanced language models to understand viewer questions in context. Unlike static FAQ rules, the AI can handle questions it's never seen before — like "do you have this in blue?" or "what year is that card from?" You provide product details and the AI does the rest.</div>
+        </div>
+      </div>
+      <div class="faq-item fade-up" style="transition-delay: 0.2s;">
+        <button class="faq-question" aria-expanded="false">
+          Can I cancel my subscription anytime?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Absolutely. You can cancel at any time from your account settings. Your Pro or Max features will stay active until the end of your billing period. No cancellation fees, no hassle.</div>
+        </div>
+      </div>
+      <div class="faq-item fade-up" style="transition-delay: 0.25s;">
+        <button class="faq-question" aria-expanded="false">
+          Will BuzzChat get me banned on any platform?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">BuzzChat is designed to stay within each platform's terms of service. It sends messages at human-like intervals and respects rate limits. Many professional sellers use chat automation tools — we just make it easy and reliable.</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- ===== FINAL CTA ===== -->
 <section class="final-cta">
-    <div class="container">
-        <div class="cta-box fade-in">
-            <h2 class="section-title">Ready to sell smarter?</h2>
-            <p>Join thousands of live sellers who automate their chat with BuzzChat. Install in seconds, see results immediately.</p>
-            <div class="hero-buttons">
-                <a href="#" class="btn btn-primary">
-                    <svg class="btn-chrome-icon" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
-                        <circle cx="12" cy="12" r="4" fill="currentColor"/>
-                    </svg>
-                    Add to Chrome — It's Free
-                </a>
-            </div>
-        </div>
+  <div class="container">
+    <div class="final-cta-inner fade-up">
+      <h2>Ready to automate your live chat?</h2>
+      <p>Join hundreds of live sellers who are saving time and boosting sales with BuzzChat. Sign up for launch notifications or install the extension today.</p>
+      <form class="email-form" id="emailForm" onsubmit="return false;">
+        <input type="email" placeholder="Enter your email" required aria-label="Email address">
+        <button type="submit" id="emailSubmit">Notify Me</button>
+      </form>
+      <p class="email-note">No spam, ever. Unsubscribe anytime.</p>
     </div>
+  </div>
 </section>
 
 <!-- ===== FOOTER ===== -->
-<footer>
-    <div class="container">
-        <div class="footer-grid">
-            <div class="footer-brand">
-                <a href="#" class="nav-logo" style="color:#e0daf0;">
-                    <div class="nav-logo-icon">💬</div>
-                    BuzzChat
-                </a>
-                <p>AI-powered live selling chat automation for modern sellers. Focus on selling, let BuzzChat handle the chat.</p>
-            </div>
-            <div class="footer-col">
-                <h4>Product</h4>
-                <a href="#features">Features</a>
-                <a href="#pricing">Pricing</a>
-                <a href="#faq">FAQ</a>
-                <a href="#">Changelog</a>
-            </div>
-            <div class="footer-col">
-                <h4>Platforms</h4>
-                <a href="#">Whatnot</a>
-                <a href="#">YouTube</a>
-                <a href="#">eBay Live</a>
-                <a href="#">Twitch</a>
-                <a href="#">Kick</a>
-            </div>
-            <div class="footer-col">
-                <h4>Company</h4>
-                <a href="#">About</a>
-                <a href="#">Blog</a>
-                <a href="#">Contact</a>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
-            </div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="nav-logo" style="color: #fff;">
+          <div class="nav-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          BuzzChat
         </div>
-        <div class="footer-bottom">
-            <span>© 2025 BuzzChat. All rights reserved.</span>
-            <span>Made with 💜 for live sellers</span>
-        </div>
+        <p>AI-powered live selling chat automation. Keep your audience engaged while you focus on what matters — selling.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <ul class="footer-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#demo">Demo</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <ul class="footer-links">
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Status</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul class="footer-links">
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Cookie Policy</a></li>
+        </ul>
+      </div>
     </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 BuzzChat. All rights reserved.</p>
+      <div class="footer-socials">
+        <a href="#" aria-label="Twitter">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <a href="#" aria-label="Discord">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.11 13.11 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        </a>
+        <a href="#" aria-label="YouTube">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
 </footer>
 
-<!-- ===== SCROLL ANIMATIONS ===== -->
 <script>
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+/* ============================================
+   DARK MODE TOGGLE
+   ============================================ */
+(function() {
+  const html = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+  const stored = localStorage.getItem('buzzchat-theme');
+  
+  if (stored) {
+    html.setAttribute('data-theme', stored);
+  }
+  
+  toggle.addEventListener('click', () => {
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('buzzchat-theme', next);
+  });
+})();
 
-    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+/* ============================================
+   MOBILE MENU
+   ============================================ */
+(function() {
+  const btn = document.getElementById('mobileMenuBtn');
+  const links = document.getElementById('navLinks');
+  btn.addEventListener('click', () => {
+    links.classList.toggle('open');
+  });
+  // Close on link click
+  links.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => links.classList.remove('open'));
+  });
+})();
 
-    // Smooth nav background on scroll
-    const nav = document.querySelector('nav');
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 20) {
-            nav.style.boxShadow = '0 1px 12px rgba(0,0,0,0.06)';
-        } else {
-            nav.style.boxShadow = 'none';
-        }
+/* ============================================
+   SCROLL FADE-IN (IntersectionObserver)
+   ============================================ */
+(function() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
     });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+})();
+
+/* ============================================
+   HERO CHAT ANIMATION
+   ============================================ */
+(function() {
+  const container = document.getElementById('heroChatMessages');
+  const userColors = ['#ef4444','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899'];
+  
+  const heroSequence = [
+    { type: 'user', name: 'Jake_M', text: 'Just joined! What are we looking at today?', color: userColors[0] },
+    { type: 'bot', label: 'welcome', text: '👋 Welcome Jake_M! We\'re going through rare sneakers tonight. Stick around for deals!' },
+    { type: 'user', name: 'SneakerFan22', text: 'Do you ship internationally?', color: userColors[1] },
+    { type: 'bot', label: 'faq', text: '🌍 Yes! We ship worldwide. US orders ship free over $50, international is flat $15.' },
+    { type: 'user', name: 'Lisa_K', text: 'Wow just found this stream 🔥', color: userColors[2] },
+    { type: 'bot', label: 'welcome', text: '👋 Hey Lisa_K! Welcome to the show! Use code BUZZ10 for 10% off your first buy!' },
+    { type: 'bot', label: 'timer', text: '⏰ REMINDER: Free shipping on all US orders over $50! Ends tonight at midnight 🚀' },
+    { type: 'user', name: 'CardKing99', text: 'Are those Jordan 4s deadstock?', color: userColors[3] },
+    { type: 'bot', label: 'ai', text: '🤖 Great question! Yes, the Jordan 4 Bred Reimagined are DS with original box. Size 10.5 currently on screen.' },
+  ];
+  
+  let heroIdx = 0;
+  
+  function addMsg(container, msg) {
+    const div = document.createElement('div');
+    div.className = 'chat-msg ' + msg.type;
+    
+    const avatar = document.createElement('div');
+    avatar.className = 'chat-msg-avatar';
+    
+    const content = document.createElement('div');
+    content.className = 'chat-msg-content';
+    
+    if (msg.type === 'user') {
+      avatar.style.background = msg.color;
+      avatar.textContent = msg.name.charAt(0).toUpperCase();
+      content.innerHTML = '<strong style="font-size:0.75rem;color:' + msg.color + '">' + msg.name + '</strong><br>' + msg.text;
+    } else {
+      avatar.textContent = 'B';
+      let labelClass = '';
+      let labelText = '';
+      if (msg.label === 'welcome') { labelClass = 'label-welcome'; labelText = 'AUTO-WELCOME'; }
+      else if (msg.label === 'faq') { labelClass = 'label-faq'; labelText = 'FAQ REPLY'; }
+      else if (msg.label === 'timer') { labelClass = 'label-timer'; labelText = 'TIMER'; }
+      else if (msg.label === 'ai') { labelClass = 'label-ai'; labelText = 'AI RESPONSE'; }
+      content.innerHTML = '<span class="chat-msg-label ' + labelClass + '">' + labelText + '</span><br>' + msg.text;
+    }
+    
+    div.appendChild(avatar);
+    div.appendChild(content);
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+  
+  function runHeroSequence() {
+    if (heroIdx < heroSequence.length) {
+      addMsg(container, heroSequence[heroIdx]);
+      heroIdx++;
+      setTimeout(runHeroSequence, 1800 + Math.random() * 1200);
+    } else {
+      // Restart after a pause
+      setTimeout(() => {
+        container.innerHTML = '';
+        heroIdx = 0;
+        runHeroSequence();
+      }, 4000);
+    }
+  }
+  
+  setTimeout(runHeroSequence, 800);
+})();
+
+/* ============================================
+   DEMO CHAT ANIMATION
+   ============================================ */
+(function() {
+  const container = document.getElementById('demoChatMessages');
+  const userColors = ['#3b82f6','#ef4444','#10b981','#f59e0b','#8b5cf6','#ec4899'];
+  let demoStarted = false;
+  
+  const demoSequence = [
+    { type: 'user', name: 'VintageVibes', text: 'Hey everyone! First time here 🎉', color: userColors[0] },
+    { type: 'bot', label: 'welcome', text: '👋 Welcome VintageVibes! We\'re showing rare vintage cards tonight — you picked a great time to join!' },
+    { type: 'user', name: 'CollectorDave', text: 'What payment methods do you accept?', color: userColors[1] },
+    { type: 'bot', label: 'faq', text: '💳 We accept all major credit cards, PayPal, Apple Pay, and Whatnot\'s built-in payment system.' },
+    { type: 'bot', label: 'timer', text: '🔥 FLASH DEAL: Use code VINTAGE20 for 20% off any card over $100! Valid for the next 30 minutes ⏰' },
+    { type: 'user', name: 'PokeFan_Ash', text: 'Is that Charizard PSA graded?', color: userColors[2] },
+    { type: 'bot', label: 'ai', text: '🤖 The Charizard currently on screen is a PSA 9 Base Set Unlimited. We also have a PSA 8 coming up later in the stream!' },
+    { type: 'user', name: 'NewbieBuyer', text: 'Hi! Just found you from TikTok!', color: userColors[3] },
+    { type: 'bot', label: 'welcome', text: '👋 Hey NewbieBuyer! Glad you found us! Tap follow so you don\'t miss future shows. We go live every Thursday!' },
+    { type: 'user', name: 'CardShark', text: 'Do you do returns?', color: userColors[4] },
+    { type: 'bot', label: 'faq', text: '↩️ Yes! 30-day returns on all items. Cards must be in the same condition as received. Refund processed within 48 hours.' },
+  ];
+  
+  let demoIdx = 0;
+  
+  function runDemoSequence() {
+    if (demoIdx < demoSequence.length) {
+      const msg = demoSequence[demoIdx];
+      const div = document.createElement('div');
+      div.className = 'chat-msg ' + msg.type;
+      
+      const avatar = document.createElement('div');
+      avatar.className = 'chat-msg-avatar';
+      
+      const content = document.createElement('div');
+      content.className = 'chat-msg-content';
+      
+      if (msg.type === 'user') {
+        avatar.style.background = msg.color;
+        avatar.textContent = msg.name.charAt(0).toUpperCase();
+        content.innerHTML = '<strong style="font-size:0.75rem;color:' + msg.color + '">' + msg.name + '</strong><br>' + msg.text;
+      } else {
+        avatar.style.background = '#6C3AED';
+        avatar.textContent = 'B';
+        let labelClass = '';
+        let labelText = '';
+        if (msg.label === 'welcome') { labelClass = 'label-welcome'; labelText = 'AUTO-WELCOME'; }
+        else if (msg.label === 'faq') { labelClass = 'label-faq'; labelText = 'FAQ REPLY'; }
+        else if (msg.label === 'timer') { labelClass = 'label-timer'; labelText = 'TIMER'; }
+        else if (msg.label === 'ai') { labelClass = 'label-ai'; labelText = 'AI RESPONSE'; }
+        content.innerHTML = '<span class="chat-msg-label ' + labelClass + '">' + labelText + '</span><br>' + msg.text;
+      }
+      
+      div.appendChild(avatar);
+      div.appendChild(content);
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+      
+      demoIdx++;
+      setTimeout(runDemoSequence, 2200 + Math.random() * 1000);
+    } else {
+      setTimeout(() => {
+        container.innerHTML = '';
+        demoIdx = 0;
+        runDemoSequence();
+      }, 5000);
+    }
+  }
+  
+  // Start demo when section comes into view
+  const demoSection = document.getElementById('demo');
+  const demoObserver = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && !demoStarted) {
+      demoStarted = true;
+      setTimeout(runDemoSequence, 500);
+    }
+  }, { threshold: 0.2 });
+  demoObserver.observe(demoSection);
+})();
+
+/* ============================================
+   FAQ ACCORDION
+   ============================================ */
+(function() {
+  document.querySelectorAll('.faq-question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.parentElement;
+      const answer = item.querySelector('.faq-answer');
+      const isOpen = item.classList.contains('open');
+      
+      // Close all
+      document.querySelectorAll('.faq-item').forEach(other => {
+        other.classList.remove('open');
+        other.querySelector('.faq-answer').style.maxHeight = null;
+        other.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+      });
+      
+      if (!isOpen) {
+        item.classList.add('open');
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+})();
+
+/* ============================================
+   EMAIL FORM
+   ============================================ */
+(function() {
+  const form = document.getElementById('emailForm');
+  const btn = document.getElementById('emailSubmit');
+  
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = form.querySelector('input').value;
+    if (email) {
+      btn.textContent = '✓ You\'re on the list!';
+      btn.style.background = '#059669';
+      form.querySelector('input').value = '';
+      setTimeout(() => {
+        btn.textContent = 'Notify Me';
+        btn.style.background = '';
+      }, 3000);
+    }
+  });
+  
+  btn.addEventListener('click', () => {
+    const email = form.querySelector('input').value;
+    if (email && email.includes('@')) {
+      btn.textContent = '✓ You\'re on the list!';
+      btn.style.background = '#059669';
+      form.querySelector('input').value = '';
+      setTimeout(() => {
+        btn.textContent = 'Notify Me';
+        btn.style.background = '';
+      }, 3000);
+    }
+  });
+})();
 </script>
 </body>
 </html>
