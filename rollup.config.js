@@ -14,7 +14,8 @@ export default [
       file: 'dist/scripts/content.js',
       format: 'iife',
       name: 'BuzzChatContent',
-      sourcemap: !production
+      sourcemap: !production,
+      inlineDynamicImports: true
     },
     plugins: [
       resolve(),
@@ -32,7 +33,8 @@ export default [
       file: 'dist/popup/popup.js',
       format: 'iife',
       name: 'BuzzChatPopup',
-      sourcemap: !production
+      sourcemap: !production,
+      inlineDynamicImports: true
     },
     plugins: [
       resolve(),
