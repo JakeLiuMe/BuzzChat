@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuzzChat — AI-Powered Live Selling Chat Automation</title>
+    <meta name="description" content="Automate your live selling chat on Whatnot, YouTube, eBay, Twitch & Kick. AI-powered responses, auto-welcome, giveaway tracking & more. Free Chrome extension.">
+    <meta name="theme-color" content="#6C3AED">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: #1a1a2e;
+            background: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        img, svg { display: block; max-width: 100%; }
+        a { color: inherit; text-decoration: none; }
+        button { font-family: inherit; cursor: pointer; border: none; }
+
+        /* ===== UTILITIES ===== */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        .section-label {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 13px; font-weight: 600; letter-spacing: 0.08em;
+            text-transform: uppercase; color: #7c3aed;
+            background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(99,102,241,0.08));
+            padding: 6px 14px; border-radius: 100px;
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 800; line-height: 1.15;
+            letter-spacing: -0.03em;
+            color: #0f0a1a;
+        }
+        .section-subtitle {
+            font-size: 18px; line-height: 1.7;
+            color: #64618a; max-width: 600px;
+            margin: 16px auto 0;
+        }
+        .text-center { text-align: center; }
+        .text-gradient {
+            background: linear-gradient(135deg, #7c3aed 0%, #6366f1 50%, #3b82f6 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            display: inline-flex; align-items: center; gap: 10px;
+            font-size: 16px; font-weight: 600;
+            padding: 14px 28px; border-radius: 12px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+            color: #fff;
+            box-shadow: 0 4px 24px rgba(124,58,237,0.3), 0 1px 2px rgba(0,0,0,0.06);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(124,58,237,0.4), 0 2px 4px rgba(0,0,0,0.08);
+        }
+        .btn-secondary {
+            background: #fff;
+            color: #1a1a2e;
+            border: 1.5px solid #e2e0ea;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .btn-secondary:hover {
+            border-color: #c4c0d8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+        .btn-chrome-icon {
+            width: 20px; height: 20px;
+        }
+
+        /* ===== NAV ===== */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        nav .container {
+            display: flex; align-items: center; justify-content: space-between;
+            height: 64px;
+        }
+        .nav-logo {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 20px; font-weight: 800; letter-spacing: -0.02em;
+        }
+        .nav-logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, #7c3aed, #6366f1);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; line-height: 1;
+        }
+        .nav-links { display: flex; align-items: center; gap: 32px; }
+        .nav-links a {
+            font-size: 14px; font-weight: 500; color: #64618a;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: #7c3aed; }
+        .nav-cta .btn { padding: 10px 20px; font-size: 14px; border-radius: 10px; }
+        .mobile-toggle { display: none; background: none; padding: 8px; }
+        .mobile-toggle span {
+            display: block; width: 20px; height: 2px;
+            background: #1a1a2e; margin: 5px 0;
+            transition: all 0.3s;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            padding: 140px 0 100px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+            width: 900px; height: 900px;
+            background: radial-gradient(circle, rgba(124,58,237,0.06) 0%, rgba(99,102,241,0.03) 40%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero-content { position: relative; z-index: 1; text-align: center; }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(59,130,246,0.06));
+            border: 1px solid rgba(124,58,237,0.12);
+            padding: 8px 18px; border-radius: 100px;
+            font-size: 14px; font-weight: 500; color: #6d28d9;
+            margin-bottom: 32px;
+            animation: fadeInUp 0.6s ease;
+        }
+        .hero h1 {
+            font-size: clamp(40px, 6.5vw, 72px);
+            font-weight: 900; line-height: 1.05;
+            letter-spacing: -0.04em;
+            max-width: 800px; margin: 0 auto 24px;
+            animation: fadeInUp 0.6s ease 0.1s both;
+        }
+        .hero p {
+            font-size: clamp(17px, 2vw, 20px);
+            color: #64618a; line-height: 1.7;
+            max-width: 560px; margin: 0 auto 40px;
+            animation: fadeInUp 0.6s ease 0.2s both;
+        }
+        .hero-buttons {
+            display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+            animation: fadeInUp 0.6s ease 0.3s both;
+        }
+        .hero-stats {
+            display: flex; gap: 48px; justify-content: center; flex-wrap: wrap;
+            margin-top: 72px; padding-top: 48px;
+            border-top: 1px solid #f0eef5;
+            animation: fadeInUp 0.6s ease 0.4s both;
+        }
+        .hero-stat { text-align: center; }
+        .hero-stat-value {
+            font-size: 36px; font-weight: 800; letter-spacing: -0.03em;
+        }
+        .hero-stat-label {
+            font-size: 14px; color: #9896a8; margin-top: 4px; font-weight: 500;
+        }
+
+        /* ===== PLATFORMS ===== */
+        .platforms {
+            padding: 60px 0 80px;
+            background: #faf9fc;
+            border-top: 1px solid #f0eef5;
+            border-bottom: 1px solid #f0eef5;
+        }
+        .platforms-label {
+            text-align: center; font-size: 14px; font-weight: 500;
+            color: #9896a8; margin-bottom: 32px;
+            letter-spacing: 0.04em; text-transform: uppercase;
+        }
+        .platforms-grid {
+            display: flex; justify-content: center; align-items: center;
+            gap: 48px; flex-wrap: wrap;
+        }
+        .platform-item {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 18px; font-weight: 600; color: #3d3a50;
+            opacity: 0.7; transition: opacity 0.2s;
+        }
+        .platform-item:hover { opacity: 1; }
+        .platform-icon {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        /* ===== FEATURES ===== */
+        .features { padding: 120px 0; }
+        .features-header { text-align: center; margin-bottom: 72px; }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        .feature-card {
+            padding: 36px;
+            border-radius: 20px;
+            border: 1px solid #f0eef5;
+            background: #fff;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card:hover {
+            border-color: #e0daf0;
+            box-shadow: 0 8px 40px rgba(124,58,237,0.06);
+            transform: translateY(-4px);
+        }
+        .feature-card::after {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(135deg, #7c3aed, #6366f1, #3b82f6);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .feature-card:hover::after { opacity: 1; }
+        .feature-icon {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .feature-icon-ai { background: linear-gradient(135deg, #ede9fe, #e0e7ff); }
+        .feature-icon-welcome { background: linear-gradient(135deg, #fce7f3, #fce4ec); }
+        .feature-icon-timer { background: linear-gradient(135deg, #e0f2fe, #dbeafe); }
+        .feature-icon-faq { background: linear-gradient(135deg, #d1fae5, #dcfce7); }
+        .feature-icon-giveaway { background: linear-gradient(135deg, #fef3c7, #fef9c3); }
+        .feature-icon-multi { background: linear-gradient(135deg, #f3e8ff, #ede9fe); }
+        .feature-card h3 {
+            font-size: 18px; font-weight: 700;
+            margin-bottom: 10px; letter-spacing: -0.01em;
+        }
+        .feature-card p {
+            font-size: 15px; color: #64618a; line-height: 1.65;
+        }
+        .feature-badge {
+            display: inline-block;
+            font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.06em;
+            color: #7c3aed; background: rgba(124,58,237,0.08);
+            padding: 3px 10px; border-radius: 6px;
+            margin-bottom: 16px;
+        }
+
+        /* ===== AI SPOTLIGHT ===== */
+        .ai-spotlight {
+            padding: 120px 0;
+            background: #0f0a1a;
+            position: relative;
+            overflow: hidden;
+        }
+        .ai-spotlight::before {
+            content: '';
+            position: absolute; top: -300px; right: -200px;
+            width: 700px; height: 700px;
+            background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .ai-spotlight::after {
+            content: '';
+            position: absolute; bottom: -200px; left: -150px;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .ai-content {
+            position: relative; z-index: 1;
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 80px; align-items: center;
+        }
+        .ai-text .section-label { color: #a78bfa; background: rgba(167,139,250,0.1); }
+        .ai-text .section-title { color: #fff; }
+        .ai-text .section-subtitle { color: #a5a2c0; margin: 16px 0 0; }
+        .ai-features-list { margin-top: 36px; display: flex; flex-direction: column; gap: 16px; }
+        .ai-feature-item {
+            display: flex; align-items: flex-start; gap: 14px;
+            color: #c4c0e0; font-size: 15px;
+        }
+        .ai-feature-check {
+            flex-shrink: 0;
+            width: 24px; height: 24px; border-radius: 8px;
+            background: rgba(124,58,237,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; margin-top: 2px;
+        }
+        .ai-visual {
+            background: linear-gradient(145deg, #1a1530, #16112a);
+            border: 1px solid rgba(124,58,237,0.2);
+            border-radius: 20px;
+            padding: 32px;
+            position: relative;
+        }
+        .ai-chat-demo { display: flex; flex-direction: column; gap: 16px; }
+        .ai-chat-bubble {
+            padding: 14px 18px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.6;
+            max-width: 90%;
+            animation: fadeInUp 0.4s ease both;
+        }
+        .ai-chat-viewer {
+            background: rgba(255,255,255,0.06);
+            color: #a5a2c0;
+            align-self: flex-start;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .ai-chat-bot {
+            background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(99,102,241,0.15));
+            color: #e0daf0;
+            align-self: flex-end;
+            border: 1px solid rgba(124,58,237,0.2);
+        }
+        .ai-chat-label {
+            font-size: 11px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.08em;
+            margin-bottom: 6px; opacity: 0.5;
+        }
+
+        /* ===== HOW IT WORKS ===== */
+        .how-it-works { padding: 120px 0; background: #faf9fc; }
+        .steps {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 40px; margin-top: 72px;
+        }
+        .step {
+            text-align: center; padding: 0 16px;
+            position: relative;
+        }
+        .step-number {
+            width: 56px; height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #7c3aed, #6366f1);
+            color: #fff;
+            font-size: 22px; font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px;
+            box-shadow: 0 4px 20px rgba(124,58,237,0.25);
+        }
+        .step h3 {
+            font-size: 20px; font-weight: 700;
+            margin-bottom: 10px; letter-spacing: -0.01em;
+        }
+        .step p { font-size: 15px; color: #64618a; line-height: 1.65; }
+        .step-connector {
+            display: none;
+        }
+
+        /* ===== SOCIAL PROOF ===== */
+        .social-proof { padding: 120px 0; }
+        .testimonials {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 24px; margin-top: 72px;
+        }
+        .testimonial {
+            padding: 32px;
+            border-radius: 20px;
+            border: 1px solid #f0eef5;
+            background: #fff;
+            transition: all 0.3s;
+        }
+        .testimonial:hover {
+            box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+            transform: translateY(-2px);
+        }
+        .testimonial-stars {
+            font-size: 16px; letter-spacing: 2px;
+            margin-bottom: 16px;
+        }
+        .testimonial-text {
+            font-size: 15px; line-height: 1.7;
+            color: #3d3a50; margin-bottom: 20px;
+        }
+        .testimonial-author {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .testimonial-avatar {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            background: linear-gradient(135deg, #ede9fe, #e0e7ff);
+        }
+        .testimonial-name { font-size: 14px; font-weight: 600; }
+        .testimonial-role { font-size: 13px; color: #9896a8; }
+
+        /* ===== PRICING ===== */
+        .pricing {
+            padding: 120px 0;
+            background: #0f0a1a;
+            position: relative;
+            overflow: hidden;
+        }
+        .pricing::before {
+            content: '';
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 1000px; height: 600px;
+            background: radial-gradient(ellipse, rgba(124,58,237,0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .pricing .section-label { color: #a78bfa; background: rgba(167,139,250,0.1); }
+        .pricing .section-title { color: #fff; }
+        .pricing .section-subtitle { color: #a5a2c0; }
+        .pricing-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 24px; margin-top: 72px;
+            position: relative; z-index: 1;
+        }
+        .pricing-card {
+            padding: 40px 32px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: all 0.3s;
+        }
+        .pricing-card:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.1);
+            transform: translateY(-4px);
+        }
+        .pricing-card.featured {
+            background: linear-gradient(145deg, rgba(124,58,237,0.12), rgba(99,102,241,0.08));
+            border-color: rgba(124,58,237,0.3);
+            position: relative;
+        }
+        .pricing-card.featured::before {
+            content: 'Most Popular';
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            background: linear-gradient(135deg, #7c3aed, #6366f1);
+            color: #fff; font-size: 12px; font-weight: 700;
+            padding: 4px 16px; border-radius: 100px;
+            text-transform: uppercase; letter-spacing: 0.06em;
+        }
+        .pricing-name {
+            font-size: 18px; font-weight: 600; color: #e0daf0;
+            margin-bottom: 8px;
+        }
+        .pricing-desc {
+            font-size: 14px; color: #8884a8; line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        .pricing-amount {
+            display: flex; align-items: baseline; gap: 4px;
+            margin-bottom: 32px;
+        }
+        .pricing-currency { font-size: 24px; font-weight: 700; color: #a5a2c0; }
+        .pricing-value {
+            font-size: 52px; font-weight: 800; color: #fff;
+            letter-spacing: -0.04em; line-height: 1;
+        }
+        .pricing-period { font-size: 16px; color: #8884a8; margin-left: 4px; }
+        .pricing-features {
+            list-style: none; display: flex; flex-direction: column; gap: 14px;
+            margin-bottom: 36px;
+        }
+        .pricing-features li {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 14px; color: #c4c0e0;
+        }
+        .pricing-features li::before {
+            content: '✓';
+            flex-shrink: 0;
+            width: 20px; height: 20px;
+            border-radius: 6px;
+            background: rgba(124,58,237,0.15);
+            color: #a78bfa;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700;
+        }
+        .pricing-btn {
+            width: 100%; padding: 14px; border-radius: 12px;
+            font-size: 15px; font-weight: 600;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .pricing-btn-default {
+            background: rgba(255,255,255,0.06);
+            color: #e0daf0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .pricing-btn-default:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .pricing-btn-featured {
+            background: linear-gradient(135deg, #7c3aed, #6366f1);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+        }
+        .pricing-btn-featured:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px rgba(124,58,237,0.4);
+        }
+
+        /* ===== FAQ ===== */
+        .faq { padding: 120px 0; }
+        .faq-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 24px; margin-top: 72px; max-width: 900px; margin-left: auto; margin-right: auto;
+        }
+        .faq-item {
+            padding: 28px;
+            border-radius: 16px;
+            border: 1px solid #f0eef5;
+            background: #fff;
+            transition: all 0.2s;
+        }
+        .faq-item:hover {
+            border-color: #e0daf0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+        }
+        .faq-item h4 {
+            font-size: 15px; font-weight: 700;
+            margin-bottom: 8px; color: #1a1a2e;
+        }
+        .faq-item p {
+            font-size: 14px; color: #64618a; line-height: 1.65;
+        }
+
+        /* ===== CTA ===== */
+        .final-cta {
+            padding: 120px 0;
+            background: linear-gradient(180deg, #faf9fc, #fff);
+            text-align: center;
+        }
+        .cta-box {
+            background: linear-gradient(145deg, #0f0a1a, #1a1530);
+            border-radius: 28px;
+            padding: 80px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-box::before {
+            content: '';
+            position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+            width: 700px; height: 500px;
+            background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .cta-box .section-title { color: #fff; position: relative; z-index: 1; }
+        .cta-box p {
+            color: #a5a2c0; font-size: 18px;
+            max-width: 500px; margin: 16px auto 40px;
+            position: relative; z-index: 1;
+        }
+        .cta-box .hero-buttons { position: relative; z-index: 1; }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: #0f0a1a;
+            padding: 64px 0 32px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+        .footer-brand p {
+            font-size: 14px; color: #8884a8; line-height: 1.7;
+            margin-top: 12px; max-width: 280px;
+        }
+        .footer-col h4 {
+            font-size: 13px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.08em;
+            color: #a5a2c0; margin-bottom: 20px;
+        }
+        .footer-col a {
+            display: block; font-size: 14px; color: #8884a8;
+            padding: 5px 0; transition: color 0.2s;
+        }
+        .footer-col a:hover { color: #c4c0e0; }
+        .footer-bottom {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-top: 32px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 13px; color: #5a577a;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            opacity: 0; transform: translateY(24px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .fade-in.visible {
+            opacity: 1; transform: translateY(0);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+            .pricing-card:last-child { grid-column: span 2; max-width: 420px; margin: 0 auto; }
+            .ai-content { grid-template-columns: 1fr; gap: 48px; }
+            .footer-grid { grid-template-columns: 2fr 1fr 1fr; }
+            .footer-grid > :last-child { grid-column: span 3; }
+        }
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .mobile-toggle { display: block; }
+            .hero { padding: 120px 0 80px; }
+            .hero h1 { font-size: 36px; }
+            .hero-stats { gap: 32px; }
+            .features-grid,
+            .pricing-grid,
+            .testimonials,
+            .steps { grid-template-columns: 1fr; }
+            .pricing-card:last-child { grid-column: span 1; max-width: none; }
+            .faq-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+            .footer-grid > :last-child { grid-column: span 1; }
+            .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+            .cta-box { padding: 48px 28px; border-radius: 20px; }
+            .section-title { font-size: 32px; }
+            .platforms-grid { gap: 24px; }
+            .ai-visual { padding: 24px; }
+        }
+        @media (max-width: 480px) {
+            .container { padding: 0 16px; }
+            .hero-buttons { flex-direction: column; align-items: center; }
+            .hero-buttons .btn { width: 100%; justify-content: center; }
+            .hero h1 { font-size: 32px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav>
+    <div class="container">
+        <a href="#" class="nav-logo">
+            <div class="nav-logo-icon">💬</div>
+            BuzzChat
+        </a>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#faq">FAQ</a>
+        </div>
+        <div class="nav-cta">
+            <a href="#pricing" class="btn btn-primary" style="padding:10px 20px;font-size:14px;border-radius:10px;">Get Started</a>
+        </div>
+        <button class="mobile-toggle" onclick="document.querySelector('.nav-links').classList.toggle('show')" aria-label="Toggle menu">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+    <div class="container hero-content">
+        <div class="hero-badge">
+            ✨ Now with AI-powered chat responses
+        </div>
+        <h1>
+            Automate your<br><span class="text-gradient">live selling chat</span>
+        </h1>
+        <p>
+            The Chrome extension that handles your chat so you can focus on selling. Works on Whatnot, YouTube, eBay, Twitch & Kick.
+        </p>
+        <div class="hero-buttons">
+            <a href="#" class="btn btn-primary">
+                <svg class="btn-chrome-icon" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="12" cy="12" r="4" fill="currentColor"/>
+                </svg>
+                Add to Chrome — It's Free
+            </a>
+            <a href="#features" class="btn btn-secondary">See Features</a>
+        </div>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="hero-stat-value text-gradient">5</div>
+                <div class="hero-stat-label">Platforms Supported</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value text-gradient">10K+</div>
+                <div class="hero-stat-label">Messages Automated</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value text-gradient">100%</div>
+                <div class="hero-stat-label">Free to Start</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== PLATFORMS ===== -->
+<section class="platforms">
+    <div class="container">
+        <div class="platforms-label">Works everywhere you sell live</div>
+        <div class="platforms-grid">
+            <div class="platform-item">
+                <div class="platform-icon">🟣</div>
+                Whatnot
+            </div>
+            <div class="platform-item">
+                <div class="platform-icon">🔴</div>
+                YouTube
+            </div>
+            <div class="platform-item">
+                <div class="platform-icon">🟡</div>
+                eBay
+            </div>
+            <div class="platform-item">
+                <div class="platform-icon">🟣</div>
+                Twitch
+            </div>
+            <div class="platform-item">
+                <div class="platform-icon">🟢</div>
+                Kick
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section class="features" id="features">
+    <div class="container">
+        <div class="features-header fade-in">
+            <div class="section-label">⚡ Features</div>
+            <h2 class="section-title">Everything you need to<br><span class="text-gradient">dominate live chat</span></h2>
+            <p class="section-subtitle">From AI-powered responses to giveaway tracking, BuzzChat handles it all while you focus on the sale.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card fade-in">
+                <div class="feature-badge">Only in BuzzChat</div>
+                <div class="feature-icon feature-icon-ai">🤖</div>
+                <h3>AI-Powered Responses</h3>
+                <p>Our AI understands context and crafts natural responses to viewer questions in real-time. No other tool has this — it's your unfair advantage.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon feature-icon-welcome">👋</div>
+                <h3>Auto-Welcome Viewers</h3>
+                <p>Greet every new viewer by name automatically. Make everyone feel seen and build loyal repeat buyers from the first message.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon feature-icon-timer">⏱️</div>
+                <h3>Timer Messages</h3>
+                <p>Set up rotating promotional messages that fire at custom intervals. Keep your deals, shipping info, and announcements front and center.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon feature-icon-faq">💬</div>
+                <h3>FAQ Auto-Replies</h3>
+                <p>Define keyword triggers and let BuzzChat answer common questions instantly. Shipping? Returns? Payment? Handled.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon feature-icon-giveaway">🎁</div>
+                <h3>Giveaway Tracking</h3>
+                <p>Run engaging giveaways with automatic entry tracking and winner selection. Boost engagement and keep viewers locked in.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon feature-icon-multi">🌐</div>
+                <h3>Multi-Platform</h3>
+                <p>One extension, five platforms. Switch between Whatnot, YouTube, eBay, Twitch, and Kick without missing a beat.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== AI SPOTLIGHT ===== -->
+<section class="ai-spotlight">
+    <div class="container">
+        <div class="ai-content">
+            <div class="ai-text fade-in">
+                <div class="section-label">🧠 AI Superpower</div>
+                <h2 class="section-title">Chat AI that<br>actually gets it</h2>
+                <p class="section-subtitle">BuzzChat's AI doesn't just match keywords — it understands what viewers are really asking and responds naturally, like having another team member in chat.</p>
+                <div class="ai-features-list">
+                    <div class="ai-feature-item">
+                        <div class="ai-feature-check">✓</div>
+                        <span>Understands context and nuance in questions</span>
+                    </div>
+                    <div class="ai-feature-item">
+                        <div class="ai-feature-check">✓</div>
+                        <span>Responds in your brand voice and tone</span>
+                    </div>
+                    <div class="ai-feature-item">
+                        <div class="ai-feature-check">✓</div>
+                        <span>Handles multiple questions simultaneously</span>
+                    </div>
+                    <div class="ai-feature-item">
+                        <div class="ai-feature-check">✓</div>
+                        <span>Learns from your products and past answers</span>
+                    </div>
+                </div>
+            </div>
+            <div class="ai-visual fade-in">
+                <div class="ai-chat-demo">
+                    <div class="ai-chat-bubble ai-chat-viewer" style="animation-delay:0.1s">
+                        <div class="ai-chat-label">Viewer</div>
+                        hey is that pokemon card near mint? whats the centering like?
+                    </div>
+                    <div class="ai-chat-bubble ai-chat-bot" style="animation-delay:0.3s">
+                        <div class="ai-chat-label">BuzzChat AI</div>
+                        Great question! 🔥 This card is NM — centering is about 60/40 on the front and 55/45 on the back. Definitely a solid candidate for grading!
+                    </div>
+                    <div class="ai-chat-bubble ai-chat-viewer" style="animation-delay:0.5s">
+                        <div class="ai-chat-label">Viewer</div>
+                        do u guys ship to canada?
+                    </div>
+                    <div class="ai-chat-bubble ai-chat-bot" style="animation-delay:0.7s">
+                        <div class="ai-chat-label">BuzzChat AI</div>
+                        Absolutely! 🇨🇦 We ship worldwide. Canada orders typically arrive in 7-10 business days. Shipping is calculated at checkout!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="how-it-works" id="how-it-works">
+    <div class="container">
+        <div class="text-center fade-in">
+            <div class="section-label">🚀 How It Works</div>
+            <h2 class="section-title">Up and running in<br><span class="text-gradient">under 2 minutes</span></h2>
+            <p class="section-subtitle">No complicated setup. No learning curve. Just install and go.</p>
+        </div>
+        <div class="steps">
+            <div class="step fade-in">
+                <div class="step-number">1</div>
+                <h3>Install Extension</h3>
+                <p>Add BuzzChat to Chrome in one click. It's lightweight and won't slow your browser down.</p>
+            </div>
+            <div class="step fade-in">
+                <div class="step-number">2</div>
+                <h3>Configure Your Rules</h3>
+                <p>Set up welcome messages, FAQ replies, timers, and AI behavior. Takes 60 seconds.</p>
+            </div>
+            <div class="step fade-in">
+                <div class="step-number">3</div>
+                <h3>Go Live & Relax</h3>
+                <p>Start your stream and let BuzzChat handle the chat. Focus on selling while we handle engagement.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SOCIAL PROOF ===== -->
+<section class="social-proof">
+    <div class="container">
+        <div class="text-center fade-in">
+            <div class="section-label">💜 Loved by Sellers</div>
+            <h2 class="section-title">What sellers are<br><span class="text-gradient">saying about us</span></h2>
+        </div>
+        <div class="testimonials">
+            <div class="testimonial fade-in">
+                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                <p class="testimonial-text">"BuzzChat's AI feature is a game-changer. It answers questions I'd normally miss while showing items. My engagement went way up and I've seen 30% more bids."</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">🎴</div>
+                    <div>
+                        <div class="testimonial-name">Sarah M.</div>
+                        <div class="testimonial-role">Whatnot Card Seller</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial fade-in">
+                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                <p class="testimonial-text">"I sell vintage on eBay Live and this extension saves me so much time. The timer messages keep my promotions running without me remembering to type them."</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">👗</div>
+                    <div>
+                        <div class="testimonial-name">Marcus T.</div>
+                        <div class="testimonial-role">eBay Live Seller</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial fade-in">
+                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                <p class="testimonial-text">"The auto-welcome feature makes everyone feel seen. I've built a loyal community and people keep coming back to my streams. Absolute must-have!"</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">🎮</div>
+                    <div>
+                        <div class="testimonial-name">Jen L.</div>
+                        <div class="testimonial-role">YouTube Live Seller</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== PRICING ===== -->
+<section class="pricing" id="pricing">
+    <div class="container">
+        <div class="text-center fade-in">
+            <div class="section-label">💎 Pricing</div>
+            <h2 class="section-title">Start free,<br>upgrade when you're ready</h2>
+            <p class="section-subtitle">No credit card required. No hidden fees. Cancel anytime.</p>
+        </div>
+        <div class="pricing-grid">
+            <!-- FREE -->
+            <div class="pricing-card fade-in">
+                <div class="pricing-name">Free</div>
+                <div class="pricing-desc">Perfect for getting started with live selling automation.</div>
+                <div class="pricing-amount">
+                    <span class="pricing-currency">$</span>
+                    <span class="pricing-value">0</span>
+                    <span class="pricing-period">/mo</span>
+                </div>
+                <ul class="pricing-features">
+                    <li>1 platform</li>
+                    <li>Auto-welcome viewers</li>
+                    <li>3 FAQ auto-replies</li>
+                    <li>1 timer message</li>
+                    <li>Basic giveaway tracking</li>
+                </ul>
+                <a href="#" class="pricing-btn pricing-btn-default">Get Started Free</a>
+            </div>
+            <!-- PRO -->
+            <div class="pricing-card featured fade-in">
+                <div class="pricing-name">Pro</div>
+                <div class="pricing-desc">For serious sellers who want AI power and full automation.</div>
+                <div class="pricing-amount">
+                    <span class="pricing-currency">$</span>
+                    <span class="pricing-value">7.99</span>
+                    <span class="pricing-period">/mo</span>
+                </div>
+                <ul class="pricing-features">
+                    <li>All 5 platforms</li>
+                    <li>AI-powered chat responses</li>
+                    <li>Unlimited FAQ auto-replies</li>
+                    <li>Unlimited timer messages</li>
+                    <li>Advanced giveaway tools</li>
+                    <li>Custom welcome messages</li>
+                    <li>Priority support</li>
+                </ul>
+                <a href="#" class="pricing-btn pricing-btn-featured">Start Pro Trial</a>
+            </div>
+            <!-- BUSINESS -->
+            <div class="pricing-card fade-in">
+                <div class="pricing-name">Business</div>
+                <div class="pricing-desc">For teams and high-volume sellers who need everything.</div>
+                <div class="pricing-amount">
+                    <span class="pricing-currency">$</span>
+                    <span class="pricing-value">19.99</span>
+                    <span class="pricing-period">/mo</span>
+                </div>
+                <ul class="pricing-features">
+                    <li>Everything in Pro</li>
+                    <li>Multi-stream support</li>
+                    <li>Team member accounts</li>
+                    <li>Advanced AI training</li>
+                    <li>Analytics dashboard</li>
+                    <li>Custom AI brand voice</li>
+                    <li>Dedicated account manager</li>
+                </ul>
+                <a href="#" class="pricing-btn pricing-btn-default">Contact Sales</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="faq" id="faq">
+    <div class="container">
+        <div class="text-center fade-in">
+            <div class="section-label">❓ FAQ</div>
+            <h2 class="section-title">Common questions</h2>
+        </div>
+        <div class="faq-grid">
+            <div class="faq-item fade-in">
+                <h4>Is BuzzChat really free?</h4>
+                <p>Yes! The free tier gives you core automation features on one platform. No credit card required, no time limit.</p>
+            </div>
+            <div class="faq-item fade-in">
+                <h4>Does it slow down my browser?</h4>
+                <p>Not at all. BuzzChat is lightweight and only activates on supported streaming platforms. You won't notice it's there.</p>
+            </div>
+            <div class="faq-item fade-in">
+                <h4>How does the AI work?</h4>
+                <p>Our AI reads incoming chat messages, understands the intent, and generates natural responses based on your product info and configured rules.</p>
+            </div>
+            <div class="faq-item fade-in">
+                <h4>Can I use it on multiple platforms?</h4>
+                <p>Free supports one platform. Pro and Business support all five: Whatnot, YouTube, eBay, Twitch, and Kick.</p>
+            </div>
+            <div class="faq-item fade-in">
+                <h4>Will viewers know it's automated?</h4>
+                <p>Nope. Messages are crafted to sound natural and personal. The AI adapts to your style so it feels authentic.</p>
+            </div>
+            <div class="faq-item fade-in">
+                <h4>Can I cancel anytime?</h4>
+                <p>Absolutely. No contracts, no cancellation fees. Downgrade to Free whenever you want and keep your settings.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FINAL CTA ===== -->
+<section class="final-cta">
+    <div class="container">
+        <div class="cta-box fade-in">
+            <h2 class="section-title">Ready to sell smarter?</h2>
+            <p>Join thousands of live sellers who automate their chat with BuzzChat. Install in seconds, see results immediately.</p>
+            <div class="hero-buttons">
+                <a href="#" class="btn btn-primary">
+                    <svg class="btn-chrome-icon" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+                        <circle cx="12" cy="12" r="4" fill="currentColor"/>
+                    </svg>
+                    Add to Chrome — It's Free
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="#" class="nav-logo" style="color:#e0daf0;">
+                    <div class="nav-logo-icon">💬</div>
+                    BuzzChat
+                </a>
+                <p>AI-powered live selling chat automation for modern sellers. Focus on selling, let BuzzChat handle the chat.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Product</h4>
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#faq">FAQ</a>
+                <a href="#">Changelog</a>
+            </div>
+            <div class="footer-col">
+                <h4>Platforms</h4>
+                <a href="#">Whatnot</a>
+                <a href="#">YouTube</a>
+                <a href="#">eBay Live</a>
+                <a href="#">Twitch</a>
+                <a href="#">Kick</a>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <a href="#">About</a>
+                <a href="#">Blog</a>
+                <a href="#">Contact</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2025 BuzzChat. All rights reserved.</span>
+            <span>Made with 💜 for live sellers</span>
+        </div>
+    </div>
+</footer>
+
+<!-- ===== SCROLL ANIMATIONS ===== -->
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Smooth nav background on scroll
+    const nav = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 20) {
+            nav.style.boxShadow = '0 1px 12px rgba(0,0,0,0.06)';
+        } else {
+            nav.style.boxShadow = 'none';
+        }
+    });
+</script>
+</body>
+</html>

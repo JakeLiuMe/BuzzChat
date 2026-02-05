@@ -180,7 +180,14 @@ const BuzzChatSecurity = {
     if (sender.url && sender.tab) {
       try {
         const url = new URL(sender.url);
-        const allowedHosts = ['whatnot.com', 'www.whatnot.com'];
+        const allowedHosts = [
+          'whatnot.com', 'www.whatnot.com',
+          'youtube.com', 'www.youtube.com',
+          'ebay.com', 'www.ebay.com',
+          'twitch.tv', 'www.twitch.tv',
+          'kick.com', 'www.kick.com',
+          'extensionpay.com'
+        ];
         if (!allowedHosts.includes(url.hostname)) {
           this.Logger.security('Message rejected: unauthorized host', { host: url.hostname });
           return false;

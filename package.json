@@ -14,7 +14,7 @@
     "build:bundle:prod": "NODE_ENV=production rollup -c",
     "build:bundle:watch": "rollup -c --watch",
     "icons": "node scripts/generate-icons.js",
-    "zip": "zip -r whatnot-chat-bot.zip manifest.json assets src README.md",
+    "zip": "zip -r buzzchat.zip manifest.json assets src README.md",
     "lint": "eslint src/ --ext .js",
     "lint:fix": "eslint src/ --ext .js --fix",
     "test": "npx playwright test",

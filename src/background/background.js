@@ -10,6 +10,90 @@ const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
 // Import native messaging handler for MCP server communication
 import { initNativeMessaging, handleNativeMessage } from './nativeMessaging.js';
 
+// =============================================================================
+// SECURE AI PROXY
+// =============================================================================
+// All Anthropic API calls are routed through this background worker so that
+// API keys never appear in content-script network traffic (DevTools safe).
+
+const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
+const HAIKU_MODEL = 'claude-3-haiku-20240307';
+const AI_MAX_TOKENS = 100;
+const AI_TIMEOUT_MS = 5000;
+
+const AI_TONE_STYLES = {
+  friendly: 'warm, casual, use emojis sparingly, helpful and approachable',
+  professional: 'polite, clear, businesslike, courteous',
+  hype: 'excited, energetic, lots of enthusiasm, occasional emojis like fire and sparkles',
+  chill: 'relaxed, laid-back, conversational, easygoing'
+};
+
+function buildAISystemPrompt(context, tone) {
+  const toneStyle = AI_TONE_STYLES[tone] || AI_TONE_STYLES.friendly;
+  let prompt = `You are a chat assistant for a live selling stream. Your job is to respond helpfully to viewer questions while keeping the energy positive.\n\nTone: ${toneStyle}\n\nContext:`;
+  if (context.platform) prompt += `\n- Platform: ${context.platform}`;
+  if (context.sellerName) prompt += `\n- Seller name: ${context.sellerName}`;
+  if (context.currentItem) prompt += `\n- Currently selling: ${context.currentItem}`;
+  if (context.additionalContext) prompt += `\n- Topic: ${context.additionalContext}`;
+  prompt += `\n\nCRITICAL RULES:\n1. Keep responses under 100 characters (this is live chat!)\n2. NEVER mention you are AI, a bot, or automated\n3. NEVER give specific prices - say "Check the listing!" or "Posted in chat!"\n4. NEVER give specific shipping costs - say "Depends on location, check listing!"\n5. Be genuinely helpful and engaging\n6. Match the casual tone of live stream chat\n7. If unsure about item details, redirect to the stream or listing`;
+  return prompt;
+}
+
+async function handleAIRequest(payload) {
+  const { userMessage, context = {}, tone = 'friendly', apiKey } = payload;
+
+  if (!apiKey || !userMessage) {
+    return { error: 'Missing required fields' };
+  }
+
+  const systemPrompt = buildAISystemPrompt(context, tone);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(ANTHROPIC_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: HAIKU_MODEL,
+        max_tokens: AI_MAX_TOKENS,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMessage }]
+      }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      if (response.status === 401) return { error: 'Invalid API key' };
+      if (response.status === 429) return { error: 'Rate limited - too many requests' };
+      if (response.status === 400) return { error: errorData.error?.message || 'Bad request' };
+      return { error: `API error: ${response.status}` };
+    }
+
+    const data = await response.json();
+    const responseText = (data.content?.[0]?.text || '').trim().slice(0, 150);
+
+    return {
+      text: responseText,
+      usage: {
+        inputTokens: data.usage?.input_tokens || 0,
+        outputTokens: data.usage?.output_tokens || 0
+      }
+    };
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') return { error: 'Request timed out' };
+    return { error: error.message || 'Unknown AI error' };
+  }
+}
+
 // License verification configuration
 const LICENSE_CONFIG = {
   TRIAL_DAYS: 7,
@@ -274,6 +358,16 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
       // Get AI credits for Max tier users
       getAICredits().then(credits => {
         sendResponse(credits);
+      }).catch(err => {
+        sendResponse({ error: err.message });
+      });
+      return true;
+
+    case 'AI_GENERATE_RESPONSE':
+      // SECURE AI PROXY: Handle AI requests from content scripts
+      // The API key stays in the background worker's network traffic only
+      handleAIRequest(message.payload).then(result => {
+        sendResponse(result);
       }).catch(err => {
         sendResponse({ error: err.message });
       });

@@ -1,11 +1,12 @@
 // BuzzChat - Claude Haiku AI Service
 // Copyright (c) 2024-2026 BuzzChat. All rights reserved.
 // AI-powered chat responses for Max tier users
+//
+// SECURITY: All API calls are routed through the background service worker.
+// The API key is NEVER sent from the content script directly.
+// This prevents key exposure in DevTools Network tab.
 
-const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const HAIKU_MODEL = 'claude-3-haiku-20240307';
-const MAX_TOKENS = 100; // Keep responses short for live chat
-const TIMEOUT_MS = 5000; // 5 second timeout for responsiveness
 
 // Tone styles for different seller personalities
 const TONE_STYLES = {
@@ -15,55 +16,19 @@ const TONE_STYLES = {
   chill: 'relaxed, laid-back, conversational, easygoing'
 };
 
-/**
- * Build the system prompt for Claude
- * @param {Object} context - Current context (item, seller name, platform)
- * @param {string} tone - Tone style (friendly, professional, hype, chill)
- * @returns {string} System prompt
- */
-function buildSystemPrompt(context, tone) {
-  const toneStyle = TONE_STYLES[tone] || TONE_STYLES.friendly;
-
-  let prompt = `You are a chat assistant for a live selling stream. Your job is to respond helpfully to viewer questions while keeping the energy positive.
-
-Tone: ${toneStyle}
-
-Context:`;
-
-  if (context.platform) {
-    prompt += `\n- Platform: ${context.platform}`;
-  }
-  if (context.sellerName) {
-    prompt += `\n- Seller name: ${context.sellerName}`;
-  }
-  if (context.currentItem) {
-    prompt += `\n- Currently selling: ${context.currentItem}`;
-  }
-  if (context.additionalContext) {
-    prompt += `\n- Topic: ${context.additionalContext}`;
-  }
-
-  prompt += `
-
-CRITICAL RULES:
-1. Keep responses under 100 characters (this is live chat!)
-2. NEVER mention you are AI, a bot, or automated
-3. NEVER give specific prices - say "Check the listing!" or "Posted in chat!"
-4. NEVER give specific shipping costs - say "Depends on location, check listing!"
-5. Be genuinely helpful and engaging
-6. Match the casual tone of live stream chat
-7. If unsure about item details, redirect to the stream or listing`;
-
-  return prompt;
-}
+// Browser API compatibility
+const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
 
 /**
- * Generate an AI response using Claude Haiku
+ * Generate an AI response by delegating to the background service worker.
+ * The background worker holds the API key and makes the actual fetch call,
+ * so the key never appears in content script network traffic.
+ *
  * @param {Object} options - Generation options
  * @param {string} options.userMessage - The viewer's message to respond to
  * @param {Object} options.context - Current context (platform, seller, item)
  * @param {string} options.tone - Tone style (friendly, professional, hype, chill)
- * @param {string} options.apiKey - Anthropic API key
+ * @param {string} options.apiKey - Anthropic API key (passed to background)
  * @returns {Promise<{text: string, usage: {inputTokens: number, outputTokens: number}}>}
  */
 async function generateAIResponse(options) {
@@ -80,77 +45,48 @@ async function generateAIResponse(options) {
   // Sanitize the user message (basic XSS prevention for display)
   const sanitizedMessage = userMessage.trim().slice(0, 500);
 
-  const systemPrompt = buildSystemPrompt(context, tone);
+  // Delegate to background service worker for secure API call
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error('Request timed out'));
+    }, 8000); // 8s timeout (background needs a bit more time than direct calls)
 
-  // Create AbortController for timeout
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    browserAPI.runtime.sendMessage({
+      type: 'AI_GENERATE_RESPONSE',
+      payload: {
+        userMessage: sanitizedMessage,
+        context,
+        tone,
+        apiKey
+      }
+    }, (response) => {
+      clearTimeout(timeout);
 
-  try {
-    const response = await fetch(ANTHROPIC_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: HAIKU_MODEL,
-        max_tokens: MAX_TOKENS,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: sanitizedMessage }]
-      }),
-      signal: controller.signal
+      if (browserAPI.runtime.lastError) {
+        reject(new Error(browserAPI.runtime.lastError.message));
+        return;
+      }
+
+      if (!response) {
+        reject(new Error('No response from background worker'));
+        return;
+      }
+
+      if (response.error) {
+        reject(new Error(response.error));
+        return;
+      }
+
+      resolve({
+        text: response.text,
+        usage: response.usage || { inputTokens: 0, outputTokens: 0 }
+      });
     });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-
-      // Handle specific error codes
-      if (response.status === 401) {
-        throw new Error('Invalid API key');
-      }
-      if (response.status === 429) {
-        throw new Error('Rate limited - too many requests');
-      }
-      if (response.status === 400) {
-        throw new Error(errorData.error?.message || 'Bad request');
-      }
-
-      throw new Error(`API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    // Extract response text
-    const responseText = data.content?.[0]?.text || '';
-
-    // Ensure response isn't too long for chat
-    const trimmedResponse = responseText.trim().slice(0, 150);
-
-    return {
-      text: trimmedResponse,
-      usage: {
-        inputTokens: data.usage?.input_tokens || 0,
-        outputTokens: data.usage?.output_tokens || 0
-      }
-    };
-  } catch (error) {
-    clearTimeout(timeoutId);
-
-    if (error.name === 'AbortError') {
-      throw new Error('Request timed out');
-    }
-
-    throw error;
-  }
+  });
 }
 
 /**
- * Test if an API key is valid by making a minimal request
+ * Test if an API key is valid by making a minimal request via background
  * @param {string} apiKey - Anthropic API key to test
  * @returns {Promise<{valid: boolean, error?: string}>}
  */
@@ -165,8 +101,7 @@ async function testApiKey(apiKey) {
   }
 
   try {
-    // Make a minimal test request
-    const result = await generateAIResponse({
+    await generateAIResponse({
       userMessage: 'test',
       context: {},
       tone: 'friendly',
