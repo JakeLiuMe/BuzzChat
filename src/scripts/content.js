@@ -508,8 +508,8 @@
   // Load settings from storage (sync storage for cross-device sync)
   async function loadSettings() {
     return new Promise((resolve) => {
-      browserAPI.storage.sync.get(['whatnotBotSettings'], (result) => {
-        state.settings = result.whatnotBotSettings || getDefaultSettings();
+      browserAPI.storage.sync.get(['buzzchatSettings'], (result) => {
+        state.settings = result.buzzchatSettings || getDefaultSettings();
         resolve();
       });
     });
@@ -905,7 +905,7 @@
     safeTrackAnalytics('command', { trigger: commandTrigger });
 
     // Persist updated usage count to storage
-    StorageWriter.queue('whatnotBotSettings', state.settings);
+    StorageWriter.queue('buzzchatSettings', state.settings);
 
     // Notify popup of command usage update (popup may not be open)
     browserAPI.runtime.sendMessage({
@@ -1077,7 +1077,7 @@
             // Track analytics with trigger keyword
             safeTrackAnalytics('faq', { trigger: trigger.toLowerCase() });
             // Persist updated usage count to storage
-            StorageWriter.queue('whatnotBotSettings', state.settings);
+            StorageWriter.queue('buzzchatSettings', state.settings);
           }
 
           return; // Only send one reply per message
@@ -1243,7 +1243,7 @@
     if (state.settings.tier === 'free') {
       state.settings.messagesUsed++;
       // Use batched storage writer to reduce I/O
-      StorageWriter.queue('whatnotBotSettings', state.settings);
+      StorageWriter.queue('buzzchatSettings', state.settings);
       browserAPI.runtime.sendMessage({ type: 'MESSAGE_SENT' });
     }
 
@@ -2130,7 +2130,7 @@
           bar.classList.toggle('minimized');
           target.textContent = state.settings.quickReply.minimized ? '💬' : '✕';
           target.title = state.settings.quickReply.minimized ? 'Show quick replies' : 'Hide quick replies';
-          StorageWriter.queue('whatnotBotSettings', state.settings);
+          StorageWriter.queue('buzzchatSettings', state.settings);
         } else if (action === 'send') {
           if (target.classList.contains('sending')) return;
           target.classList.add('sending');

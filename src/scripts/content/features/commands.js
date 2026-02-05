@@ -62,7 +62,7 @@ export function checkCustomCommand(messageText, username) {
 
   // Update usage count (persist to storage)
   command.usageCount = (command.usageCount || 0) + 1;
-  StorageWriter.queue('whatnotBotSettings', state.settings);
+  StorageWriter.queue('buzzchatSettings', state.settings);
 
   // Notify popup of command usage update
   browserAPI.runtime.sendMessage({

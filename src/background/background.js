@@ -140,14 +140,14 @@ async function verifyLicense() {
     // Get user data and settings from sync storage (settings + license sync across devices)
     let syncData;
     try {
-      syncData = await browserAPI.storage.sync.get(['extensionpay_user', 'whatnotBotLicense', 'whatnotBotSettings']);
+      syncData = await browserAPI.storage.sync.get(['extensionpay_user', 'buzzchatLicense', 'buzzchatSettings']);
     } catch (e) {
       console.error('[BuzzChat] Failed to get sync storage:', e);
       syncData = {};
     }
     const user = syncData.extensionpay_user;
-    const cachedLicense = syncData.whatnotBotLicense;
-    const settings = syncData.whatnotBotSettings || {};
+    const cachedLicense = syncData.buzzchatLicense;
+    const settings = syncData.buzzchatSettings || {};
 
     let license = { tier: 'free', paid: false, trialActive: false };
 
@@ -183,7 +183,7 @@ async function verifyLicense() {
 
     // Cache the license (sync storage for cross-device sync)
     await browserAPI.storage.sync.set({
-      whatnotBotLicense: { ...license, cachedAt: Date.now() }
+      buzzchatLicense: { ...license, cachedAt: Date.now() }
     });
 
     // Sync tier with settings and apply tier-specific limits
@@ -194,7 +194,7 @@ async function verifyLicense() {
       settings.faqRulesLimit = limits.faqRules;
       settings.timersLimit = limits.timers;
       settings.templatesLimit = limits.templates;
-      await browserAPI.storage.sync.set({ whatnotBotSettings: settings });
+      await browserAPI.storage.sync.set({ buzzchatSettings: settings });
       console.log('[BuzzChat] License synced:', license.tier, 'limits:', limits);
     }
 
@@ -214,7 +214,7 @@ browserAPI.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     const freeLimits = getTierLimits('free');
     browserAPI.storage.sync.set({
-      whatnotBotSettings: {
+      buzzchatSettings: {
         tier: 'free',
         messagesUsed: 0,
         messagesLimit: freeLimits.messages, // Per-show limit based on tier
@@ -299,7 +299,7 @@ browserAPI.runtime.onInstalled.addListener((details) => {
 
 // Listen for messages from content scripts and popup
 browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log('[Whatnot Bot Background] Received message:', message.type);
+  console.log('[BuzzChat] Received message:', message.type);
 
   // Handle MCP bridge messages
   if (message && message.source === 'mcp-bridge') {
@@ -314,17 +314,17 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
       break;
 
     case 'GET_SETTINGS':
-      browserAPI.storage.sync.get(['whatnotBotSettings'], (result) => {
-        sendResponse(result.whatnotBotSettings);
+      browserAPI.storage.sync.get(['buzzchatSettings'], (result) => {
+        sendResponse(result.buzzchatSettings);
       });
       return true; // Keep channel open for async response
 
     case 'RESET_MESSAGE_COUNT':
       // Reset daily message count (for free tier)
-      browserAPI.storage.sync.get(['whatnotBotSettings'], (result) => {
-        if (result.whatnotBotSettings) {
-          result.whatnotBotSettings.messagesUsed = 0;
-          browserAPI.storage.sync.set({ whatnotBotSettings: result.whatnotBotSettings });
+      browserAPI.storage.sync.get(['buzzchatSettings'], (result) => {
+        if (result.buzzchatSettings) {
+          result.buzzchatSettings.messagesUsed = 0;
+          browserAPI.storage.sync.set({ buzzchatSettings: result.buzzchatSettings });
           sendResponse({ success: true });
         }
       });
@@ -339,15 +339,15 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     case 'GET_LICENSE':
       // Get cached license (from sync storage for cross-device sync)
-      browserAPI.storage.sync.get(['whatnotBotLicense'], (result) => {
-        sendResponse(result.whatnotBotLicense || { tier: 'free', paid: false });
+      browserAPI.storage.sync.get(['buzzchatLicense'], (result) => {
+        sendResponse(result.buzzchatLicense || { tier: 'free', paid: false });
       });
       return true;
 
     case 'GET_TIER_LIMITS':
       // Get limits for a specific tier (or current tier if not specified)
-      browserAPI.storage.sync.get(['whatnotBotSettings'], (result) => {
-        const tier = message.tier || result.whatnotBotSettings?.tier || 'free';
+      browserAPI.storage.sync.get(['buzzchatSettings'], (result) => {
+        const tier = message.tier || result.buzzchatSettings?.tier || 'free';
         const limits = getTierLimits(tier);
         sendResponse({ tier, limits });
       });
@@ -445,14 +445,14 @@ browserAPI.alarms.create('cleanupAnalytics', {
 
 browserAPI.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === 'resetDailyMessages') {
-    browserAPI.storage.sync.get(['whatnotBotSettings'], (result) => {
+    browserAPI.storage.sync.get(['buzzchatSettings'], (result) => {
       if (browserAPI.runtime.lastError) {
         console.error('[BuzzChat] Storage error:', browserAPI.runtime.lastError);
         return;
       }
-      if (result.whatnotBotSettings && result.whatnotBotSettings.tier === 'free') {
-        result.whatnotBotSettings.messagesUsed = 0;
-        browserAPI.storage.sync.set({ whatnotBotSettings: result.whatnotBotSettings }, () => {
+      if (result.buzzchatSettings && result.buzzchatSettings.tier === 'free') {
+        result.buzzchatSettings.messagesUsed = 0;
+        browserAPI.storage.sync.set({ buzzchatSettings: result.buzzchatSettings }, () => {
           if (browserAPI.runtime.lastError) {
             console.error('[BuzzChat] Storage set error:', browserAPI.runtime.lastError);
           } else {
@@ -465,13 +465,13 @@ browserAPI.alarms.onAlarm.addListener((alarm) => {
 
   if (alarm.name === 'cleanupAnalytics') {
     // Clean up old analytics data (keep last 90 days)
-    browserAPI.storage.local.get(['whatnotBotAnalytics'], (result) => {
+    browserAPI.storage.local.get(['buzzchatAnalytics'], (result) => {
       if (browserAPI.runtime.lastError) {
         console.error('[BuzzChat] Storage error:', browserAPI.runtime.lastError);
         return;
       }
-      if (result.whatnotBotAnalytics && result.whatnotBotAnalytics.dailyStats) {
-        const data = result.whatnotBotAnalytics;
+      if (result.buzzchatAnalytics && result.buzzchatAnalytics.dailyStats) {
+        const data = result.buzzchatAnalytics;
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - 90);
         const cutoffKey = cutoffDate.toISOString().split('T')[0];
@@ -485,7 +485,7 @@ browserAPI.alarms.onAlarm.addListener((alarm) => {
         });
 
         if (cleaned) {
-          browserAPI.storage.local.set({ whatnotBotAnalytics: data }, () => {
+          browserAPI.storage.local.set({ buzzchatAnalytics: data }, () => {
             if (browserAPI.runtime.lastError) {
               console.error('[BuzzChat] Analytics cleanup error:', browserAPI.runtime.lastError);
             } else {

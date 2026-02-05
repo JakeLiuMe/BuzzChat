@@ -258,43 +258,14 @@ BuzzChat does NOT collect:
 - Manifest V3 compatible browser
 - JavaScript enabled
 
-## Automated Maintenance
+## Contributing
 
-This product is designed to run forever with minimal maintenance. The following automation is in place:
+Found a bug? Have an idea?
 
-### AI-Powered Bug Fixes
-- Users report bugs using the structured issue template
-- **Maintainer** comments `/autofix` to trigger AI analysis
-- AI analyzes the issue and proposes a fix
-- Creates a **draft PR** that requires human review
-- All 220 tests must pass before PR is created
-
-**Safety Features:**
-- Only maintainers can trigger `/autofix` (not random users)
-- Never auto-merges - always requires human review
-- Rate limited to 10 attempts per day
-- AI instructed to reject suspicious requests
-- All PRs clearly labeled as AI-generated
-
-### Automatic Dependency Updates
-- Dependencies are updated weekly via Dependabot
-- Security vulnerabilities are flagged automatically
-- Patch updates can be auto-merged after tests pass
-
-### Stale Issue Management
-- Issues without activity for 60 days are marked stale
-- Stale issues are closed after 14 additional days
-- Add "keep-open" label to prevent auto-closure
-
-### Required Secrets (for maintainers)
-- `ANTHROPIC_API_KEY` - Claude API key for AI auto-fix (~$0.10 per attempt)
-
-## Support
-
-- **GitHub Issues**: [Report a bug](../../issues/new?template=bug_report.yml)
+- **Bug Reports**: [Report a bug](../../issues/new?template=bug_report.yml)
 - **Feature Requests**: [Suggest a feature](../../issues/new?template=feature_request.yml)
 
-*Note: This product is in maintenance mode. Bug fixes are automated, but new features are not planned.*
+Dependencies are kept up to date automatically. Stale issues are closed after 60 days of inactivity.
 
 ## License
 
@@ -303,3 +274,7 @@ MIT License - See LICENSE file for details
 ---
 
 Made with love for the live selling community.
+
+---
+
+**Disclaimer:** BuzzChat is not affiliated with, endorsed by, or sponsored by Whatnot, YouTube, eBay, Twitch, or Kick. All platform names are trademarks of their respective owners.

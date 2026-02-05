@@ -1,7 +1,7 @@
 {
   "name": "buzzchat",
   "version": "1.2.0",
-  "description": "Browser extension for automating Whatnot live chat with auto-welcome, timer messages, FAQ auto-replies, and giveaway automation. Works on Chrome and Firefox.",
+  "description": "Browser extension for automating live selling chat with auto-welcome, timer messages, FAQ auto-replies, and giveaway automation. Works on Chrome and Firefox.",
   "main": "src/background/background.js",
   "scripts": {
     "serve": "node test/serve.js",

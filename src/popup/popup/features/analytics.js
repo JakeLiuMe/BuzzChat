@@ -9,7 +9,7 @@ import { triggerConfetti } from './giveaway.js';
 
 // Analytics Module
 export const Analytics = {
-  STORAGE_KEY: 'whatnotBotAnalytics',
+  STORAGE_KEY: 'buzzchatAnalytics',
 
   getDefaultData() {
     return {

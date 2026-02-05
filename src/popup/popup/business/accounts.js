@@ -6,8 +6,8 @@ import { browserAPI, DEFAULT_SETTINGS } from '../core/config.js';
 // Account Manager
 export const AccountManager = {
   STORAGE_KEYS: {
-    ACCOUNTS: 'whatnotBotAccounts',
-    ACTIVE_ID: 'whatnotBotActiveAccountId'
+    ACCOUNTS: 'buzzchatAccounts',
+    ACTIVE_ID: 'buzzchatActiveAccountId'
   },
   MAX_ACCOUNTS: 10,
 
@@ -127,12 +127,12 @@ export const AccountManager = {
 
   async migrateFromLegacy() {
     return new Promise((resolve) => {
-      browserAPI.storage.sync.get(['whatnotBotSettings', this.STORAGE_KEYS.ACCOUNTS], async (result) => {
+      browserAPI.storage.sync.get(['buzzchatSettings', this.STORAGE_KEYS.ACCOUNTS], async (result) => {
         if (result[this.STORAGE_KEYS.ACCOUNTS] && Object.keys(result[this.STORAGE_KEYS.ACCOUNTS]).length > 0) {
           resolve(false);
           return;
         }
-        const legacySettings = result.whatnotBotSettings;
+        const legacySettings = result.buzzchatSettings;
         const defaultAccount = this.createDefaultAccount('default', 'Default');
         if (legacySettings) {
           defaultAccount.settings = this.deepMerge(defaultAccount.settings, legacySettings);

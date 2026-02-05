@@ -78,8 +78,8 @@ export function getDefaultSettings() {
 // Load settings from storage (sync storage for cross-device sync)
 export async function loadSettings() {
   return new Promise((resolve) => {
-    browserAPI.storage.sync.get(['whatnotBotSettings'], (result) => {
-      state.settings = result.whatnotBotSettings || getDefaultSettings();
+    browserAPI.storage.sync.get(['buzzchatSettings'], (result) => {
+      state.settings = result.buzzchatSettings || getDefaultSettings();
       resolve();
     });
   });

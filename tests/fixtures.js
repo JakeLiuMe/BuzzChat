@@ -143,7 +143,7 @@ const test = base.extend({
         });
       },
       async getSettings() {
-        return this.get('whatnotBotSettings');
+        return this.get('buzzchatSettings');
       }
     };
 

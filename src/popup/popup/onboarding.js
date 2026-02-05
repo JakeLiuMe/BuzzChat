@@ -15,8 +15,8 @@ export const Onboarding = {
   totalSteps: 3,
 
   async check() {
-    const result = await browserAPI.storage.sync.get(['whatnotBotOnboarded']);
-    if (!result.whatnotBotOnboarded && elements.onboardingModal) {
+    const result = await browserAPI.storage.sync.get(['buzzchatOnboarded']);
+    if (!result.buzzchatOnboarded && elements.onboardingModal) {
       elements.onboardingModal.classList.add('active');
       FocusTrap.activate(elements.onboardingModal);
       this.updateUI();
@@ -107,7 +107,7 @@ export const Onboarding = {
     }
 
     await saveSettings();
-    await browserAPI.storage.sync.set({ whatnotBotOnboarded: true });
+    await browserAPI.storage.sync.set({ buzzchatOnboarded: true });
 
     if (elements.onboardingModal) {
       elements.onboardingModal.classList.remove('active');

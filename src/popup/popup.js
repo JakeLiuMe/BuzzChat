@@ -778,8 +778,8 @@ const DEFAULT_SETTINGS = {
 // Account Manager (inline for popup context)
 const AccountManager = {
   STORAGE_KEYS: {
-    ACCOUNTS: 'whatnotBotAccounts',
-    ACTIVE_ID: 'whatnotBotActiveAccountId'
+    ACCOUNTS: 'buzzchatAccounts',
+    ACTIVE_ID: 'buzzchatActiveAccountId'
   },
   MAX_ACCOUNTS: 10,
 
@@ -899,12 +899,12 @@ const AccountManager = {
 
   async migrateFromLegacy() {
     return new Promise((resolve) => {
-      browserAPI.storage.sync.get(['whatnotBotSettings', this.STORAGE_KEYS.ACCOUNTS], async (result) => {
+      browserAPI.storage.sync.get(['buzzchatSettings', this.STORAGE_KEYS.ACCOUNTS], async (result) => {
         if (result[this.STORAGE_KEYS.ACCOUNTS] && Object.keys(result[this.STORAGE_KEYS.ACCOUNTS]).length > 0) {
           resolve(false);
           return;
         }
-        const legacySettings = result.whatnotBotSettings;
+        const legacySettings = result.buzzchatSettings;
         const defaultAccount = this.createDefaultAccount('default', 'Default');
         if (legacySettings) {
           defaultAccount.settings = this.deepMerge(defaultAccount.settings, legacySettings);
@@ -947,7 +947,7 @@ const AccountManager = {
 
 // API Key Manager (inline for popup context)
 const ApiKeyManager = {
-  STORAGE_KEY: 'whatnotBotApiKeys',
+  STORAGE_KEY: 'buzzchatApiKeys',
   KEY_PREFIX: 'bz_live_',
   MAX_KEYS: 5,
 
@@ -1349,8 +1349,8 @@ const Onboarding = {
   totalSteps: 3,
 
   async check() {
-    const result = await browserAPI.storage.sync.get(['whatnotBotOnboarded']);
-    if (!result.whatnotBotOnboarded && elements.onboardingModal) {
+    const result = await browserAPI.storage.sync.get(['buzzchatOnboarded']);
+    if (!result.buzzchatOnboarded && elements.onboardingModal) {
       elements.onboardingModal.classList.add('active');
       FocusTrap.activate(elements.onboardingModal);
       this.updateUI();
@@ -1441,7 +1441,7 @@ const Onboarding = {
     }
 
     await saveSettings();
-    await browserAPI.storage.sync.set({ whatnotBotOnboarded: true });
+    await browserAPI.storage.sync.set({ buzzchatOnboarded: true });
 
     if (elements.onboardingModal) {
       elements.onboardingModal.classList.remove('active');
@@ -1478,14 +1478,14 @@ async function loadSettings() {
 
   // Fallback to legacy storage
   return new Promise((resolve) => {
-    browserAPI.storage.sync.get(['whatnotBotSettings'], (result) => {
+    browserAPI.storage.sync.get(['buzzchatSettings'], (result) => {
       if (browserAPI.runtime.lastError) {
         console.error('[BuzzChat] Failed to load settings:', browserAPI.runtime.lastError);
         resolve();
         return;
       }
-      if (result.whatnotBotSettings) {
-        settings = { ...DEFAULT_SETTINGS, ...result.whatnotBotSettings };
+      if (result.buzzchatSettings) {
+        settings = { ...DEFAULT_SETTINGS, ...result.buzzchatSettings };
       }
       resolve();
     });
@@ -1521,7 +1521,7 @@ async function saveSettings(showToast = false) {
 
   // Fallback to legacy storage
   return new Promise((resolve) => {
-    browserAPI.storage.sync.set({ whatnotBotSettings: settings }, () => {
+    browserAPI.storage.sync.set({ buzzchatSettings: settings }, () => {
       if (browserAPI.runtime.lastError) {
         StorageErrorHandler.handleError(browserAPI.runtime.lastError, 'save settings');
         resolve();
@@ -3767,8 +3767,8 @@ const ExtensionPay = {
 
   async getCachedLicense() {
     return new Promise((resolve) => {
-      browserAPI.storage.sync.get(['whatnotBotLicense'], (result) => {
-        resolve(result.whatnotBotLicense || null);
+      browserAPI.storage.sync.get(['buzzchatLicense'], (result) => {
+        resolve(result.buzzchatLicense || null);
       });
     });
   },
@@ -3776,7 +3776,7 @@ const ExtensionPay = {
   async cacheLicense(license) {
     return new Promise((resolve) => {
       browserAPI.storage.sync.set({
-        whatnotBotLicense: { ...license, cachedAt: Date.now() }
+        buzzchatLicense: { ...license, cachedAt: Date.now() }
       }, resolve);
     });
   },
@@ -4095,7 +4095,7 @@ function canAddItem(type) {
 
 // Referral Module
 const Referral = {
-  STORAGE_KEY: 'whatnotBotReferral',
+  STORAGE_KEY: 'buzzchatReferral',
   BONUS_PER_REFERRAL: 10,
   CODE_LENGTH: 8,
 
@@ -4179,11 +4179,11 @@ const Referral = {
   // Apply bonus messages to settings (sync storage for cross-device sync)
   async applyBonus(amount) {
     return new Promise((resolve) => {
-      browserAPI.storage.sync.get(['whatnotBotSettings'], (result) => {
-        if (result.whatnotBotSettings) {
-          const settings = result.whatnotBotSettings;
+      browserAPI.storage.sync.get(['buzzchatSettings'], (result) => {
+        if (result.buzzchatSettings) {
+          const settings = result.buzzchatSettings;
           settings.referralBonus = (settings.referralBonus || 0) + amount;
-          browserAPI.storage.sync.set({ whatnotBotSettings: settings }, resolve);
+          browserAPI.storage.sync.set({ buzzchatSettings: settings }, resolve);
         } else {
           resolve();
         }
@@ -4206,7 +4206,7 @@ const Referral = {
 
 // Analytics Module (inline for popup context)
 const Analytics = {
-  STORAGE_KEY: 'whatnotBotAnalytics',
+  STORAGE_KEY: 'buzzchatAnalytics',
 
   getDefaultData() {
     return {

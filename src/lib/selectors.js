@@ -421,8 +421,8 @@ const SelectorManager = {
   // Get cached selectors from storage
   async getCachedSelectors() {
     return new Promise((resolve) => {
-      browserAPI.storage.local.get(['whatnotBotSelectors'], (result) => {
-        resolve(result.whatnotBotSelectors || null);
+      browserAPI.storage.local.get(['buzzchatSelectors'], (result) => {
+        resolve(result.buzzchatSelectors || null);
       });
     });
   },
@@ -431,7 +431,7 @@ const SelectorManager = {
   async cacheSelectors(selectorsData) {
     return new Promise((resolve) => {
       browserAPI.storage.local.set({
-        whatnotBotSelectors: {
+        buzzchatSelectors: {
           ...selectorsData,
           cachedAt: Date.now()
         }

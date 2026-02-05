@@ -50,8 +50,8 @@ const ExtensionPay = {
   // Get cached license from storage (sync storage for cross-device sync)
   async getCachedLicense() {
     return new Promise((resolve) => {
-      browserAPI.storage.sync.get(['whatnotBotLicense'], (result) => {
-        resolve(result.whatnotBotLicense || null);
+      browserAPI.storage.sync.get(['buzzchatLicense'], (result) => {
+        resolve(result.buzzchatLicense || null);
       });
     });
   },
@@ -60,7 +60,7 @@ const ExtensionPay = {
   async cacheLicense(license) {
     return new Promise((resolve) => {
       browserAPI.storage.sync.set({
-        whatnotBotLicense: {
+        buzzchatLicense: {
           ...license,
           cachedAt: Date.now()
         }
@@ -218,8 +218,8 @@ const ExtensionPay = {
     if (!license) return;
 
     return new Promise((resolve) => {
-      browserAPI.storage.sync.get(['whatnotBotSettings'], (result) => {
-        const settings = result.whatnotBotSettings || {};
+      browserAPI.storage.sync.get(['buzzchatSettings'], (result) => {
+        const settings = result.buzzchatSettings || {};
         const newTier = license.tier || 'free';
 
         if (settings.tier !== newTier) {
@@ -234,7 +234,7 @@ const ExtensionPay = {
               settings.timersLimit = response.limits.timers;
               settings.templatesLimit = response.limits.templates;
             }
-            browserAPI.storage.sync.set({ whatnotBotSettings: settings }, () => {
+            browserAPI.storage.sync.set({ buzzchatSettings: settings }, () => {
               console.log('[BuzzChat] Settings synced with tier:', newTier, 'limits:', response?.limits);
               resolve(settings);
             });

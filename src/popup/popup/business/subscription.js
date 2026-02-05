@@ -17,8 +17,8 @@ export const ExtensionPay = {
 
   async getCachedLicense() {
     return new Promise((resolve) => {
-      browserAPI.storage.sync.get(['whatnotBotLicense'], (result) => {
-        resolve(result.whatnotBotLicense || null);
+      browserAPI.storage.sync.get(['buzzchatLicense'], (result) => {
+        resolve(result.buzzchatLicense || null);
       });
     });
   },
@@ -26,7 +26,7 @@ export const ExtensionPay = {
   async cacheLicense(license) {
     return new Promise((resolve) => {
       browserAPI.storage.sync.set({
-        whatnotBotLicense: { ...license, cachedAt: Date.now() }
+        buzzchatLicense: { ...license, cachedAt: Date.now() }
       }, resolve);
     });
   },

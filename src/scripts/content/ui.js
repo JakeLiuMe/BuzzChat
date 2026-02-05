@@ -265,7 +265,7 @@ export function showQuickReplyBar() {
         bar.classList.toggle('minimized');
         target.textContent = state.settings.quickReply.minimized ? '💬' : '✕';
         target.title = state.settings.quickReply.minimized ? 'Show quick replies' : 'Hide quick replies';
-        StorageWriter.queue('whatnotBotSettings', state.settings);
+        StorageWriter.queue('buzzchatSettings', state.settings);
       } else if (action === 'send') {
         if (target.classList.contains('sending')) return;
         target.classList.add('sending');

@@ -8,7 +8,7 @@ import { updateTierBanner } from '../ui/theme.js';
 
 // Referral Module
 export const Referral = {
-  STORAGE_KEY: 'whatnotBotReferral',
+  STORAGE_KEY: 'buzzchatReferral',
   BONUS_PER_REFERRAL: 10,
   CODE_LENGTH: 8,
 
@@ -91,11 +91,11 @@ export const Referral = {
   // Apply bonus messages to settings (sync storage for cross-device sync)
   async applyBonus(amount) {
     return new Promise((resolve) => {
-      browserAPI.storage.sync.get(['whatnotBotSettings'], (result) => {
-        if (result.whatnotBotSettings) {
-          const settings = result.whatnotBotSettings;
+      browserAPI.storage.sync.get(['buzzchatSettings'], (result) => {
+        if (result.buzzchatSettings) {
+          const settings = result.buzzchatSettings;
           settings.referralBonus = (settings.referralBonus || 0) + amount;
-          browserAPI.storage.sync.set({ whatnotBotSettings: settings }, resolve);
+          browserAPI.storage.sync.set({ buzzchatSettings: settings }, resolve);
         } else {
           resolve();
         }

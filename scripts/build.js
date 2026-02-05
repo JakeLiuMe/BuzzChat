@@ -106,8 +106,8 @@ async function minifyJS(content, filename) {
         // Keep browser API names
         'chrome', 'browser', 'browserAPI',
         // Keep storage keys that are referenced by strings
-        'whatnotBotSettings', 'whatnotBotAccounts', 'whatnotBotActiveAccountId',
-        'whatnotBotApiKeys', 'whatnotBotOnboarded', 'whatnotBotAnalytics'
+        'buzzchatSettings', 'buzzchatAccounts', 'buzzchatActiveAccountId',
+        'buzzchatApiKeys', 'buzzchatOnboarded', 'buzzchatAnalytics'
       ]
     },
     format: {

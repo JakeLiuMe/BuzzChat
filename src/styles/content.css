@@ -1,7 +1,7 @@
-/* Whatnot Chat Bot - Content Script Styles */
+/* BuzzChat - Content Script Styles */
 
 /* Status Indicator */
-#whatnot-bot-indicator {
+#buzzchat-indicator {
   position: fixed;
   bottom: 20px;
   right: 20px;
@@ -9,17 +9,17 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-#whatnot-bot-indicator > div {
+#buzzchat-indicator > div {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-#whatnot-bot-indicator > div:hover {
+#buzzchat-indicator > div:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Toast Notifications */
-.whatnot-bot-toast {
+.buzzchat-toast {
   position: fixed;
   top: 20px;
   right: 20px;
@@ -31,14 +31,14 @@
   font-size: 13px;
   z-index: 10001;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  animation: whatnotBotSlideIn 0.3s ease;
+  animation: buzzchatSlideIn 0.3s ease;
 }
 
-.whatnot-bot-toast.hiding {
-  animation: whatnotBotSlideOut 0.3s ease;
+.buzzchat-toast.hiding {
+  animation: buzzchatSlideOut 0.3s ease;
 }
 
-@keyframes whatnotBotSlideIn {
+@keyframes buzzchatSlideIn {
   from {
     transform: translateX(100%);
     opacity: 0;
@@ -49,7 +49,7 @@
   }
 }
 
-@keyframes whatnotBotSlideOut {
+@keyframes buzzchatSlideOut {
   from {
     transform: translateX(0);
     opacity: 1;
@@ -61,7 +61,7 @@
 }
 
 /* Bot Panel (optional floating panel) */
-.whatnot-bot-panel {
+.buzzchat-panel {
   position: fixed;
   bottom: 70px;
   right: 20px;
@@ -76,12 +76,12 @@
   display: none;
 }
 
-.whatnot-bot-panel.visible {
+.buzzchat-panel.visible {
   display: block;
-  animation: whatnotBotFadeIn 0.2s ease;
+  animation: buzzchatFadeIn 0.2s ease;
 }
 
-@keyframes whatnotBotFadeIn {
+@keyframes buzzchatFadeIn {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -92,7 +92,7 @@
   }
 }
 
-.whatnot-bot-panel-header {
+.buzzchat-panel-header {
   padding: 12px 16px;
   background: linear-gradient(135deg, #7c3aed, #9333ea);
   color: white;
@@ -103,7 +103,7 @@
   align-items: center;
 }
 
-.whatnot-bot-panel-close {
+.buzzchat-panel-close {
   background: none;
   border: none;
   color: white;
@@ -113,25 +113,25 @@
   transition: opacity 0.2s;
 }
 
-.whatnot-bot-panel-close:hover {
+.buzzchat-panel-close:hover {
   opacity: 1;
 }
 
-.whatnot-bot-panel-content {
+.buzzchat-panel-content {
   padding: 16px;
   max-height: 300px;
   overflow-y: auto;
 }
 
 /* Quick Action Buttons */
-.whatnot-bot-quick-actions {
+.buzzchat-quick-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 12px;
 }
 
-.whatnot-bot-quick-btn {
+.buzzchat-quick-btn {
   padding: 6px 12px;
   background: #f3f4f6;
   border: none;
@@ -143,49 +143,49 @@
   transition: all 0.2s;
 }
 
-.whatnot-bot-quick-btn:hover {
+.buzzchat-quick-btn:hover {
   background: #e5e7eb;
 }
 
-.whatnot-bot-quick-btn:active {
+.buzzchat-quick-btn:active {
   transform: scale(0.96);
   background: #7c3aed;
   color: white;
 }
 
-.whatnot-bot-quick-btn.active {
+.buzzchat-quick-btn.active {
   background: #7c3aed;
   color: white;
 }
 
 /* Stats Section */
-.whatnot-bot-stats {
+.buzzchat-stats {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
 }
 
-.whatnot-bot-stat {
+.buzzchat-stat {
   padding: 12px;
   background: #f9fafb;
   border-radius: 8px;
   text-align: center;
 }
 
-.whatnot-bot-stat-value {
+.buzzchat-stat-value {
   font-size: 24px;
   font-weight: 700;
   color: #7c3aed;
 }
 
-.whatnot-bot-stat-label {
+.buzzchat-stat-label {
   font-size: 11px;
   color: #6b7280;
   margin-top: 4px;
 }
 
 /* Giveaway Entries Display */
-.whatnot-bot-entries {
+.buzzchat-entries {
   max-height: 150px;
   overflow-y: auto;
   background: #f9fafb;
@@ -193,7 +193,7 @@
   padding: 8px;
 }
 
-.whatnot-bot-entry {
+.buzzchat-entry {
   padding: 6px 10px;
   background: white;
   border-radius: 4px;
@@ -205,39 +205,39 @@
   align-items: center;
 }
 
-.whatnot-bot-entry:last-child {
+.buzzchat-entry:last-child {
   margin-bottom: 0;
 }
 
-.whatnot-bot-entry-time {
+.buzzchat-entry-time {
   font-size: 10px;
   color: #9ca3af;
 }
 
 /* Scrollbar Styling */
-.whatnot-bot-panel-content::-webkit-scrollbar,
-.whatnot-bot-entries::-webkit-scrollbar {
+.buzzchat-panel-content::-webkit-scrollbar,
+.buzzchat-entries::-webkit-scrollbar {
   width: 4px;
 }
 
-.whatnot-bot-panel-content::-webkit-scrollbar-track,
-.whatnot-bot-entries::-webkit-scrollbar-track {
+.buzzchat-panel-content::-webkit-scrollbar-track,
+.buzzchat-entries::-webkit-scrollbar-track {
   background: #f3f4f6;
 }
 
-.whatnot-bot-panel-content::-webkit-scrollbar-thumb,
-.whatnot-bot-entries::-webkit-scrollbar-thumb {
+.buzzchat-panel-content::-webkit-scrollbar-thumb,
+.buzzchat-entries::-webkit-scrollbar-thumb {
   background: #d1d5db;
   border-radius: 2px;
 }
 
-.whatnot-bot-panel-content::-webkit-scrollbar-thumb:hover,
-.whatnot-bot-entries::-webkit-scrollbar-thumb:hover {
+.buzzchat-panel-content::-webkit-scrollbar-thumb:hover,
+.buzzchat-entries::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
 }
 
 /* Pulse Animation for Active Status */
-@keyframes whatnotBotPulse {
+@keyframes buzzchatPulse {
   0%, 100% {
     box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
   }
@@ -246,6 +246,6 @@
   }
 }
 
-.whatnot-bot-status-active {
-  animation: whatnotBotPulse 2s ease-in-out infinite;
+.buzzchat-status-active {
+  animation: buzzchatPulse 2s ease-in-out infinite;
 }

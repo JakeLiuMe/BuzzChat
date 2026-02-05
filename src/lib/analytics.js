@@ -10,7 +10,7 @@ const Analytics = {
   // SECURITY: Verification marker to confirm this is the legitimate extension module
   __BUZZCHAT_VERIFIED: true,
 
-  STORAGE_KEY: 'whatnotBotAnalytics',
+  STORAGE_KEY: 'buzzchatAnalytics',
 
   // Default analytics structure
   getDefaultData() {
@@ -296,7 +296,7 @@ const Analytics = {
   // Check if any milestones have been reached and return new ones
   async checkMilestones() {
     const data = await this.load();
-    const celebratedKey = 'whatnotBotCelebratedMilestones';
+    const celebratedKey = 'buzzchatCelebratedMilestones';
 
     // Get already celebrated milestones from storage
     const result = await new Promise(resolve => {

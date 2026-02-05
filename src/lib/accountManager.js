@@ -7,8 +7,8 @@ const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
 
 const AccountManager = {
   STORAGE_KEYS: {
-    ACCOUNTS: 'whatnotBotAccounts',
-    ACTIVE_ID: 'whatnotBotActiveAccountId'
+    ACCOUNTS: 'buzzchatAccounts',
+    ACTIVE_ID: 'buzzchatActiveAccountId'
   },
 
   MAX_ACCOUNTS: 10,
@@ -253,7 +253,7 @@ const AccountManager = {
   // Migrate from legacy flat storage to namespaced accounts
   async migrateFromLegacy() {
     return new Promise((resolve) => {
-      browserAPI.storage.sync.get(['whatnotBotSettings', this.STORAGE_KEYS.ACCOUNTS], async (result) => {
+      browserAPI.storage.sync.get(['buzzchatSettings', this.STORAGE_KEYS.ACCOUNTS], async (result) => {
         if (browserAPI.runtime.lastError) {
           console.error('[BuzzChat] Migration read error:', browserAPI.runtime.lastError);
           resolve(false);
@@ -268,7 +268,7 @@ const AccountManager = {
         }
 
         // Create default account from legacy settings or fresh defaults
-        const legacySettings = result.whatnotBotSettings;
+        const legacySettings = result.buzzchatSettings;
         const defaultAccount = this.createDefaultAccount('default', 'Default');
 
         if (legacySettings) {

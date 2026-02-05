@@ -19,9 +19,9 @@ const NATIVE_HOST_NAME = 'com.buzzchat.mcp';
 
 // Storage keys
 const STORAGE_KEYS = {
-  SETTINGS: 'whatnotBotSettings',
-  LICENSE: 'whatnotBotLicense',
-  ANALYTICS: 'whatnotBotAnalytics'
+  SETTINGS: 'buzzchatSettings',
+  LICENSE: 'buzzchatLicense',
+  ANALYTICS: 'buzzchatAnalytics'
 };
 
 /**

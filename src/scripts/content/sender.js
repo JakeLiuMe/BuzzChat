@@ -98,7 +98,7 @@ export function sendChatMessage(message) {
   if (state.settings.tier === 'free') {
     state.settings.messagesUsed++;
     // Use batched storage writer to reduce I/O
-    StorageWriter.queue('whatnotBotSettings', state.settings);
+    StorageWriter.queue('buzzchatSettings', state.settings);
     browserAPI.runtime.sendMessage({ type: 'MESSAGE_SENT' });
   }
 

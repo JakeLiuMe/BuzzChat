@@ -8,7 +8,7 @@
 const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
 
 const ApiKeyManager = {
-  STORAGE_KEY: 'whatnotBotApiKeys',
+  STORAGE_KEY: 'buzzchatApiKeys',
   KEY_PREFIX: 'bz_live_',
   MAX_KEYS: 5,
 

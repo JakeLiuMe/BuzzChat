@@ -14,7 +14,7 @@ const SCREENSHOTS_DIR = path.join(__dirname, '../docs/screenshots');
 // Mock Chrome APIs (same approach as tests/fixtures.js)
 const MOCK_CHROME_SCRIPT = `
   window.mockStorage = {
-    whatnotBotSettings: {
+    buzzchatSettings: {
       isActive: true,
       welcomeMessage: 'Hey {username}! Welcome to the stream! 🎉',
       welcomeEnabled: true,

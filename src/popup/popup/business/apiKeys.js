@@ -5,7 +5,7 @@ import { browserAPI } from '../core/config.js';
 
 // API Key Manager
 export const ApiKeyManager = {
-  STORAGE_KEY: 'whatnotBotApiKeys',
+  STORAGE_KEY: 'buzzchatApiKeys',
   KEY_PREFIX: 'bz_live_',
   MAX_KEYS: 5,
 

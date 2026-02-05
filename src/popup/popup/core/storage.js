@@ -21,14 +21,14 @@ export async function loadSettings() {
 
   // Fallback to legacy storage
   return new Promise((resolve) => {
-    browserAPI.storage.sync.get(['whatnotBotSettings'], (result) => {
+    browserAPI.storage.sync.get(['buzzchatSettings'], (result) => {
       if (browserAPI.runtime.lastError) {
         console.error('[BuzzChat] Failed to load settings:', browserAPI.runtime.lastError);
         resolve();
         return;
       }
-      if (result.whatnotBotSettings) {
-        setSettings({ ...DEFAULT_SETTINGS, ...result.whatnotBotSettings });
+      if (result.buzzchatSettings) {
+        setSettings({ ...DEFAULT_SETTINGS, ...result.buzzchatSettings });
       }
       resolve();
     });
@@ -67,7 +67,7 @@ export async function saveSettings(showToast = false) {
 
   // Fallback to legacy storage
   return new Promise((resolve) => {
-    browserAPI.storage.sync.set({ whatnotBotSettings: currentSettings }, () => {
+    browserAPI.storage.sync.set({ buzzchatSettings: currentSettings }, () => {
       if (browserAPI.runtime.lastError) {
         console.error('[BuzzChat] Failed to save settings:', browserAPI.runtime.lastError);
         Toast.error('Failed to save settings');

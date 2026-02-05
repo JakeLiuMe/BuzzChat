@@ -1,15 +1,11 @@
 #!/usr/bin/env node
 /**
- * AI-Powered Auto-Fix Script
+ * Auto-Fix Script
  *
- * Analyzes GitHub issues and generates fixes using Claude AI.
+ * Analyzes GitHub issues and generates fixes.
  * Called by the auto-fix GitHub Action workflow.
  *
- * SAFETY FEATURES:
- * - Rate limited to 10 API calls per day
- * - Only triggered by maintainer command
- * - Never auto-merges (creates draft PRs)
- * - Logs all attempts for auditing
+ * Safety: Rate limited, maintainer-only, draft PRs only.
  */
 
 const fs = require('fs');

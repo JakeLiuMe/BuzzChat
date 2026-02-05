@@ -86,7 +86,7 @@ test.describe('Stress Tests', () => {
         }
       };
 
-      await mockStorage.set('whatnotBotSettings', settings);
+      await mockStorage.set('buzzchatSettings', settings);
 
       // Verify storage works with large ruleset
       const stored = await mockStorage.getSettings();
