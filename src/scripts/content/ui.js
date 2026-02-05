@@ -44,6 +44,22 @@ export function showStatusIndicator(isActive) {
     transition: all 0.2s;
   `;
 
+  // Add pulse animation for active state
+  if (!document.getElementById('buzzchat-pulse-animation')) {
+    const pulseStyle = document.createElement('style');
+    pulseStyle.id = 'buzzchat-pulse-animation';
+    pulseStyle.textContent = `
+      @keyframes buzzchat-pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.2); }
+      }
+      .buzzchat-pulse {
+        animation: buzzchat-pulse 2s ease-in-out infinite;
+      }
+    `;
+    document.head.appendChild(pulseStyle);
+  }
+
   // Create status dot
   const statusDot = document.createElement('span');
   statusDot.style.cssText = `
@@ -52,6 +68,10 @@ export function showStatusIndicator(isActive) {
     background: ${state.settings?.masterEnabled ? '#10b981' : '#ef4444'};
     border-radius: 50%;
   `;
+  // Add pulse animation when active
+  if (state.settings?.masterEnabled) {
+    statusDot.classList.add('buzzchat-pulse');
+  }
 
   // Create text node (safe - no HTML parsing)
   const statusText = document.createTextNode(
@@ -206,6 +226,14 @@ export function showQuickReplyBar() {
         #buzzchat-quick-reply .quick-reply-emoji {
           font-size: 16px;
         }
+        #buzzchat-quick-reply .quick-reply-shortcut {
+          font-size: 10px;
+          background: rgba(255,255,255,0.2);
+          padding: 2px 6px;
+          border-radius: 4px;
+          margin-left: auto;
+          font-weight: 600;
+        }
       `;
       document.head.appendChild(style);
     }
@@ -246,6 +274,15 @@ export function showQuickReplyBar() {
     const text = document.createTextNode(btn.text || '');
     button.appendChild(text);
 
+    // Add keyboard shortcut hint (1-9)
+    if (index < 9) {
+      const shortcut = document.createElement('span');
+      shortcut.className = 'quick-reply-shortcut';
+      shortcut.textContent = String(index + 1);
+      shortcut.title = `Press ${index + 1} to send`;
+      button.appendChild(shortcut);
+    }
+
     buttonsContainer.appendChild(button);
   });
 
@@ -272,13 +309,45 @@ export function showQuickReplyBar() {
 
         const msgText = target.dataset.text;
         if (msgText && canSendMessage()) {
-          sendChatMessage(msgText);
-          safeTrackAnalytics('quickReply');
+          const sent = sendChatMessage(msgText);
+          if (sent) {
+            safeTrackAnalytics('quickReply');
+            showQuickReplyToast(msgText);
+          }
         }
 
         setTimeout(() => {
           target.classList.remove('sending');
         }, 1000);
+      }
+    });
+
+    // Keyboard shortcuts: Press 1-9 to trigger quick reply buttons
+    document.addEventListener('keydown', (e) => {
+      // Don't trigger if typing in an input/textarea or if quick reply is minimized
+      const activeEl = document.activeElement;
+      const isTyping = activeEl && (
+        activeEl.tagName === 'INPUT' ||
+        activeEl.tagName === 'TEXTAREA' ||
+        activeEl.isContentEditable
+      );
+      if (isTyping) return;
+
+      // Check if quick reply is minimized
+      if (state.settings?.quickReply?.minimized) return;
+
+      // Check for number keys 1-9
+      const keyNum = parseInt(e.key);
+      if (keyNum >= 1 && keyNum <= 9) {
+        const buttons = state.settings?.quickReply?.buttons || [];
+        const index = keyNum - 1;
+        if (index < buttons.length) {
+          e.preventDefault();
+          const btn = bar.querySelector(`[data-index="${index}"]`);
+          if (btn && !btn.classList.contains('sending')) {
+            btn.click();
+          }
+        }
       }
     });
   }
@@ -295,4 +364,52 @@ export function removeQuickReplyBar() {
   if (bar) {
     bar.remove();
   }
+}
+
+// Show mini toast for quick reply feedback
+function showQuickReplyToast(message) {
+  // Create compact toast for sent confirmation
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 140px;
+    right: 20px;
+    padding: 8px 14px;
+    background: #10b981;
+    color: white;
+    border-radius: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    z-index: 10001;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    animation: slideIn 0.2s ease;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  `;
+
+  // Checkmark icon
+  const check = document.createElement('span');
+  check.textContent = '✓';
+  check.style.fontWeight = 'bold';
+
+  // Truncated message preview
+  const text = document.createElement('span');
+  const truncated = message.length > 20 ? message.slice(0, 20) + '...' : message;
+  text.textContent = truncated;
+
+  toast.appendChild(check);
+  toast.appendChild(text);
+  document.body.appendChild(toast);
+
+  // Remove after 1.5 seconds
+  setTimeout(() => {
+    toast.style.animation = 'slideOut 0.2s ease';
+    setTimeout(() => toast.remove(), 200);
+  }, 1500);
 }
