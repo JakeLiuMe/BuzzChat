@@ -48,7 +48,7 @@ jobs:
         run: npm test
 
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: playwright-report
@@ -75,7 +75,7 @@ jobs:
         run: npm run build:prod
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: extension-build
           path: dist-chrome/
