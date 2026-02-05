@@ -43,7 +43,7 @@
     "@playwright/test": "^1.57.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
-    "archiver": "^6.0.1",
+    "archiver": "^7.0.1",
     "clean-css": "^5.3.3",
     "eslint": "^8.56.0",
     "playwright": "^1.57.0",
