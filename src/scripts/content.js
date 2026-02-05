@@ -29,7 +29,7 @@
 
   // Use security module if available
   const Security = typeof BuzzChatSecurity !== 'undefined' ? BuzzChatSecurity : null;
-  const Logger = Security ? Security.Logger : console;
+  const _Logger = Security ? Security.Logger : console;
 
   // Verify security module integrity on load
   if (Security && !Security.isIntact()) {
@@ -345,7 +345,7 @@
   }
 
   // Clear selector cache (useful when page structure changes)
-  function clearSelectorCache() {
+  function _clearSelectorCache() {
     for (const key in selectorCache) {
       selectorCache[key] = null;
     }
@@ -730,7 +730,7 @@
     }
 
     // Message processing queue for batching
-    let pendingMessages = [];
+    const pendingMessages = [];
     let processingScheduled = false;
 
     const processBatch = () => {

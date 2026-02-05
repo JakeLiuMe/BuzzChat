@@ -1,280 +1,215 @@
-# BuzzChat
+# 🐝 BuzzChat — Live Selling Chat Automation
 
-A Chrome extension that automates chat interactions during live selling shows. Boost engagement with auto-welcome messages, timed promotions, and FAQ auto-replies.
+<p align="center">
+  <img src="assets/icons/icon128.png" alt="BuzzChat Logo" width="128">
+</p>
 
-**Platform Support:** Chrome only (Manifest V3). Firefox is not currently supported.
+<p align="center">
+  <strong>Make your live streams buzz with engagement!</strong>
+</p>
 
-## Features
+<p align="center">
+  <a href="https://github.com/JakeLiuMe/buzzchat/actions"><img src="https://img.shields.io/github/actions/workflow/status/JakeLiuMe/buzzchat/ci.yml?branch=main&style=for-the-badge" alt="CI Status"></a>
+  <a href="https://github.com/JakeLiuMe/buzzchat/releases"><img src="https://img.shields.io/github/v/release/JakeLiuMe/buzzchat?style=for-the-badge" alt="Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
+  <a href="https://github.com/JakeLiuMe/buzzchat/issues"><img src="https://img.shields.io/github/issues/JakeLiuMe/buzzchat?style=for-the-badge" alt="Issues"></a>
+</p>
 
-### Free Tier
-- **25 auto-messages per show** (+5 bonus with watermark)
-- Auto-welcome messages
-- Timer messages
-- 2 FAQ auto-reply rules
-- Quick templates
-- Giveaway tracking
-- Basic analytics (7 days)
+**BuzzChat** is a browser extension that automates chat interactions during live selling shows. Welcome viewers instantly, answer FAQs automatically, run giveaways, and keep engagement high — all while you focus on selling.
 
-### Pro Tier ($7.99/month or $59/year)
-- **Unlimited auto-messages**
-- **Unlimited FAQ rules**
-- Full analytics (90-day history)
-- CSV export
-- Priority support
-- Early access to new features
+Works on **Whatnot**, **YouTube Live**, **eBay Live**, **Twitch**, and **Kick**.
 
-### Business Tier ($19.99/month or $149/year)
-- Everything in Pro
-- Giveaway management tools
-- Advanced analytics dashboard
-- Multi-account support (coming soon)
-- API access (coming soon)
+[Installation](#-quick-start) · [Features](#-features) · [Documentation](docs/) · [Issues](https://github.com/JakeLiuMe/buzzchat/issues) · [Privacy](docs/PRIVACY_POLICY.md)
 
-## Installation
+---
 
-### From Chrome Web Store (Coming Soon)
-1. Visit the Chrome Web Store
-2. Search for "BuzzChat"
-3. Click "Add to Chrome"
-
-### Manual Installation (Developer Mode)
-1. Download or clone this repository
-2. Generate icon files (see below)
-3. Open Chrome and go to `chrome://extensions/`
-4. Enable "Developer mode" (toggle in top right)
-5. Click "Load unpacked"
-6. Select the extension folder
-7. The extension icon should appear in your toolbar
-
-## Generating Icons
-
-Before loading the extension, you need to generate PNG icons from the SVG:
+## 🚀 Quick Start
 
 ```bash
-# Using ImageMagick
-convert -background none assets/icons/icon.svg -resize 16x16 assets/icons/icon16.png
-convert -background none assets/icons/icon.svg -resize 48x48 assets/icons/icon48.png
-convert -background none assets/icons/icon.svg -resize 128x128 assets/icons/icon128.png
+# Clone the repo
+git clone https://github.com/JakeLiuMe/buzzchat.git
+cd buzzchat
 
-# Or using Inkscape
-inkscape -w 16 -h 16 assets/icons/icon.svg -o assets/icons/icon16.png
-inkscape -w 48 -h 48 assets/icons/icon.svg -o assets/icons/icon48.png
-inkscape -w 128 -h 128 assets/icons/icon.svg -o assets/icons/icon128.png
+# Install dependencies & generate icons
+npm install
+npm run icons
+
+# Load in Chrome
+# 1. Go to chrome://extensions
+# 2. Enable "Developer mode"
+# 3. Click "Load unpacked" → select this folder
 ```
 
-Alternatively, use an online SVG to PNG converter like https://svgtopng.com/
+That's it! Navigate to a live stream and click the 🐝 icon to start.
 
-## Usage
+---
+
+## ✨ Features
+
+### 🎯 Core Features (Free)
+| Feature | Description |
+|---------|-------------|
+| 👋 **Auto-Welcome** | Greet new viewers with personalized messages |
+| ⏰ **Timer Messages** | Schedule recurring announcements (deals, reminders) |
+| ❓ **FAQ Auto-Reply** | Automatically respond to common questions |
+| 💬 **Quick Templates** | One-click message templates |
+| 🎁 **Giveaway Tracking** | Track entries and pick random winners |
+| 📊 **Basic Analytics** | 7-day message history |
+
+### 🚀 Pro Features ($7.99/mo)
+- ♾️ Unlimited auto-messages
+- ♾️ Unlimited FAQ rules
+- 📈 90-day analytics history
+- 📥 CSV export
+- ⚡ Priority support
+
+### 🏢 Business Features ($19.99/mo)
+- Everything in Pro
+- 🎰 Advanced giveaway tools
+- 📊 Full analytics dashboard
+- 🔌 API access (coming soon)
+
+---
+
+## 🖼️ Screenshots
+
+<p align="center">
+  <em>Screenshots coming soon!</em>
+</p>
+
+---
+
+## 💡 Why BuzzChat?
+
+| Pain Point | BuzzChat Solution |
+|------------|-------------------|
+| 😓 Can't greet everyone manually | Auto-welcome handles it |
+| 🔁 Repeating the same answers | FAQ auto-replies save you |
+| ⏰ Forgetting to announce deals | Timer messages never forget |
+| 📝 Typing the same messages | Templates = one click |
+| 🎁 Tracking giveaway entries | Built-in entry tracking |
+
+**Focus on selling. Let BuzzChat handle the chat.**
+
+---
+
+## 📦 Installation
+
+### Chrome Web Store (Recommended)
+*Coming soon!*
+
+### Manual Installation
+
+1. **Download** — Clone or download this repo
+2. **Install** — Run `npm install && npm run icons`
+3. **Load** — Open `chrome://extensions`, enable Developer mode, click "Load unpacked"
+4. **Done** — The 🐝 icon appears in your toolbar
+
+---
+
+## 🎮 Usage
 
 ### Getting Started
-1. Click the extension icon in your Chrome toolbar
-2. Toggle "Bot Active" to enable the extension
-3. Navigate to a live stream
-4. The bot will automatically detect the chat and start working
+1. Click the 🐝 icon in Chrome
+2. Toggle **Bot Active** to enable
+3. Go to a live stream (Whatnot, YouTube, etc.)
+4. Watch BuzzChat work its magic!
 
-### Auto-Welcome
-- Enable "Auto-Welcome New Viewers" in the Welcome tab
-- Customize your welcome message
-- Use `{username}` to include the viewer's name
-- Set a delay between welcomes to avoid spam
+### Configuration Tips
 
-### Timer Messages
-- Add promotional messages that repeat every X minutes
-- Great for shipping deals, coupon codes, or reminders
-- Add multiple timer messages with different intervals
+**Auto-Welcome Messages:**
+```
+Hey {username}! Welcome to the stream! 🎉
+```
 
-### FAQ Auto-Replies
-- Set up trigger keywords (comma-separated)
-- When a viewer's message contains a trigger, the auto-reply is sent
-- Perfect for common questions about shipping, payment, returns, etc.
+**FAQ Triggers:**
+- Keywords: `shipping, ship, deliver`
+- Reply: `We ship within 24 hours! Free shipping over $50 🚚`
 
-### Templates
-- Save frequently used messages as templates
-- Click "Send Now" to instantly send a template
-- Great for shipping info, follow reminders, thank you messages
+**Timer Messages:**
+- Message: `🔥 Use code LIVE10 for 10% off!`
+- Interval: Every 5 minutes
 
-## Configuration
+---
 
-### Settings
-- **Chat Input Selector**: Override auto-detection with a custom CSS selector
-- **Sound Notifications**: Enable/disable notification sounds
-- **Show Message Count**: Display message counter in the UI
+## 🛠️ Development
 
-### Export/Import
-- Export all your settings and templates to a JSON file
-- Import settings on a new device or share with team members
+### Prerequisites
+- Node.js 18+
+- Chrome or Chromium browser
 
-## Troubleshooting
+### Setup
+```bash
+npm install
+npm run icons
+npx playwright install chromium
+```
 
-### Bot not detecting chat
-- Make sure you're on a live stream page
-- Try refreshing the page
-- Check if the status indicator shows "Active"
-- Try setting a custom chat selector in Settings
-
-### Messages not sending
-- Verify the bot is enabled (green status dot)
-- Check your message limit (Free tier: 3 per show)
-- Make sure the chat input is visible and accessible
-
-### FAQ triggers not working
-- Keywords are matched case-insensitively by default
-- Make sure the trigger keyword is contained in the message
-- Check that FAQ auto-reply is enabled
-
-## Development
+### Commands
+| Command | Description |
+|---------|-------------|
+| `npm run build` | Production build |
+| `npm run lint` | Check code style |
+| `npm run lint:fix` | Auto-fix issues |
+| `npm test` | Run all tests |
+| `npm run test:unit` | Unit tests only |
 
 ### Project Structure
 ```
 buzzchat/
-├── manifest.json              # Chrome extension manifest
-├── rollup.config.js           # Rollup bundler configuration
-├── assets/
-│   └── icons/                 # Extension icons
 ├── src/
-│   ├── popup/                 # Extension popup UI
-│   │   ├── popup.html
-│   │   ├── popup-entry.js     # Main entry point
-│   │   ├── popup/             # Modular popup components
-│   │   │   ├── core/          # Config, state, storage, utils
-│   │   │   ├── ui/            # UI components (tabs, modals, toast)
-│   │   │   ├── features/      # Feature modules (timers, FAQ, giveaway)
-│   │   │   ├── business/      # Business tier features
-│   │   │   └── settings/      # Import/export
-│   │   └── styles/            # Modular CSS
-│   │       ├── main.css       # Entry point
-│   │       ├── variables.css  # CSS custom properties
-│   │       ├── components/    # Button, form, card, modal styles
-│   │       └── features/      # Feature-specific styles
-│   ├── scripts/               # Content scripts
-│   │   ├── content-entry.js   # Main entry point
-│   │   └── content/           # Modular content script components
-│   │       ├── config.js      # Configuration constants
-│   │       ├── state.js       # Global state management
-│   │       ├── messaging.js   # Message processing
-│   │       ├── features/      # Feature modules
-│   │       └── ui.js          # Status indicator, notifications
-│   ├── background/            # Service worker
-│   │   └── background.js
-│   └── lib/                   # Shared libraries
-│       ├── analytics.js       # Analytics tracking
-│       ├── security.js        # Security utilities
-│       └── selectors.js       # Selector management
-├── tests/                     # Test suites
-│   ├── popup.test.js          # Popup UI tests
-│   ├── e2e.test.js            # End-to-end tests
-│   ├── stress.test.js         # Performance tests
-│   └── unit/                  # Unit tests
-├── dist/                      # Built output (generated)
-└── README.md
+│   ├── popup/          # Extension popup UI
+│   ├── scripts/        # Content scripts
+│   ├── background/     # Service worker
+│   └── lib/            # Shared utilities
+├── tests/              # Test suites
+├── assets/             # Icons & images
+└── docs/               # Documentation
 ```
 
-### Prerequisites
+---
 
-```bash
-# Install dependencies
-npm install
+## 🔒 Privacy
 
-# Install Playwright browsers for testing
-npx playwright install chromium
-```
+Your data stays with you:
+- ✅ All settings stored locally
+- ✅ Chat processed in-browser only
+- ✅ No message content collected
+- ❌ No tracking or telemetry
 
-### Building
+See our full [Privacy Policy](docs/PRIVACY_POLICY.md).
 
-```bash
-# Development build (with source maps)
-npm run build:dev
+---
 
-# Production build (minified)
-npm run build
+## 🤝 Contributing
 
-# Watch mode for development
-npm run build:watch
-```
+We love contributions! Here's how to help:
 
-### Testing
+- 🐛 [Report a Bug](https://github.com/JakeLiuMe/buzzchat/issues/new?template=bug_report.yml)
+- 💡 [Request a Feature](https://github.com/JakeLiuMe/buzzchat/issues/new?template=feature_request.yml)
+- 📖 Improve documentation
+- 🔧 Submit a PR
 
-```bash
-# Run all tests
-npm test
+---
 
-# Run specific test suites
-npm run test:popup     # Popup UI tests (Playwright)
-npm run test:e2e       # End-to-end tests
-npm run test:stress    # Stress/performance tests
-npm run test:unit      # Unit tests
+## 📋 Requirements
 
-# Run tests with coverage
-npm run test:coverage
-
-# Run linter
-npm run lint
-
-# Auto-fix linting issues
-npm run lint:fix
-```
-
-### CI/CD
-
-This project uses GitHub Actions for continuous integration:
-- Tests run automatically on every push and pull request
-- Linting is enforced before tests
-- Test reports are uploaded as artifacts on failure
-
-### Building for Production
-1. Update version in `manifest.json`
-2. Run `npm run build` for production build
-3. Zip the `dist/` folder
-4. Submit to Chrome Web Store
-
-### Manual Testing
-1. Load the extension in developer mode from `dist/` folder
-2. Navigate to a live stream
-3. Open DevTools (F12) and check the Console for `[BuzzChat]` logs
-4. Test each feature individually
-
-## Privacy
-
-- All settings are stored locally in Chrome sync storage
-- Analytics data is stored locally and never transmitted
-- Chat messages are processed in-browser only
-- Payment processing is handled securely by ExtensionPay
-- See our full [Privacy Policy](docs/PRIVACY_POLICY.md) for details
-
-### Data Collection Disclosure
-BuzzChat collects:
-- Anonymous usage analytics (message counts, feature usage)
-- Your settings and preferences (stored locally)
-- Payment/subscription info (via ExtensionPay for Pro/Business users)
-
-BuzzChat does NOT collect:
-- Chat message content
-- Viewer usernames or information
-- Browsing history
-
-## Requirements
-
-- **Chrome 100+** (or Chromium-based browsers like Edge, Brave)
+- **Chrome 100+** (or Edge, Brave, Arc)
 - Manifest V3 compatible browser
 - JavaScript enabled
 
-## Contributing
+---
 
-Found a bug? Have an idea?
+## 📄 License
 
-- **Bug Reports**: [Report a bug](../../issues/new?template=bug_report.yml)
-- **Feature Requests**: [Suggest a feature](../../issues/new?template=feature_request.yml)
-
-Dependencies are kept up to date automatically. Stale issues are closed after 60 days of inactivity.
-
-## License
-
-MIT License - See LICENSE file for details
+[MIT License](LICENSE) — Use it, modify it, share it.
 
 ---
 
-Made with love for the live selling community.
+<p align="center">
+  Made with 🐝 for the live selling community
+</p>
 
----
-
-**Disclaimer:** BuzzChat is not affiliated with, endorsed by, or sponsored by Whatnot, YouTube, eBay, Twitch, or Kick. All platform names are trademarks of their respective owners.
+<p align="center">
+  <sub>BuzzChat is not affiliated with Whatnot, YouTube, eBay, Twitch, or Kick. All trademarks belong to their respective owners.</sub>
+</p>

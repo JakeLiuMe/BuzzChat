@@ -718,7 +718,7 @@ const SelectorManager = {
     console.log('[BuzzChat] Attempting self-heal for ' + platformId);
 
     // Check current health
-    const { health, broken } = this.checkSelectorHealth(platformId);
+    const { health: _health, broken } = this.checkSelectorHealth(platformId);
 
     if (broken.length === 0) {
       console.log('[BuzzChat] No broken selectors, self-heal not needed');

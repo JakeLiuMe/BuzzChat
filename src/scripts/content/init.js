@@ -1,6 +1,6 @@
 // BuzzChat - Initialization & Lifecycle
 // Copyright (c) 2024-2026 BuzzChat. All rights reserved.
-/* global BuzzChatPlatform, BuzzChatSecurity */
+/* global BuzzChatPlatform */
 
 import { browserAPI, debounce } from './config.js';
 import { state, FALLBACK_SELECTORS, getSelectors } from './state.js';
@@ -16,7 +16,7 @@ const platformDetection = typeof BuzzChatPlatform !== 'undefined' && BuzzChatPla
 
 // Get Security module if available
 const Security = typeof BuzzChatSecurity !== 'undefined' ? BuzzChatSecurity : null;
-const Logger = Security ? Security.Logger : console;
+const _Logger = Security ? Security.Logger : console;
 
 // Get default settings
 export function getDefaultSettings() {
@@ -170,7 +170,7 @@ export function startChatObserver() {
   }
 
   // Message processing queue for batching
-  let pendingMessages = [];
+  const pendingMessages = [];
   let processingScheduled = false;
 
   const processBatch = () => {

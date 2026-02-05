@@ -2,35 +2,35 @@
 // Main entry file that imports all modules and initializes the popup
 
 import { browserAPI, VALIDATION } from './popup/core/config.js';
-import { settings, setSettings } from './popup/core/state.js';
+import { settings, setSettings as _setSettings } from './popup/core/state.js';
 import { loadSettings, saveSettings, sendMessageToContent } from './popup/core/storage.js';
 import { debounce, validateText, validateNumber } from './popup/core/utils.js';
-import { Toast, SaveIndicator, Loading } from './popup/ui/toast.js';
-import { FocusTrap, openModal, closeModal, setupModalBackdropClose } from './popup/ui/modals.js';
+import { Toast, SaveIndicator as _SaveIndicator, Loading } from './popup/ui/toast.js';
+import { FocusTrap as _FocusTrap, openModal, closeModal, setupModalBackdropClose } from './popup/ui/modals.js';
 import { initTabNavigation } from './popup/ui/tabs.js';
 import { applyDarkMode, updateStatusBadge, updateTierBanner } from './popup/ui/theme.js';
 import { elements, initElements } from './popup/ui/elements.js';
 import { initUI } from './popup/ui/init.js';
-import { renderTimerMessages, addTimerMessage } from './popup/features/timers.js';
-import { renderFaqRules, addFaqRule } from './popup/features/faq.js';
-import { renderTemplates, addTemplate } from './popup/features/templates.js';
+import { renderTimerMessages as _renderTimerMessages, addTimerMessage } from './popup/features/timers.js';
+import { renderFaqRules as _renderFaqRules, addFaqRule } from './popup/features/faq.js';
+import { renderTemplates as _renderTemplates, addTemplate } from './popup/features/templates.js';
 import { renderCommands, addCommand, exportCommands, importCommands } from './popup/features/commands.js';
-import { renderQuickReplyButtons, addQuickReplyButton } from './popup/features/quickReply.js';
+import { renderQuickReplyButtons as _renderQuickReplyButtons, addQuickReplyButton } from './popup/features/quickReply.js';
 import { canAddFeature } from './popup/features/featureAccess.js';
 import {
-  spinGiveawayWheel, hideWinnerDisplay, announceWinners, triggerConfetti,
+  spinGiveawayWheel, hideWinnerDisplay, announceWinners, triggerConfetti as _triggerConfetti,
   loadGiveawayData, loadChatMetrics, updateMetricsDisplay
 } from './popup/features/giveaway.js';
-import { Analytics, initAnalytics, loadAnalyticsData, checkMilestones } from './popup/features/analytics.js';
-import { Referral, initReferral } from './popup/features/referral.js';
-import { AccountManager } from './popup/business/accounts.js';
-import { ApiKeyManager } from './popup/business/apiKeys.js';
+import { Analytics, initAnalytics as _initAnalytics, loadAnalyticsData as _loadAnalyticsData, checkMilestones } from './popup/features/analytics.js';
+import { Referral as _Referral, initReferral } from './popup/features/referral.js';
+import { AccountManager as _AccountManager } from './popup/business/accounts.js';
+import { ApiKeyManager as _ApiKeyManager } from './popup/business/apiKeys.js';
 import {
-  ExtensionPay, subscribe, startTrial, manageSubscription,
+  ExtensionPay as _ExtensionPay, subscribe, startTrial, manageSubscription as _manageSubscription,
   checkTrialAvailability, togglePricingDisplay
 } from './popup/business/subscription.js';
-import { exportSettings, importSettings, validateSettingsSchema } from './popup/settings/importExport.js';
-import { Onboarding, checkOnboarding, initOnboardingListeners } from './popup/onboarding.js';
+import { exportSettings, importSettings, validateSettingsSchema as _validateSettingsSchema } from './popup/settings/importExport.js';
+import { Onboarding as _Onboarding, checkOnboarding, initOnboardingListeners } from './popup/onboarding.js';
 
 // Initialize on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', async () => {
@@ -396,7 +396,7 @@ function initEventListeners() {
   setupModalBackdropClose(elements.upgradeModal);
 
   // Listen for messages from content script (with security validation)
-  browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  browserAPI.runtime.onMessage.addListener((message, sender, _sendResponse) => {
     // SECURITY: Verify sender is from this extension
     if (!sender || sender.id !== browserAPI.runtime.id) {
       console.warn('[BuzzChat] Message from unknown sender rejected');

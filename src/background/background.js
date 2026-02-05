@@ -35,7 +35,7 @@ function buildAISystemPrompt(context, tone) {
   if (context.sellerName) prompt += `\n- Seller name: ${context.sellerName}`;
   if (context.currentItem) prompt += `\n- Currently selling: ${context.currentItem}`;
   if (context.additionalContext) prompt += `\n- Topic: ${context.additionalContext}`;
-  prompt += `\n\nCRITICAL RULES:\n1. Keep responses under 100 characters (this is live chat!)\n2. NEVER mention you are AI, a bot, or automated\n3. NEVER give specific prices - say "Check the listing!" or "Posted in chat!"\n4. NEVER give specific shipping costs - say "Depends on location, check listing!"\n5. Be genuinely helpful and engaging\n6. Match the casual tone of live stream chat\n7. If unsure about item details, redirect to the stream or listing`;
+  prompt += '\n\nCRITICAL RULES:\n1. Keep responses under 100 characters (this is live chat!)\n2. NEVER mention you are AI, a bot, or automated\n3. NEVER give specific prices - say "Check the listing!" or "Posted in chat!"\n4. NEVER give specific shipping costs - say "Depends on location, check listing!"\n5. Be genuinely helpful and engaging\n6. Match the casual tone of live stream chat\n7. If unsure about item details, redirect to the stream or listing';
   return prompt;
 }
 
@@ -146,7 +146,7 @@ async function verifyLicense() {
       syncData = {};
     }
     const user = syncData.extensionpay_user;
-    const cachedLicense = syncData.buzzchatLicense;
+    const _cachedLicense = syncData.buzzchatLicense;
     const settings = syncData.buzzchatSettings || {};
 
     let license = { tier: 'free', paid: false, trialActive: false };
@@ -499,7 +499,7 @@ browserAPI.alarms.onAlarm.addListener((alarm) => {
 });
 
 // Handle extension icon click
-browserAPI.action.onClicked.addListener((tab) => {
+browserAPI.action.onClicked.addListener((_tab) => {
   // Open popup - this is handled by default_popup in manifest
   // This listener is for when there's no popup defined
 });

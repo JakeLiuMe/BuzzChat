@@ -2,7 +2,7 @@
 // ExtensionPay integration for Pro/Business tiers
 
 import { browserAPI } from '../core/config.js';
-import { settings, setSettings } from '../core/state.js';
+import { settings, setSettings as _setSettings } from '../core/state.js';
 import { saveSettings } from '../core/storage.js';
 import { Toast, Loading } from '../ui/toast.js';
 import { elements } from '../ui/elements.js';

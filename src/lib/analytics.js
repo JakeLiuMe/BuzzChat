@@ -141,9 +141,9 @@ const Analytics = {
     // Find peak activity hour
     const peakHour = data.hourlyActivity.indexOf(Math.max(...data.hourlyActivity));
     const peakHourLabel = peakHour === 0 ? '12 AM' :
-                          peakHour < 12 ? `${peakHour} AM` :
-                          peakHour === 12 ? '12 PM' :
-                          `${peakHour - 12} PM`;
+      peakHour < 12 ? `${peakHour} AM` :
+        peakHour === 12 ? '12 PM' :
+          `${peakHour - 12} PM`;
 
     return {
       totalMessages: data.totalMessagesSent,

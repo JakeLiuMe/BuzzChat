@@ -281,7 +281,7 @@ const FocusTrap = {
 };
 
 // Event Listener Manager - tracks and cleans up event listeners
-const EventManager = {
+const _EventManager = {
   listeners: new Map(), // Map<element, Map<event, Set<handler>>>
 
   // Add an event listener with tracking
@@ -420,7 +420,7 @@ const Loading = {
 };
 
 // Form validation helpers
-const FormValidator = {
+const _FormValidator = {
   /**
    * Show error state on a form group
    * @param {HTMLElement} input - The input element
@@ -1459,7 +1459,7 @@ async function checkOnboarding() {
   await Onboarding.check();
 }
 
-async function completeOnboarding() {
+async function _completeOnboarding() {
   await Onboarding.complete();
 }
 
@@ -2350,7 +2350,7 @@ function initEventListeners() {
   });
 
   // Listen for messages from content script (with security validation)
-  browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  browserAPI.runtime.onMessage.addListener((message, sender, _sendResponse) => {
     // SECURITY: Verify sender is from this extension
     if (!sender || sender.id !== browserAPI.runtime.id) {
       console.warn('[BuzzChat] Message from unknown sender rejected');
@@ -3900,7 +3900,7 @@ async function startTrial() {
 }
 
 // Manage subscription
-async function manageSubscription() {
+async function _manageSubscription() {
   await ExtensionPay.openManagementPage();
 }
 
@@ -3951,7 +3951,7 @@ function togglePricingDisplay(isAnnual) {
 }
 
 // Update message limit with watermark bonus + referral bonus
-function updateMessageLimitWithBonus() {
+function _updateMessageLimitWithBonus() {
   // Message limits are managed by background.js via getTierLimits()
   // This function preserved for backwards compatibility but no longer overrides limits
   // Bonuses could add to the base limit: settings.messagesLimit + settings.referralBonus
@@ -3966,7 +3966,7 @@ function debounce(fn, delay) {
   };
 }
 
-function escapeHtml(text) {
+function _escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
@@ -4004,7 +4004,7 @@ function createEmptyState(icon, title, description, ctaText, ctaCallback) {
 }
 
 // Retry utility for failed async operations
-async function withRetry(fn, options = {}) {
+async function _withRetry(fn, options = {}) {
   const { maxRetries = 3, delay = 1000, backoff = 2, onRetry = null } = options;
 
   let lastError;
@@ -4259,9 +4259,9 @@ const Analytics = {
 
     const peakHour = data.hourlyActivity.indexOf(Math.max(...data.hourlyActivity));
     const peakHourLabel = peakHour === 0 ? '12 AM' :
-                          peakHour < 12 ? `${peakHour} AM` :
-                          peakHour === 12 ? '12 PM' :
-                          `${peakHour - 12} PM`;
+      peakHour < 12 ? `${peakHour} AM` :
+        peakHour === 12 ? '12 PM' :
+          `${peakHour - 12} PM`;
 
     return {
       totalMessages: data.totalMessagesSent,

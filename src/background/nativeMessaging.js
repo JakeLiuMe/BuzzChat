@@ -15,7 +15,7 @@
 // Browser API compatibility - works on both Chrome and Firefox
 const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
 
-const NATIVE_HOST_NAME = 'com.buzzchat.mcp';
+const _NATIVE_HOST_NAME = 'com.buzzchat.mcp';
 
 // Storage keys
 const STORAGE_KEYS = {

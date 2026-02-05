@@ -3,7 +3,7 @@
 
 import { browserAPI } from '../core/config.js';
 import { settings } from '../core/state.js';
-import { Toast, Loading } from '../ui/toast.js';
+import { Toast, Loading as _Loading } from '../ui/toast.js';
 import { elements } from '../ui/elements.js';
 import { triggerConfetti } from './giveaway.js';
 
@@ -63,9 +63,9 @@ export const Analytics = {
 
     const peakHour = data.hourlyActivity.indexOf(Math.max(...data.hourlyActivity));
     const peakHourLabel = peakHour === 0 ? '12 AM' :
-                          peakHour < 12 ? `${peakHour} AM` :
-                          peakHour === 12 ? '12 PM' :
-                          `${peakHour - 12} PM`;
+      peakHour < 12 ? `${peakHour} AM` :
+        peakHour === 12 ? '12 PM' :
+          `${peakHour - 12} PM`;
 
     return {
       totalMessages: data.totalMessagesSent,

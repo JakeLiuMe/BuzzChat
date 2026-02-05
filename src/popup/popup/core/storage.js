@@ -2,7 +2,7 @@
 // Load and save settings to browser storage
 
 import { browserAPI, DEFAULT_SETTINGS } from './config.js';
-import { settings, setSettings, setUseAccountManager } from './state.js';
+import { settings as _settings, setSettings, setUseAccountManager } from './state.js';
 import { AccountManager } from '../business/accounts.js';
 import { Toast, SaveIndicator } from '../ui/toast.js';
 
