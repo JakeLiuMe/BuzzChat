@@ -10,6 +10,7 @@ import { checkFaqTriggers } from './features/faq.js';
 import { checkCustomCommand } from './features/commands.js';
 import { isMessageBlocked } from './features/moderation.js';
 import { checkGiveawayEntry, updateChatMetrics } from './features/giveaway.js';
+import { analyzeMessage } from './features/insights.js';
 
 // Get Security module if available
 const Security = typeof BuzzChatSecurity !== 'undefined' ? BuzzChatSecurity : null;
@@ -59,6 +60,9 @@ export function processNewMessage(element) {
 
   // Update chat engagement metrics
   updateChatMetrics(username);
+
+  // Analyze for insights (pattern detection)
+  analyzeMessage(messageText, username);
 
   // Check moderation - blocked words filter
   if (state.settings?.moderation?.enabled) {
