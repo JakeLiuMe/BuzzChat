@@ -31,6 +31,7 @@ import {
 } from './popup/business/subscription.js';
 import { exportSettings, importSettings, validateSettingsSchema as _validateSettingsSchema } from './popup/settings/importExport.js';
 import { Onboarding as _Onboarding, checkOnboarding, initOnboardingListeners } from './popup/onboarding.js';
+import { initInventory } from './popup/features/inventory.js';
 
 // Initialize on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', async () => {
@@ -48,6 +49,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initialize referral
   initReferral();
+
+  // Initialize inventory
+  initInventory();
 
   // Check onboarding
   checkOnboarding();
@@ -227,6 +231,16 @@ function initEventListeners() {
 
   if (elements.closeWinnerBtn) {
     elements.closeWinnerBtn.addEventListener('click', hideWinnerDisplay);
+  }
+
+  // Inventory auto-detect toggle
+  const inventoryAutoDetectToggle = document.getElementById('inventoryAutoDetectToggle');
+  if (inventoryAutoDetectToggle) {
+    inventoryAutoDetectToggle.addEventListener('change', async () => {
+      if (!settings.inventory) settings.inventory = { enabled: true, autoDetectSold: true, lowStockThreshold: 2 };
+      settings.inventory.autoDetectSold = inventoryAutoDetectToggle.checked;
+      await saveSettings();
+    });
   }
 
   // Templates
@@ -410,7 +424,7 @@ function initEventListeners() {
     }
 
     // Whitelist of allowed incoming message types
-    const allowedTypes = ['MESSAGE_SENT', 'GIVEAWAY_ENTRY', 'CHAT_METRICS_UPDATE', 'COMMAND_USED'];
+    const allowedTypes = ['MESSAGE_SENT', 'GIVEAWAY_ENTRY', 'CHAT_METRICS_UPDATE', 'COMMAND_USED', 'SOLD_DETECTION'];
     if (!allowedTypes.includes(message.type)) {
       console.warn('[BuzzChat] Unknown message type rejected:', message.type);
       return;

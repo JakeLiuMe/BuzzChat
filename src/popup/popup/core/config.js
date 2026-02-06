@@ -73,5 +73,10 @@ export const DEFAULT_SETTINGS = {
     showMessageCount: true,
     darkMode: false,
     watermark: false
+  },
+  inventory: {
+    enabled: true,
+    autoDetectSold: true, // Auto-detect "sold", "mine", etc. in chat
+    lowStockThreshold: 2
   }
 };

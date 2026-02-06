@@ -568,6 +568,11 @@
         showMessageCount: true,
         darkMode: false,
         watermark: false
+      },
+      inventory: {
+        enabled: true,
+        autoDetectSold: true,
+        lowStockThreshold: 2
       }
     };
   }
@@ -843,6 +848,11 @@
       checkGiveawayEntry(messageText, username);
     }
 
+    // Check for SOLD detection (inventory purchase intent)
+    if (state.settings?.inventory?.autoDetectSold) {
+      checkSoldDetection(messageText, username);
+    }
+
     // Handle welcome message
     if (state.settings?.welcome?.enabled && !state.welcomedUsers.has(username)) {
       sendWelcomeMessage(username);
@@ -991,6 +1001,71 @@
         return;
       }
     }
+  }
+
+  // SOLD detection patterns for inventory
+  const SOLD_PATTERNS = [
+    /\bsold\b/i,
+    /\bi['']?ll take it\b/i,
+    /\bmine\b/i,
+    /\bclaiming\b/i,
+    /\bclaim this\b/i,
+    /\bi want (?:this|it)\b/i,
+    /\bgive it to me\b/i,
+    /\bi['']?ll buy\b/i,
+    /\btake my money\b/i,
+    /\bdibs\b/i
+  ];
+
+  // Check for purchase intent (SOLD detection)
+  function checkSoldDetection(messageText, username) {
+    if (!state.settings?.inventory?.autoDetectSold) return;
+
+    // Check if message matches any SOLD pattern
+    let matched = false;
+    for (const pattern of SOLD_PATTERNS) {
+      if (pattern.test(messageText)) {
+        matched = true;
+        break;
+      }
+    }
+
+    if (!matched) return;
+
+    console.log(`[BuzzChat] Purchase intent detected from ${username}: ${messageText}`);
+
+    // Extract potential product hint from message
+    let productHint = null;
+    const hintPatterns = [
+      /(?:sold|take|want|claiming|claim|dibs)(?:\s+(?:on|for))?\s+(?:the\s+)?(.+?)(?:!|$)/i,
+      /(?:the\s+)?(.+?)\s+(?:sold|please|pls)/i
+    ];
+    for (const pattern of hintPatterns) {
+      const match = messageText.match(pattern);
+      if (match && match[1]) {
+        const hint = match[1].trim();
+        if (hint.length > 2 && hint.length < 50 && !/^(it|this|that|one)$/i.test(hint)) {
+          productHint = hint;
+          break;
+        }
+      }
+    }
+
+    // Notify popup about purchase intent
+    browserAPI.runtime.sendMessage({
+      type: 'SOLD_DETECTION',
+      data: {
+        username,
+        message: messageText,
+        suggestedProduct: productHint,
+        timestamp: Date.now()
+      }
+    }).catch(err => {
+      // Popup might not be open - this is expected
+      if (err?.message && !err.message.includes('Receiving end does not exist')) {
+        console.warn('[BuzzChat] SOLD notification failed:', err.message);
+      }
+    });
   }
 
   // Update chat engagement metrics
@@ -1390,7 +1465,12 @@
         enabled: Boolean(settings.bidAlerts.enabled),
         soundEnabled: Boolean(settings.bidAlerts.soundEnabled),
         minAmount: typeof settings.bidAlerts.minAmount === 'number' ? Math.max(0, settings.bidAlerts.minAmount) : 0
-      } : { enabled: false, soundEnabled: true, minAmount: 0 }
+      } : { enabled: false, soundEnabled: true, minAmount: 0 },
+      inventory: settings.inventory ? {
+        enabled: settings.inventory.enabled !== false,
+        autoDetectSold: settings.inventory.autoDetectSold !== false,
+        lowStockThreshold: typeof settings.inventory.lowStockThreshold === 'number' ? Math.max(1, Math.min(10, settings.inventory.lowStockThreshold)) : 2
+      } : { enabled: true, autoDetectSold: true, lowStockThreshold: 2 }
     };
   }
 
