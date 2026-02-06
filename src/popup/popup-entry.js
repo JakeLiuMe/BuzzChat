@@ -33,6 +33,7 @@ import { exportSettings, importSettings, validateSettingsSchema as _validateSett
 import { Onboarding as _Onboarding, checkOnboarding, initOnboardingListeners } from './popup/onboarding.js';
 import { initInventory } from './popup/features/inventory.js';
 import { initDashboard } from './popup/features/dashboard.js';
+import { initExportBuyersButton } from './popup/features/exportBuyers.js';
 
 // Initialize on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', async () => {
@@ -59,6 +60,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initialize live dashboard
   initDashboard();
+
+  // Initialize buyer export button
+  initExportBuyersButton();
 
   // Check onboarding
   checkOnboarding();

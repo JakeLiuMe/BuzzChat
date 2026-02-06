@@ -5078,6 +5078,139 @@ body {
 }
 
 /* ===========================================
+   Export Buyers Modal
+   =========================================== */
+
+.export-buyers-modal {
+  max-width: 420px;
+}
+
+.export-buyers-modal .modal-header h2 {
+  font-size: 18px;
+}
+
+.export-quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.export-quick-actions .btn {
+  width: 100%;
+  padding: var(--space-md);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.export-quick-actions .btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+}
+
+.export-quick-actions .btn-secondary {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: white;
+  border: none;
+}
+
+.export-quick-actions .btn-secondary:hover {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.export-filters-section {
+  margin-top: var(--space-md);
+}
+
+.export-filters-section summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: var(--space-sm) 0;
+  user-select: none;
+}
+
+.export-filters-section summary:hover {
+  color: var(--primary);
+}
+
+.export-filters-section[open] summary {
+  color: var(--primary);
+  margin-bottom: var(--space-md);
+}
+
+.export-filters {
+  padding: var(--space-md);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.export-filters .form-group {
+  margin-bottom: var(--space-md);
+}
+
+.export-filters .form-group:last-of-type {
+  margin-bottom: 0;
+}
+
+.export-filters label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-xs);
+}
+
+.export-filters select,
+.export-filters input[type="date"] {
+  width: 100%;
+  padding: var(--space-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.export-filters select:focus,
+.export-filters input[type="date"]:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.date-range-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.date-range-row input[type="date"] {
+  flex: 1;
+}
+
+.date-range-row span {
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+/* Dark mode for export modal */
+[data-theme="dark"] .export-filters {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .export-filters select,
+[data-theme="dark"] .export-filters input[type="date"] {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+/* ===========================================
    Inventory Tab Styles
    =========================================== */
 
