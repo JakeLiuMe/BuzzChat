@@ -103,12 +103,40 @@ export function initUI() {
     elements.watermarkToggle.checked = settings.settings.watermark || false;
   }
 
+  // Translation settings
+  if (elements.translationToggle) {
+    elements.translationToggle.checked = settings.translation?.enabled || false;
+    updateTranslationOptionsVisibility(settings.translation?.enabled || false);
+  }
+  if (elements.translationShowOriginal) {
+    elements.translationShowOriginal.checked = settings.translation?.showOriginal !== false;
+  }
+  if (elements.sellerLanguage) {
+    elements.sellerLanguage.value = settings.translation?.sellerLanguage || 'en';
+  }
+
   // Initialize analytics (async, don't await)
   initAnalytics();
 
   // Initialize Business tier features (account selector & API access)
   initBusinessFeatures();
 }
+
+// Helper to show/hide translation options
+function updateTranslationOptionsVisibility(enabled) {
+  if (elements.translationOptions) {
+    elements.translationOptions.style.display = enabled ? 'block' : 'none';
+  }
+  if (elements.translationOptionsLang) {
+    elements.translationOptionsLang.style.display = enabled ? 'block' : 'none';
+  }
+  if (elements.translationInfo) {
+    elements.translationInfo.style.display = enabled ? 'block' : 'none';
+  }
+}
+
+// Export for use in event handlers
+export { updateTranslationOptionsVisibility };
 
 // Export initElements for use in main entry
 export { initElements };

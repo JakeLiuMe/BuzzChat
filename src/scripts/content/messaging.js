@@ -11,6 +11,7 @@ import { checkCustomCommand } from './features/commands.js';
 import { isMessageBlocked } from './features/moderation.js';
 import { checkGiveawayEntry, updateChatMetrics } from './features/giveaway.js';
 import { analyzeMessage } from './features/insights.js';
+import { checkWaitlistTrigger } from './features/waitlist.js';
 
 // Get Security module if available
 const Security = typeof BuzzChatSecurity !== 'undefined' ? BuzzChatSecurity : null;
@@ -91,6 +92,11 @@ export function processNewMessage(element) {
   // Handle FAQ auto-reply
   if (state.settings?.faq?.enabled) {
     checkFaqTriggers(messageText, username);
+  }
+  
+  // Check for waitlist triggers (availability queries on sold-out items)
+  if (state.settings?.inventory?.enabled) {
+    checkWaitlistTrigger(messageText, username);
   }
 }
 

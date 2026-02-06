@@ -77,6 +77,15 @@ export const DEFAULT_SETTINGS = {
   inventory: {
     enabled: true,
     autoDetectSold: true, // Auto-detect "sold", "mine", etc. in chat
-    lowStockThreshold: 2
+    lowStockThreshold: 2,
+    autoWaitlistOffer: true, // Auto-offer waitlist for sold-out items
+    fomoAnnouncements: false // Auto-announce when items sell out
+  },
+  translation: {
+    enabled: false,
+    showOriginal: true,
+    autoDetect: true,
+    sellerLanguage: 'en',
+    minConfidence: 0.8
   }
 };

@@ -926,6 +926,56 @@
           </div>
         </details>
 
+        <!-- Translation Section -->
+        <details class="settings-section">
+          <summary>🌍 Chat Translation</summary>
+          <div class="settings-section-content">
+            <p class="help-text">AI-powered translation helps you communicate with buyers in any language.</p>
+            <div class="form-group">
+              <label class="toggle-label">
+                <span>Auto-translate Chat Messages</span>
+                <input type="checkbox" id="translationToggle" aria-label="Enable auto-translation" role="switch">
+                <span class="toggle-slider"></span>
+              </label>
+              <small class="help-text">Uses Claude AI to detect and translate messages</small>
+            </div>
+            <div class="form-group translation-options" id="translationOptions" style="display: none;">
+              <label class="toggle-label">
+                <span>Show Original Message</span>
+                <input type="checkbox" id="translationShowOriginal" checked aria-label="Show original message" role="switch">
+                <span class="toggle-slider"></span>
+              </label>
+              <small class="help-text">Display both original and translated text</small>
+            </div>
+            <div class="form-group translation-options" id="translationOptionsLang" style="display: none;">
+              <label for="sellerLanguage">Your Language</label>
+              <select id="sellerLanguage" class="form-select">
+                <option value="en" selected>English</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                <option value="de">German</option>
+                <option value="pt">Portuguese</option>
+                <option value="it">Italian</option>
+                <option value="zh">Chinese</option>
+                <option value="ja">Japanese</option>
+                <option value="ko">Korean</option>
+              </select>
+              <small class="help-text">Incoming messages will be translated to this language</small>
+            </div>
+            <div class="translation-info" id="translationInfo" style="display: none;">
+              <div class="info-box">
+                <p>🌍 <strong>How it works:</strong></p>
+                <ul>
+                  <li>Messages from buyers are auto-detected and translated to your language</li>
+                  <li>Your responses can be translated back to the buyer's language</li>
+                  <li>Emojis, prices, and usernames are preserved</li>
+                  <li>Translations are cached to reduce API usage</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </details>
+
         <!-- Hotkeys Section -->
         <details class="settings-section">
           <summary>Hotkeys</summary>

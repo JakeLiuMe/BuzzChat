@@ -220,6 +220,14 @@ export const elements = {
   dashboardAlerts: null,
   dashboardClearAlertsBtn: null,
 
+  // Translation
+  translationToggle: null,
+  translationShowOriginal: null,
+  sellerLanguage: null,
+  translationOptions: null,
+  translationOptionsLang: null,
+  translationInfo: null,
+
   // Demo Mode
   demoModeBtn: null
 };
@@ -442,6 +450,14 @@ export function initElements() {
   elements.dashboardHotItems = document.getElementById('dashboardHotItems');
   elements.dashboardAlerts = document.getElementById('dashboardAlerts');
   elements.dashboardClearAlertsBtn = document.getElementById('dashboardClearAlertsBtn');
+
+  // Translation
+  elements.translationToggle = document.getElementById('translationToggle');
+  elements.translationShowOriginal = document.getElementById('translationShowOriginal');
+  elements.sellerLanguage = document.getElementById('sellerLanguage');
+  elements.translationOptions = document.getElementById('translationOptions');
+  elements.translationOptionsLang = document.getElementById('translationOptionsLang');
+  elements.translationInfo = document.getElementById('translationInfo');
 
   // Demo Mode
   elements.demoModeBtn = document.getElementById('demoModeBtn');

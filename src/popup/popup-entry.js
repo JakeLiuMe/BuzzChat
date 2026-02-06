@@ -10,7 +10,7 @@ import { FocusTrap as _FocusTrap, openModal, closeModal, setupModalBackdropClose
 import { initTabNavigation } from './popup/ui/tabs.js';
 import { applyDarkMode, updateStatusBadge, updateTierBanner } from './popup/ui/theme.js';
 import { elements, initElements } from './popup/ui/elements.js';
-import { initUI } from './popup/ui/init.js';
+import { initUI, updateTranslationOptionsVisibility } from './popup/ui/init.js';
 import { renderTimerMessages as _renderTimerMessages, addTimerMessage } from './popup/features/timers.js';
 import { renderFaqRules as _renderFaqRules, addFaqRule } from './popup/features/faq.js';
 import { renderTemplates as _renderTemplates, addTemplate } from './popup/features/templates.js';
@@ -47,6 +47,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initialize event listeners
   initEventListeners();
+
+  // Initialize message listeners
+  initMessageListeners();
 
   // Initialize referral
   initReferral();
@@ -377,6 +380,37 @@ function initEventListeners() {
     });
   }
 
+  // Translation toggles
+  if (elements.translationToggle) {
+    elements.translationToggle.addEventListener('change', async () => {
+      if (!settings.translation) settings.translation = {};
+      settings.translation.enabled = elements.translationToggle.checked;
+      // Show/hide translation options
+      updateTranslationOptionsUI(elements.translationToggle.checked);
+      await saveSettings();
+      Toast.success(settings.translation.enabled ?
+        '🌍 Auto-translation enabled' :
+        'Auto-translation disabled');
+    });
+  }
+
+  if (elements.translationShowOriginal) {
+    elements.translationShowOriginal.addEventListener('change', async () => {
+      if (!settings.translation) settings.translation = {};
+      settings.translation.showOriginal = elements.translationShowOriginal.checked;
+      await saveSettings();
+    });
+  }
+
+  if (elements.sellerLanguage) {
+    elements.sellerLanguage.addEventListener('change', async () => {
+      if (!settings.translation) settings.translation = {};
+      settings.translation.sellerLanguage = elements.sellerLanguage.value;
+      await saveSettings();
+      Toast.success(`Your language set to ${elements.sellerLanguage.options[elements.sellerLanguage.selectedIndex].text}`);
+    });
+  }
+
   // Subscribe buttons
   elements.subscribePro.addEventListener('click', () => subscribe('pro', elements.annualBillingToggle?.checked));
   elements.subscribeBusiness.addEventListener('click', () => subscribe('business', elements.annualBillingToggle?.checked));
@@ -412,7 +446,15 @@ function initEventListeners() {
   // Close modals on backdrop click
   setupModalBackdropClose(elements.settingsModal);
   setupModalBackdropClose(elements.upgradeModal);
+}
 
+// Helper to show/hide translation options in UI
+function updateTranslationOptionsUI(enabled) {
+  updateTranslationOptionsVisibility(enabled);
+}
+
+// Initialize runtime message listeners
+function initMessageListeners() {
   // Listen for messages from content script (with security validation)
   browserAPI.runtime.onMessage.addListener((message, sender, _sendResponse) => {
     // SECURITY: Verify sender is from this extension

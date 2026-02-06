@@ -1185,6 +1185,30 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
       return true;
 
+    case 'CHECK_AVAILABILITY':
+      // Check if a product is available or sold out (for waitlist auto-capture)
+      handleCheckAvailability(message.data).then(result => {
+        sendResponse(result);
+      }).catch(err => {
+        sendResponse({ error: err.message });
+      });
+      return true;
+
+    case 'WAITLIST_ADD':
+      // Add user to waitlist
+      handleWaitlistAdd(message.data).then(result => {
+        sendResponse(result);
+      }).catch(err => {
+        sendResponse({ error: err.message });
+      });
+      return true;
+
+    case 'INVENTORY_SOLD_OUT':
+      // Forward sold-out announcement to content script if FOMO enabled
+      forwardSoldOutAnnouncement(message.data);
+      sendResponse({ success: true });
+      return true;
+
     default:
       // Also handle action-based messages for backward compatibility
       if (message.action === 'getAICredits') {
@@ -1344,5 +1368,145 @@ verifyLicense().then(license => {
 
 // Initialize native messaging for MCP server communication
 initNativeMessaging();
+
+// =============================================================================
+// WAITLIST HANDLERS
+// =============================================================================
+
+/**
+ * Check if a product is available or sold out (for waitlist auto-capture)
+ */
+async function handleCheckAvailability(data) {
+  const { productHint, username } = data;
+  
+  // Get products from local storage
+  const result = await browserAPI.storage.local.get(['buzzchatInventory', 'buzzchatWaitlists']);
+  const products = result.buzzchatInventory || [];
+  const waitlists = result.buzzchatWaitlists || {};
+  
+  if (!productHint || products.length === 0) {
+    return { soldOut: false, product: null };
+  }
+  
+  // Find matching product
+  const hintLower = productHint.toLowerCase();
+  const hintWords = hintLower.split(/\s+/);
+  
+  let bestMatch = null;
+  let bestScore = 0;
+  
+  for (const product of products) {
+    const nameLower = product.name.toLowerCase();
+    const nameWords = nameLower.split(/\s+/);
+    
+    let score = 0;
+    for (const hWord of hintWords) {
+      if (hWord.length < 2) continue;
+      for (const nWord of nameWords) {
+        if (nWord.includes(hWord) || hWord.includes(nWord)) {
+          score += hWord.length;
+        }
+      }
+    }
+    
+    // Bonus for exact substring match
+    if (nameLower.includes(hintLower) || hintLower.includes(nameLower)) {
+      score += 10;
+    }
+    
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = product;
+    }
+  }
+  
+  // Only return if we have a reasonable match and it's sold out
+  if (bestScore >= 3 && bestMatch && bestMatch.quantity === 0) {
+    const waitlistCount = waitlists[bestMatch.id]?.entries?.length || 0;
+    return {
+      soldOut: true,
+      product: bestMatch,
+      waitlistCount
+    };
+  }
+  
+  return { soldOut: false, product: null };
+}
+
+/**
+ * Add user to waitlist from content script
+ */
+async function handleWaitlistAdd(data) {
+  const { productId, username } = data;
+  
+  if (!productId || !username) {
+    return { success: false, error: 'Missing productId or username' };
+  }
+  
+  const result = await browserAPI.storage.local.get(['buzzchatWaitlists']);
+  const waitlists = result.buzzchatWaitlists || {};
+  
+  // Initialize waitlist for product if doesn't exist
+  if (!waitlists[productId]) {
+    waitlists[productId] = {
+      productId,
+      entries: [],
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+  }
+  
+  // Check if user is already on the waitlist
+  const normalizedUsername = username.toLowerCase().trim();
+  const existingEntry = waitlists[productId].entries.find(
+    e => e.username.toLowerCase() === normalizedUsername
+  );
+  
+  if (existingEntry) {
+    return { success: false, error: 'Already on waitlist' };
+  }
+  
+  // Add to waitlist
+  waitlists[productId].entries.push({
+    username: username.trim(),
+    addedAt: Date.now(),
+    notified: false
+  });
+  waitlists[productId].updatedAt = Date.now();
+  
+  await browserAPI.storage.local.set({ buzzchatWaitlists: waitlists });
+  
+  console.log(`[BuzzChat] Added ${username} to waitlist for ${productId}`);
+  
+  return {
+    success: true,
+    count: waitlists[productId].entries.length
+  };
+}
+
+/**
+ * Forward sold-out announcement to content script
+ */
+async function forwardSoldOutAnnouncement(data) {
+  const { announcement } = data;
+  
+  if (!announcement) return;
+  
+  // Get settings to check if FOMO announcements are enabled
+  const result = await browserAPI.storage.sync.get(['buzzchatSettings']);
+  const settings = result.buzzchatSettings || {};
+  
+  if (!settings.inventory?.fomoAnnouncements) return;
+  
+  // Forward to content script
+  browserAPI.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0]?.id) {
+      browserAPI.tabs.sendMessage(tabs[0].id, {
+        type: 'INVENTORY_SOLD_OUT_ANNOUNCE',
+        data: { announcement }
+      }).catch(() => {});
+    }
+  });
+}
 
 console.log('[BuzzChat] Background service worker started');
