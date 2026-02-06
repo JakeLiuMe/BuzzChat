@@ -14,9 +14,9 @@ The AI-powered chat assistant for live sellers. Auto-reply to buyers, track inve
 
 ---
 
-<img src="assets/demo.gif" alt="BuzzChat Demo" width="600">
+<img src="docs/screenshots/screenshot-1-home.png" alt="BuzzChat Dashboard" width="600">
 
-*Auto-welcome, instant FAQ replies, real-time inventory tracking*
+*Auto-welcome, instant FAQ replies, real-time inventory tracking — all in one dashboard*
 
 </div>
 
