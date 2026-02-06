@@ -1186,6 +1186,82 @@ body {
   width: 100%;
 }
 
+/* 4-Tier Pricing Grid */
+.pricing-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.pricing-grid-4 .pricing-card {
+  padding: 16px;
+  margin-bottom: 0;
+}
+
+.pricing-grid-4 .pricing-card h3 {
+  font-size: 15px;
+}
+
+.pricing-grid-4 .price {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.pricing-grid-4 .features-list li {
+  font-size: 12px;
+  padding: 4px 0;
+  padding-left: 20px;
+}
+
+.pricing-grid-4 .features-list li::before {
+  font-size: 11px;
+}
+
+/* Tier badges */
+.tier-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.tier-badge.current {
+  background: var(--gray-200);
+  color: var(--gray-600);
+}
+
+.tier-badge.popular {
+  background: var(--primary);
+  color: white;
+}
+
+.tier-badge.value {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+}
+
+.tier-badge.team {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+}
+
+/* Responsive: stack on smaller screens */
+@media (max-width: 800px) {
+  .pricing-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .pricing-grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
@@ -4661,5 +4737,521 @@ body {
   .btn {
     padding: var(--space-sm) var(--space-md);
     font-size: 12px;
+  }
+}
+
+/* ===========================================
+   Buyer Profiles Section
+   =========================================== */
+
+/* Buyer Section Toggle */
+.buyer-section {
+  margin-top: var(--space-lg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+}
+
+.buyer-section summary {
+  padding: var(--space-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.buyer-section summary:hover {
+  background: var(--bg-tertiary);
+}
+
+.buyer-section summary::marker {
+  color: var(--primary);
+}
+
+.section-title-icon {
+  font-size: 16px;
+}
+
+.buyer-stats-badge {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.buyer-section-content {
+  padding: 0 var(--space-md) var(--space-md);
+}
+
+/* Buyer Panel */
+.buyer-panel {
+  margin-top: var(--space-sm);
+}
+
+.buyer-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+/* Buyer Card */
+.buyer-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  transition: all 0.15s;
+}
+
+.buyer-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.buyer-card.vip {
+  border-color: var(--warning);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(245, 158, 11, 0.05) 100%);
+}
+
+.buyer-card.vip:hover {
+  border-color: var(--warning);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+}
+
+.buyer-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.buyer-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.buyer-name {
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.buyer-stats {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.buyer-notes-preview {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  font-style: italic;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.buyer-last-seen {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+/* Buyer Actions */
+.buyer-actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+  flex-wrap: wrap;
+}
+
+/* Buyer Details Modal */
+.buyer-details-modal {
+  max-width: 400px;
+}
+
+.buyer-detail-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.vip-badge-small {
+  font-size: 12px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: white;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+}
+
+.buyer-detail-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  padding: var(--space-md);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+}
+
+.buyer-detail-stats .stat {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.buyer-detail-stats .stat strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Buyer Tags */
+.buyer-tags-section,
+.buyer-history-section,
+.buyer-notes-section {
+  margin-top: var(--space-md);
+}
+
+.buyer-tags-section h4,
+.buyer-history-section h4,
+.buyer-notes-section h4 {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.buyer-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.tag-vip {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: white;
+}
+
+.tag-repeat {
+  background: var(--primary);
+  color: white;
+}
+
+.tag-new {
+  background: var(--success);
+  color: white;
+}
+
+.tag-fast-payer {
+  background: #10b981;
+  color: white;
+}
+
+.tag-active-bidder {
+  background: #3b82f6;
+  color: white;
+}
+
+/* Purchase History */
+.buyer-purchase-history {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.purchase-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) 0;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.purchase-item:last-child {
+  border-bottom: none;
+}
+
+.purchase-date {
+  color: var(--text-tertiary);
+  font-size: 10px;
+  min-width: 70px;
+}
+
+.purchase-item-name {
+  flex: 1;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.purchase-price {
+  font-weight: 600;
+  color: var(--success);
+}
+
+.empty-history {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  font-style: italic;
+  text-align: center;
+  padding: var(--space-md);
+}
+
+/* Buyer Notes */
+.buyer-detail-notes {
+  width: 100%;
+  font-size: 13px;
+  padding: var(--space-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  resize: vertical;
+  min-height: 60px;
+  margin-bottom: var(--space-sm);
+}
+
+.buyer-detail-notes:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+/* Buyer Search */
+.buyer-search-results {
+  margin-top: var(--space-md);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Dark mode for buyer components */
+[data-theme="dark"] .buyer-section {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .buyer-card {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .buyer-card:hover {
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .buyer-detail-stats {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .buyer-detail-notes {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+/* ===========================================
+   Inventory Tab Styles
+   =========================================== */
+
+/* Quick Add Row */
+.inventory-quick-add {
+  margin-bottom: var(--space-lg);
+}
+
+.quick-add-row {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.quick-add-row input {
+  flex: 1;
+}
+
+.quick-add-row .btn {
+  white-space: nowrap;
+}
+
+/* Stream Summary */
+.inventory-stream-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+  color: white;
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-lg);
+  font-weight: 600;
+}
+
+.summary-icon {
+  font-size: 18px;
+}
+
+/* Inventory List */
+.inventory-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: var(--space-lg);
+}
+
+/* Inventory Item */
+.inventory-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  gap: var(--space-md);
+}
+
+.inventory-item.status-low {
+  border-color: var(--warning);
+  background: rgba(245, 158, 11, 0.05);
+}
+
+.inventory-item.status-sold {
+  border-color: var(--gray-300);
+  opacity: 0.6;
+}
+
+.inventory-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex: 1;
+  min-width: 0;
+}
+
+.inventory-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.inventory-price {
+  color: var(--success);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.inventory-qty {
+  color: var(--text-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* Status Badges */
+.inventory-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge-ok {
+  background: var(--success);
+  color: white;
+}
+
+.badge-low {
+  background: var(--warning);
+  color: white;
+}
+
+.badge-sold {
+  background: var(--gray-400);
+  color: white;
+}
+
+/* Inventory Actions */
+.inventory-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.inventory-actions .btn {
+  padding: 4px 8px;
+  font-size: 12px;
+  min-width: auto;
+}
+
+.inventory-actions-bar {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+/* Inventory Settings */
+.inventory-settings {
+  margin-top: var(--space-lg);
+  padding: var(--space-md);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+}
+
+.inventory-settings summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.inventory-settings .settings-section-content {
+  padding-top: var(--space-md);
+}
+
+/* Responsive adjustments */
+@media (max-width: 400px) {
+  .inventory-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-sm);
+  }
+
+  .inventory-info {
+    flex-wrap: wrap;
+  }
+
+  .inventory-actions {
+    justify-content: flex-end;
   }
 }

@@ -136,6 +136,12 @@
         </svg>
         <span>Giveaway</span>
       </button>
+      <button id="inventory-tab" class="tab-btn" data-tab="inventory" role="tab" aria-selected="false" aria-controls="inventory-panel" title="Track products & sales">
+        <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+        <span>📦 Inventory</span>
+      </button>
       <button id="analytics-tab" class="tab-btn" data-tab="analytics" role="tab" aria-selected="false" aria-controls="analytics-panel" title="View message statistics (Pro)">
         <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -148,6 +154,74 @@
     <div class="tab-content" id="main-content">
       <!-- Home Tab (Welcome settings) -->
       <section class="tab-panel active" id="home-panel" role="tabpanel" aria-labelledby="home-tab">
+        <!-- Live Seller Dashboard -->
+        <details class="dashboard-section" id="dashboardSection" open>
+          <summary>
+            <span class="section-title-icon">📊</span>
+            Live Dashboard
+            <span class="dashboard-alert-badge" id="dashboardAlertBadge" style="display: none;">0</span>
+          </summary>
+          <div class="dashboard-content">
+            <!-- Stream Controls -->
+            <div class="dashboard-controls">
+              <button class="btn btn-primary btn-sm" id="dashboardStartBtn" title="Start tracking this stream">
+                ▶️ Start Stream
+              </button>
+              <button class="btn btn-secondary btn-sm" id="dashboardEndBtn" title="End stream session">
+                ⏹️ End Stream
+              </button>
+              <span class="dashboard-uptime" id="dashboardUptime">--</span>
+            </div>
+
+            <!-- Real-time Stats Grid -->
+            <div class="dashboard-stats-grid">
+              <div class="dashboard-stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value" id="dashboardViewers">0</div>
+                <div class="stat-label">Viewers</div>
+              </div>
+              <div class="dashboard-stat-card">
+                <div class="stat-icon">💬</div>
+                <div class="stat-value" id="dashboardChatRate">0</div>
+                <div class="stat-label">Chat/min</div>
+              </div>
+              <div class="dashboard-stat-card">
+                <div class="stat-value engagement-indicator engagement-low" id="dashboardEngagement" title="Engagement level">📊</div>
+                <div class="stat-label">Engagement</div>
+              </div>
+              <div class="dashboard-stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value" id="dashboardRevenue">$0.00</div>
+                <div class="stat-label">Est. Revenue</div>
+              </div>
+            </div>
+
+            <!-- Hot Items Section -->
+            <div class="dashboard-hot-items-section">
+              <h4 class="dashboard-section-title">🔥 Hot Items</h4>
+              <div class="dashboard-hot-items" id="dashboardHotItems">
+                <div class="empty-state-inline">
+                  <span class="empty-icon">🔥</span>
+                  <p class="empty-entries">No trending items yet</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Alerts Section -->
+            <div class="dashboard-alerts-section">
+              <h4 class="dashboard-section-title">🔔 Alerts</h4>
+              <div class="dashboard-alerts" id="dashboardAlerts">
+                <div class="empty-state-inline">
+                  <span class="empty-icon">🔔</span>
+                  <p class="empty-entries">No alerts</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <hr class="section-divider">
+
         <div class="feature-toggle">
           <label class="toggle-label">
             <span>Auto-Welcome New Viewers</span>
@@ -167,6 +241,44 @@
           <input type="number" id="welcomeDelay" value="5" min="1" max="60" aria-describedby="welcomeDelay-help">
           <small id="welcomeDelay-help" class="help-text">Avoid spam by spacing out welcome messages</small>
         </div>
+
+        <!-- Buyer Profiles Section -->
+        <details class="buyer-section" id="buyerSection">
+          <summary>
+            <span class="section-title-icon">👥</span>
+            Buyer Profiles
+            <span class="buyer-stats-badge">
+              <span id="buyerVipCount">0</span> VIP · <span id="buyerTotalCount">0</span> total
+            </span>
+          </summary>
+          <div class="buyer-section-content">
+            <p class="help-text">Track your repeat buyers and VIP customers for personalized welcomes.</p>
+            
+            <!-- Buyer List -->
+            <div class="buyer-panel" id="buyerPanel">
+              <div class="buyer-list" id="buyerList">
+                <div class="empty-state-inline">
+                  <span class="empty-icon">👥</span>
+                  <p class="empty-entries">No buyers tracked yet</p>
+                  <p class="empty-hint">Buyer profiles are created when you record purchases.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Buyer Actions -->
+            <div class="buyer-actions">
+              <button class="btn btn-secondary btn-sm" id="refreshBuyersBtn" title="Refresh buyer list">
+                Refresh
+              </button>
+              <button class="btn btn-secondary btn-sm" id="exportBuyersBtn" title="Export buyers as CSV">
+                Export CSV
+              </button>
+              <button class="btn btn-secondary btn-sm" id="searchBuyersBtn" title="Search buyers">
+                Search
+              </button>
+            </div>
+          </div>
+        </details>
       </section>
 
       <!-- Messages Tab (Timer + Templates combined) -->
@@ -535,6 +647,57 @@
         </details>
       </section>
 
+      <!-- Inventory Tab -->
+      <section class="tab-panel" id="inventory-panel" role="tabpanel" aria-labelledby="inventory-tab">
+        <!-- Quick Add -->
+        <div class="inventory-quick-add">
+          <div class="form-group">
+            <label for="inventoryQuickAdd">Quick Add Product</label>
+            <div class="quick-add-row">
+              <input type="text" id="inventoryQuickAdd" placeholder="Jordan 4, $180, 3" aria-describedby="inventoryQuickAdd-help">
+              <button class="btn btn-primary" id="inventoryQuickAddBtn">+ Add</button>
+            </div>
+            <small id="inventoryQuickAdd-help" class="help-text">Format: Product name, $price, quantity</small>
+          </div>
+        </div>
+
+        <!-- Stream Summary -->
+        <div class="inventory-stream-summary">
+          <span class="summary-icon">📊</span>
+          <span id="inventoryStreamSummary">This stream: 0 sold • $0.00 estimated</span>
+        </div>
+
+        <!-- Product List -->
+        <div class="inventory-list" id="inventoryList">
+          <div class="empty-state-inline">
+            <span class="empty-icon">📦</span>
+            <p class="empty-entries">No products yet!</p>
+            <p class="empty-hint">Quick add: "Jordan 4, $180, 3"</p>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="inventory-actions-bar">
+          <button class="btn btn-secondary btn-sm" id="inventoryExportBtn">Export CSV</button>
+          <button class="btn btn-secondary btn-sm" id="inventoryResetSessionBtn">Reset Session</button>
+        </div>
+
+        <!-- Sold Detection Settings -->
+        <details class="inventory-settings">
+          <summary>SOLD Detection Settings</summary>
+          <div class="settings-section-content">
+            <div class="feature-toggle">
+              <label class="toggle-label">
+                <span>Auto-detect Purchase Intent</span>
+                <input type="checkbox" id="inventoryAutoDetectToggle" checked aria-label="Enable SOLD detection" role="switch">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <small class="help-text">Detects "sold", "I'll take it", "mine", "claiming" in chat and prompts you to mark items sold.</small>
+          </div>
+        </details>
+      </section>
+
       <!-- Analytics Tab (Pro Feature) -->
       <section class="tab-panel" id="analytics-panel" role="tabpanel" aria-labelledby="analytics-tab">
         <div class="analytics-container" id="analyticsContainer">
@@ -553,7 +716,7 @@
               <li>Message type breakdown</li>
               <li>Export to CSV</li>
             </ul>
-            <button class="btn btn-primary" id="unlockAnalyticsBtn">Upgrade to Pro - $7.99/mo</button>
+            <button class="btn btn-primary" id="unlockAnalyticsBtn">Upgrade to Pro - $4.99/mo</button>
           </div>
         </div>
 
@@ -978,23 +1141,23 @@
             <input type="checkbox" id="annualBillingToggle">
             <span class="billing-slider"></span>
           </label>
-          <span class="billing-option" data-billing="annual">Annual <span class="save-badge">Save 38%</span></span>
+          <span class="billing-option" data-billing="annual">Annual <span class="save-badge">Save 35%</span></span>
         </div>
 
-        <!-- 3-Tier Pricing Grid -->
-        <div class="pricing-grid">
-          <!-- FREE - shown first for comparison -->
+        <!-- 4-Tier Pricing Grid -->
+        <div class="pricing-grid pricing-grid-4">
+          <!-- FREE -->
           <div class="pricing-card current-plan" id="freePlanCard">
             <div class="tier-badge current">Current Plan</div>
             <h3>Free</h3>
             <div class="price">$0<span>/forever</span></div>
             <ul class="features-list">
+              <li>🤖 <strong>50 AI responses/day</strong></li>
               <li>3 FAQ auto-reply rules</li>
-              <li>5 custom commands</li>
               <li>Basic giveaway picker</li>
-              <li>Welcome messages</li>
-              <li>Timer messages</li>
-              <li class="feature-limited">No analytics</li>
+              <li>Welcome & timer messages</li>
+              <li>7-day chat history</li>
+              <li class="feature-limited">1 platform</li>
             </ul>
             <button class="btn btn-secondary btn-lg" disabled>Your Plan</button>
           </div>
@@ -1003,36 +1166,58 @@
           <div class="pricing-card recommended">
             <div class="tier-badge popular">Most Popular</div>
             <h3>Pro</h3>
-            <div class="price" id="proPrice">$7.99<span>/month</span></div>
-            <div class="price-annual" id="proPriceAnnual" style="display: none;">$59<span>/year</span></div>
-            <p class="price-note" id="proPriceNote" style="display: none;">$4.92/month billed annually</p>
+            <div class="price" id="proPrice">$4.99<span>/month</span></div>
+            <div class="price-annual" id="proPriceAnnual" style="display: none;">$39<span>/year</span></div>
+            <p class="price-note" id="proPriceNote" style="display: none;">$3.25/month billed annually</p>
             <ul class="features-list">
-              <li><strong>20 FAQ rules</strong></li>
-              <li><strong>50 custom commands</strong></li>
-              <li><strong>Animated wheel</strong></li>
-              <li><strong>Full analytics</strong></li>
-              <li>30-day history</li>
-              <li>CSV export</li>
+              <li>🤖 <strong>Unlimited AI responses</strong></li>
+              <li>⚡ <strong>Smart chat queue</strong></li>
+              <li>🎯 <strong>Intent detection</strong></li>
+              <li>Unlimited FAQ rules</li>
+              <li>Animated giveaway wheel</li>
+              <li>30-day analytics + export</li>
+              <li>All platforms</li>
             </ul>
             <button class="btn btn-primary btn-lg" id="subscribePro">Start Free Trial</button>
           </div>
 
-          <!-- MAX - Best Value -->
+          <!-- SELLER+ - Best Value -->
           <div class="pricing-card featured">
             <div class="tier-badge value">Best Value</div>
-            <h3>Max</h3>
-            <div class="price" id="businessPrice">$19.99<span>/month</span></div>
-            <div class="price-annual" id="businessPriceAnnual" style="display: none;">$149<span>/year</span></div>
-            <p class="price-note" id="businessPriceNote" style="display: none;">$12.42/month billed annually</p>
+            <h3>Seller+</h3>
+            <div class="price" id="businessPrice">$12.99<span>/month</span></div>
+            <div class="price-annual" id="businessPriceAnnual" style="display: none;">$99<span>/year</span></div>
+            <p class="price-note" id="businessPriceNote" style="display: none;">$8.25/month billed annually</p>
             <ul class="features-list">
               <li>Everything in Pro, plus:</li>
-              <li><strong>Multi-account</strong> (10 configs)</li>
-              <li><strong>API access</strong></li>
-              <li><strong>MCP integration</strong></li>
-              <li><strong>90-day analytics</strong></li>
-              <li><strong>Priority support</strong></li>
+              <li>📊 <strong>Live seller dashboard</strong></li>
+              <li>📦 <strong>Inventory tracking</strong></li>
+              <li>🛒 <strong>SOLD auto-detection</strong></li>
+              <li>👤 <strong>Buyer profiles</strong></li>
+              <li>Multi-account (5 configs)</li>
+              <li>Team seats (3 members)</li>
+              <li>90-day history</li>
             </ul>
             <button class="btn btn-primary btn-lg" id="subscribeBusiness">Start Free Trial</button>
+          </div>
+
+          <!-- TEAM -->
+          <div class="pricing-card" id="teamPlanCard">
+            <div class="tier-badge team">Teams</div>
+            <h3>Team</h3>
+            <div class="price" id="teamPrice">$29.99<span>/month</span></div>
+            <div class="price-annual" id="teamPriceAnnual" style="display: none;">$249<span>/year</span></div>
+            <p class="price-note" id="teamPriceNote" style="display: none;">$20.75/month billed annually</p>
+            <ul class="features-list">
+              <li>Everything in Seller+, plus:</li>
+              <li>👥 <strong>Unlimited team seats</strong></li>
+              <li>🔌 <strong>API access</strong></li>
+              <li>🎨 <strong>Custom AI training</strong></li>
+              <li>🏷️ White-label option</li>
+              <li>1-year history</li>
+              <li>Dedicated support</li>
+            </ul>
+            <button class="btn btn-primary btn-lg" id="subscribeTeam">Contact Sales</button>
           </div>
         </div>
 
@@ -1045,48 +1230,91 @@
                 <th>Feature</th>
                 <th>Free</th>
                 <th>Pro</th>
-                <th>Max</th>
+                <th>Seller+</th>
+                <th>Team</th>
               </tr>
             </thead>
             <tbody>
               <tr>
+                <td>🤖 AI Responses</td>
+                <td>50/day</td>
+                <td>Unlimited</td>
+                <td>Unlimited</td>
+                <td>Unlimited</td>
+              </tr>
+              <tr>
+                <td>⚡ Smart Chat Queue</td>
+                <td class="feature-no">-</td>
+                <td class="feature-yes">Yes</td>
+                <td class="feature-yes">Yes</td>
+                <td class="feature-yes">Yes</td>
+              </tr>
+              <tr>
+                <td>🎯 Intent Detection</td>
+                <td class="feature-no">-</td>
+                <td class="feature-yes">Yes</td>
+                <td class="feature-yes">Yes</td>
+                <td class="feature-yes">Yes</td>
+              </tr>
+              <tr>
+                <td>📊 Live Dashboard</td>
+                <td class="feature-no">-</td>
+                <td class="feature-no">-</td>
+                <td class="feature-yes">Yes</td>
+                <td class="feature-yes">Yes</td>
+              </tr>
+              <tr>
+                <td>📦 Inventory Tracking</td>
+                <td class="feature-no">-</td>
+                <td class="feature-no">-</td>
+                <td class="feature-yes">Yes</td>
+                <td class="feature-yes">Yes</td>
+              </tr>
+              <tr>
+                <td>🛒 SOLD Detection</td>
+                <td class="feature-no">-</td>
+                <td class="feature-no">-</td>
+                <td class="feature-yes">Yes</td>
+                <td class="feature-yes">Yes</td>
+              </tr>
+              <tr>
+                <td>👤 Buyer Profiles</td>
+                <td class="feature-no">-</td>
+                <td class="feature-no">-</td>
+                <td class="feature-yes">Yes</td>
+                <td class="feature-yes">Yes</td>
+              </tr>
+              <tr>
                 <td>FAQ Rules</td>
                 <td>3</td>
-                <td>20</td>
-                <td>20</td>
+                <td>Unlimited</td>
+                <td>Unlimited</td>
+                <td>Unlimited</td>
               </tr>
               <tr>
-                <td>Custom Commands</td>
-                <td>5</td>
-                <td>50</td>
-                <td>50</td>
-              </tr>
-              <tr>
-                <td>Giveaway Wheel</td>
-                <td>Basic</td>
-                <td>Animated</td>
-                <td>Animated</td>
-              </tr>
-              <tr>
-                <td>Analytics</td>
-                <td class="feature-no">-</td>
+                <td>Analytics History</td>
+                <td>7 days</td>
                 <td>30 days</td>
                 <td>90 days</td>
+                <td>1 year</td>
               </tr>
               <tr>
-                <td>CSV Export</td>
+                <td>Team Seats</td>
                 <td class="feature-no">-</td>
-                <td class="feature-yes">Yes</td>
-                <td class="feature-yes">Yes</td>
+                <td class="feature-no">-</td>
+                <td>3 members</td>
+                <td>Unlimited</td>
               </tr>
               <tr>
                 <td>Multi-Account</td>
                 <td class="feature-no">-</td>
                 <td class="feature-no">-</td>
-                <td>10 configs</td>
+                <td>5 configs</td>
+                <td>Unlimited</td>
               </tr>
               <tr>
-                <td>API / MCP Access</td>
+                <td>API Access</td>
+                <td class="feature-no">-</td>
                 <td class="feature-no">-</td>
                 <td class="feature-no">-</td>
                 <td class="feature-yes">Yes</td>
@@ -1094,8 +1322,9 @@
               <tr>
                 <td>Support</td>
                 <td>Community</td>
-                <td>Email</td>
+                <td>Email 48hr</td>
                 <td>Priority 24hr</td>
+                <td>Dedicated</td>
               </tr>
             </tbody>
           </table>
@@ -1387,6 +1616,57 @@
       <div class="modal-footer confirm-footer">
         <button class="btn btn-secondary" id="confirmCancelBtn">Cancel</button>
         <button class="btn btn-danger" id="confirmOkBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buyer Details Modal -->
+  <div class="modal" id="buyerDetailsModal" role="dialog" aria-labelledby="buyer-detail-title" aria-modal="true">
+    <div class="modal-content buyer-details-modal">
+      <div class="modal-header">
+        <h2 id="buyer-detail-title" class="buyer-detail-name">Buyer Details</h2>
+        <button class="modal-close" id="closeBuyerDetailsBtn" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Buyer Stats -->
+        <div class="buyer-detail-stats"></div>
+
+        <!-- Buyer Tags -->
+        <div class="buyer-tags-section">
+          <h4>Tags</h4>
+          <div class="buyer-detail-tags"></div>
+        </div>
+
+        <!-- Purchase History -->
+        <div class="buyer-history-section">
+          <h4>Recent Purchases</h4>
+          <div class="buyer-purchase-history"></div>
+        </div>
+
+        <!-- Notes -->
+        <div class="buyer-notes-section">
+          <h4>Notes</h4>
+          <textarea class="buyer-detail-notes" id="buyerNotesInput" rows="3" placeholder="Add notes about this buyer..." maxlength="500"></textarea>
+          <button class="btn btn-primary btn-sm" id="saveBuyerNotesBtn">Save Notes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buyer Search Modal -->
+  <div class="modal" id="buyerSearchModal" role="dialog" aria-labelledby="buyer-search-title" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="buyer-search-title">Search Buyers</h2>
+        <button class="modal-close" id="closeBuyerSearchBtn" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <input type="text" id="buyerSearchInput" placeholder="Search by username..." autofocus>
+        </div>
+        <div class="buyer-search-results" id="buyerSearchResults">
+          <p class="help-text">Enter a username to search</p>
+        </div>
       </div>
     </div>
   </div>

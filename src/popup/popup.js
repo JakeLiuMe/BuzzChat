@@ -1315,6 +1315,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initEventListeners();
   init10x10Features(); // 10/10 Features initialization
   initReferral();
+  initBuyerProfiles(); // Buyer profiles feature
   checkOnboarding();
   ConfirmDialog.init(); // Initialize confirmation dialog
 
@@ -4759,6 +4760,425 @@ async function initReferral() {
 
   } catch (error) {
     console.error('[BuzzChat] Failed to initialize referral:', error);
+  }
+}
+
+// ============================================
+// BUYER PROFILES FEATURE
+// ============================================
+
+// Buyer Profiles storage key
+const BUYER_PROFILES_KEY = 'buzzchatBuyerProfiles';
+const VIP_PURCHASE_THRESHOLD = 3;
+const VIP_SPEND_THRESHOLD = 200;
+
+// Get all buyer profiles
+async function getBuyerProfiles() {
+  return new Promise((resolve) => {
+    browserAPI.storage.local.get([BUYER_PROFILES_KEY], (result) => {
+      resolve(result[BUYER_PROFILES_KEY] || {});
+    });
+  });
+}
+
+// Save buyer profiles
+async function saveBuyerProfiles(profiles) {
+  return new Promise((resolve, reject) => {
+    browserAPI.storage.local.set({ [BUYER_PROFILES_KEY]: profiles }, () => {
+      if (browserAPI.runtime.lastError) {
+        reject(browserAPI.runtime.lastError);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
+// Check if buyer is VIP
+function isVIPBuyer(profile) {
+  if (!profile) return false;
+  return profile.totalPurchases >= VIP_PURCHASE_THRESHOLD ||
+         profile.totalSpent >= VIP_SPEND_THRESHOLD;
+}
+
+// Check if buyer is repeat buyer
+function isRepeatBuyer(profile) {
+  if (!profile) return false;
+  return profile.totalPurchases >= 2;
+}
+
+// Format relative time
+function formatBuyerTime(timestamp) {
+  if (!timestamp) return 'Never';
+  const diff = Date.now() - timestamp;
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days < 7) return `${days}d ago`;
+  return new Date(timestamp).toLocaleDateString();
+}
+
+// Create buyer card element
+function createBuyerCard(profile, onClick) {
+  const card = document.createElement('div');
+  card.className = 'buyer-card';
+  if (isVIPBuyer(profile)) {
+    card.classList.add('vip');
+  }
+
+  const avatar = document.createElement('div');
+  avatar.className = 'buyer-avatar';
+  avatar.textContent = isVIPBuyer(profile) ? '🌟' : isRepeatBuyer(profile) ? '💜' : '👤';
+  card.appendChild(avatar);
+
+  const info = document.createElement('div');
+  info.className = 'buyer-info';
+
+  const name = document.createElement('div');
+  name.className = 'buyer-name';
+  name.textContent = profile.displayName || profile.username;
+  info.appendChild(name);
+
+  const stats = document.createElement('div');
+  stats.className = 'buyer-stats';
+  stats.textContent = `${profile.totalPurchases} purchase${profile.totalPurchases !== 1 ? 's' : ''} · $${profile.totalSpent.toFixed(0)}`;
+  info.appendChild(stats);
+
+  if (profile.notes) {
+    const notes = document.createElement('div');
+    notes.className = 'buyer-notes-preview';
+    notes.textContent = profile.notes.slice(0, 50) + (profile.notes.length > 50 ? '...' : '');
+    info.appendChild(notes);
+  }
+
+  card.appendChild(info);
+
+  const lastSeen = document.createElement('div');
+  lastSeen.className = 'buyer-last-seen';
+  lastSeen.textContent = formatBuyerTime(profile.lastSeen);
+  card.appendChild(lastSeen);
+
+  if (onClick) {
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', () => onClick(profile));
+  }
+
+  return card;
+}
+
+// Get buyer stats
+async function getBuyerStats() {
+  const profiles = await getBuyerProfiles();
+  const allBuyers = Object.values(profiles);
+  const buyers = allBuyers.filter(p => p.totalPurchases > 0);
+  const vipBuyers = buyers.filter(p => isVIPBuyer(p));
+
+  return {
+    totalBuyers: buyers.length,
+    vipCount: vipBuyers.length
+  };
+}
+
+// Load buyer panel
+async function loadBuyerPanel() {
+  const buyerList = document.getElementById('buyerList');
+  if (!buyerList) return;
+
+  try {
+    const profiles = await getBuyerProfiles();
+    const buyers = Object.values(profiles)
+      .filter(p => p.totalPurchases > 0)
+      .sort((a, b) => {
+        // VIPs first, then by last seen
+        const aVip = isVIPBuyer(a) ? 1 : 0;
+        const bVip = isVIPBuyer(b) ? 1 : 0;
+        if (bVip !== aVip) return bVip - aVip;
+        return b.lastSeen - a.lastSeen;
+      })
+      .slice(0, 5);
+
+    // Clear and rebuild list
+    buyerList.innerHTML = '';
+
+    if (buyers.length === 0) {
+      buyerList.innerHTML = `
+        <div class="empty-state-inline">
+          <span class="empty-icon">👥</span>
+          <p class="empty-entries">No buyers tracked yet</p>
+          <p class="empty-hint">Buyer profiles are created when you record purchases.</p>
+        </div>
+      `;
+      return;
+    }
+
+    buyers.forEach(buyer => {
+      const card = createBuyerCard(buyer, showBuyerDetails);
+      buyerList.appendChild(card);
+    });
+
+    // Update stats
+    const stats = await getBuyerStats();
+    const vipCountEl = document.getElementById('buyerVipCount');
+    const totalCountEl = document.getElementById('buyerTotalCount');
+    if (vipCountEl) vipCountEl.textContent = stats.vipCount;
+    if (totalCountEl) totalCountEl.textContent = stats.totalBuyers;
+
+  } catch (error) {
+    console.error('[BuzzChat] Failed to load buyer panel:', error);
+  }
+}
+
+// Show buyer details modal
+function showBuyerDetails(profile) {
+  const modal = document.getElementById('buyerDetailsModal');
+  if (!modal) {
+    Toast.info(`${profile.displayName}: ${profile.totalPurchases} purchases, $${profile.totalSpent.toFixed(0)} total`);
+    return;
+  }
+
+  // Populate modal
+  const nameEl = modal.querySelector('.buyer-detail-name');
+  const statsEl = modal.querySelector('.buyer-detail-stats');
+  const tagsEl = modal.querySelector('.buyer-detail-tags');
+  const notesEl = document.getElementById('buyerNotesInput');
+  const historyEl = modal.querySelector('.buyer-purchase-history');
+
+  if (nameEl) {
+    nameEl.innerHTML = '';
+    nameEl.textContent = profile.displayName || profile.username;
+    if (isVIPBuyer(profile)) {
+      const badge = document.createElement('span');
+      badge.className = 'vip-badge-small';
+      badge.textContent = '🌟 VIP';
+      nameEl.appendChild(badge);
+    }
+  }
+
+  if (statsEl) {
+    statsEl.innerHTML = `
+      <div class="stat"><strong>${profile.totalPurchases}</strong> purchases</div>
+      <div class="stat"><strong>$${profile.totalSpent.toFixed(2)}</strong> total</div>
+      <div class="stat">First seen: ${new Date(profile.firstSeen).toLocaleDateString()}</div>
+      <div class="stat">Last seen: ${formatBuyerTime(profile.lastSeen)}</div>
+    `;
+  }
+
+  if (tagsEl) {
+    tagsEl.innerHTML = (profile.tags || []).map(t =>
+      `<span class="tag tag-${t}">${t}</span>`
+    ).join('');
+  }
+
+  if (notesEl) {
+    notesEl.value = profile.notes || '';
+    notesEl.dataset.username = profile.username;
+  }
+
+  if (historyEl) {
+    if (profile.purchaseHistory && profile.purchaseHistory.length > 0) {
+      historyEl.innerHTML = profile.purchaseHistory
+        .slice(-10)
+        .reverse()
+        .map(p => `
+          <div class="purchase-item">
+            <span class="purchase-date">${new Date(p.date).toLocaleDateString()}</span>
+            <span class="purchase-item-name">${p.item || 'Item'}</span>
+            <span class="purchase-price">$${p.price.toFixed(2)}</span>
+          </div>
+        `).join('');
+    } else {
+      historyEl.innerHTML = '<p class="empty-history">No purchase history recorded</p>';
+    }
+  }
+
+  modal.classList.add('active');
+  FocusTrap.activate(modal);
+}
+
+// Search buyers
+async function searchBuyers(query) {
+  if (!query || query.length < 2) return [];
+  const profiles = await getBuyerProfiles();
+  const normalizedQuery = query.toLowerCase();
+
+  return Object.values(profiles)
+    .filter(p => p.username.includes(normalizedQuery) ||
+                 (p.displayName && p.displayName.toLowerCase().includes(normalizedQuery)))
+    .sort((a, b) => b.totalSpent - a.totalSpent)
+    .slice(0, 10);
+}
+
+// Export buyers as CSV
+async function exportBuyersCSV() {
+  const profiles = await getBuyerProfiles();
+  const buyers = Object.values(profiles).sort((a, b) => b.totalSpent - a.totalSpent);
+
+  if (buyers.length === 0) {
+    Toast.warning('No buyers to export');
+    return;
+  }
+
+  const headers = ['Username', 'First Seen', 'Last Seen', 'Purchases', 'Total Spent', 'Tags', 'Notes'];
+  const rows = [headers.join(',')];
+
+  for (const buyer of buyers) {
+    const row = [
+      buyer.displayName || buyer.username,
+      new Date(buyer.firstSeen).toLocaleDateString(),
+      new Date(buyer.lastSeen).toLocaleDateString(),
+      buyer.totalPurchases,
+      `$${buyer.totalSpent.toFixed(2)}`,
+      `"${(buyer.tags || []).join(', ')}"`,
+      `"${(buyer.notes || '').replace(/"/g, '""')}"`
+    ];
+    rows.push(row.join(','));
+  }
+
+  const csv = rows.join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `buzzchat-buyers-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+
+  URL.revokeObjectURL(url);
+  Toast.success(`Exported ${buyers.length} buyers`);
+}
+
+// Initialize buyer profiles feature
+function initBuyerProfiles() {
+  // Load buyer panel
+  loadBuyerPanel();
+
+  // Refresh button
+  const refreshBtn = document.getElementById('refreshBuyersBtn');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', async () => {
+      Loading.show(refreshBtn);
+      await loadBuyerPanel();
+      Loading.hide(refreshBtn);
+      Toast.success('Buyer list refreshed');
+    });
+  }
+
+  // Export button
+  const exportBtn = document.getElementById('exportBuyersBtn');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', async () => {
+      Loading.show(exportBtn);
+      await exportBuyersCSV();
+      Loading.hide(exportBtn);
+    });
+  }
+
+  // Search button
+  const searchBtn = document.getElementById('searchBuyersBtn');
+  const searchModal = document.getElementById('buyerSearchModal');
+  const closeSearchBtn = document.getElementById('closeBuyerSearchBtn');
+  const searchInput = document.getElementById('buyerSearchInput');
+  const searchResults = document.getElementById('buyerSearchResults');
+
+  if (searchBtn && searchModal) {
+    searchBtn.addEventListener('click', () => {
+      searchModal.classList.add('active');
+      FocusTrap.activate(searchModal);
+      if (searchInput) searchInput.focus();
+    });
+  }
+
+  if (closeSearchBtn && searchModal) {
+    closeSearchBtn.addEventListener('click', () => {
+      searchModal.classList.remove('active');
+      FocusTrap.deactivate();
+    });
+  }
+
+  if (searchInput && searchResults) {
+    searchInput.addEventListener('input', debounce(async () => {
+      const query = searchInput.value.trim();
+      if (query.length < 2) {
+        searchResults.innerHTML = '<p class="help-text">Enter at least 2 characters to search</p>';
+        return;
+      }
+
+      const results = await searchBuyers(query);
+      searchResults.innerHTML = '';
+
+      if (results.length === 0) {
+        searchResults.innerHTML = '<p class="help-text">No buyers found</p>';
+        return;
+      }
+
+      results.forEach(buyer => {
+        const card = createBuyerCard(buyer, (profile) => {
+          searchModal.classList.remove('active');
+          FocusTrap.deactivate();
+          showBuyerDetails(profile);
+        });
+        searchResults.appendChild(card);
+      });
+    }, 300));
+  }
+
+  // Buyer details modal
+  const detailsModal = document.getElementById('buyerDetailsModal');
+  const closeDetailsBtn = document.getElementById('closeBuyerDetailsBtn');
+  const saveNotesBtn = document.getElementById('saveBuyerNotesBtn');
+  const notesInput = document.getElementById('buyerNotesInput');
+
+  if (closeDetailsBtn && detailsModal) {
+    closeDetailsBtn.addEventListener('click', () => {
+      detailsModal.classList.remove('active');
+      FocusTrap.deactivate();
+    });
+  }
+
+  if (saveNotesBtn && notesInput && detailsModal) {
+    saveNotesBtn.addEventListener('click', async () => {
+      const username = notesInput.dataset.username;
+      if (!username) return;
+
+      Loading.show(saveNotesBtn);
+
+      try {
+        const profiles = await getBuyerProfiles();
+        if (profiles[username]) {
+          profiles[username].notes = (notesInput.value || '').slice(0, 500);
+          await saveBuyerProfiles(profiles);
+          Toast.success('Notes saved');
+          await loadBuyerPanel();
+        }
+      } catch (error) {
+        console.error('[BuzzChat] Failed to save notes:', error);
+        Toast.error('Failed to save notes');
+      }
+
+      Loading.hide(saveNotesBtn);
+    });
+  }
+
+  // Close modals on backdrop click
+  if (searchModal) {
+    searchModal.addEventListener('click', (e) => {
+      if (e.target === searchModal) {
+        searchModal.classList.remove('active');
+        FocusTrap.deactivate();
+      }
+    });
+  }
+
+  if (detailsModal) {
+    detailsModal.addEventListener('click', (e) => {
+      if (e.target === detailsModal) {
+        detailsModal.classList.remove('active');
+        FocusTrap.deactivate();
+      }
+    });
   }
 }
 

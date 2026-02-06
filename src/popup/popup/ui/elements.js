@@ -178,7 +178,47 @@ export const elements = {
   quickReplyPosition: null,
   quickReplyButtonsList: null,
   addQuickReplyBtn: null,
-  quickReplyTemplate: null
+  quickReplyTemplate: null,
+
+  // Inventory
+  inventoryList: null,
+  inventoryQuickAdd: null,
+  inventoryQuickAddBtn: null,
+  inventoryStreamSummary: null,
+  inventoryExportBtn: null,
+  inventoryResetSessionBtn: null,
+
+  // Buyer Profiles
+  buyerSection: null,
+  buyerPanel: null,
+  buyerList: null,
+  buyerVipCount: null,
+  buyerTotalCount: null,
+  refreshBuyersBtn: null,
+  exportBuyersBtn: null,
+  searchBuyersBtn: null,
+  buyerDetailsModal: null,
+  closeBuyerDetailsBtn: null,
+  buyerNotesInput: null,
+  saveBuyerNotesBtn: null,
+  buyerSearchModal: null,
+  closeBuyerSearchBtn: null,
+  buyerSearchInput: null,
+  buyerSearchResults: null,
+
+  // Live Dashboard
+  dashboardSection: null,
+  dashboardAlertBadge: null,
+  dashboardStartBtn: null,
+  dashboardEndBtn: null,
+  dashboardUptime: null,
+  dashboardViewers: null,
+  dashboardChatRate: null,
+  dashboardEngagement: null,
+  dashboardRevenue: null,
+  dashboardHotItems: null,
+  dashboardAlerts: null,
+  dashboardClearAlertsBtn: null
 };
 
 // Initialize all element references
@@ -359,4 +399,30 @@ export function initElements() {
   elements.quickReplyButtonsList = document.getElementById('quickReplyButtonsList');
   elements.addQuickReplyBtn = document.getElementById('addQuickReplyBtn');
   elements.quickReplyTemplate = document.getElementById('quickReplyTemplate');
+
+  // Inventory
+  elements.inventoryList = document.getElementById('inventoryList');
+  elements.inventoryQuickAdd = document.getElementById('inventoryQuickAdd');
+  elements.inventoryQuickAddBtn = document.getElementById('inventoryQuickAddBtn');
+  elements.inventoryStreamSummary = document.getElementById('inventoryStreamSummary');
+  elements.inventoryExportBtn = document.getElementById('inventoryExportBtn');
+  elements.inventoryResetSessionBtn = document.getElementById('inventoryResetSessionBtn');
+
+  // Buyer Profiles
+  elements.buyerSection = document.getElementById('buyerSection');
+  elements.buyerPanel = document.getElementById('buyerPanel');
+  elements.buyerList = document.getElementById('buyerList');
+  elements.buyerVipCount = document.getElementById('buyerVipCount');
+  elements.buyerTotalCount = document.getElementById('buyerTotalCount');
+  elements.refreshBuyersBtn = document.getElementById('refreshBuyersBtn');
+  elements.exportBuyersBtn = document.getElementById('exportBuyersBtn');
+  elements.searchBuyersBtn = document.getElementById('searchBuyersBtn');
+  elements.buyerDetailsModal = document.getElementById('buyerDetailsModal');
+  elements.closeBuyerDetailsBtn = document.getElementById('closeBuyerDetailsBtn');
+  elements.buyerNotesInput = document.getElementById('buyerNotesInput');
+  elements.saveBuyerNotesBtn = document.getElementById('saveBuyerNotesBtn');
+  elements.buyerSearchModal = document.getElementById('buyerSearchModal');
+  elements.closeBuyerSearchBtn = document.getElementById('closeBuyerSearchBtn');
+  elements.buyerSearchInput = document.getElementById('buyerSearchInput');
+  elements.buyerSearchResults = document.getElementById('buyerSearchResults');
 }
