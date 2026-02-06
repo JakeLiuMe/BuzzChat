@@ -5,6 +5,7 @@ import { browserAPI } from '../core/config.js';
 import { elements } from '../ui/elements.js';
 import { Toast } from '../ui/toast.js';
 import { getProducts, getSalesSummary } from './inventory.js';
+import { showStreamSummaryModal, startSession as startSummarySession, recordSessionMessage } from './streamSummary.js';
 
 // Storage keys
 const STORAGE_KEYS = {
@@ -93,17 +94,29 @@ export async function startStream(platform = null) {
   await saveDashboard(dashboard);
   await saveAlerts([]);
   
+  // Start summary session tracking
+  startSummarySession();
+  
   return dashboard;
 }
 
 /**
  * End stream session
  */
-export async function endStream() {
+export async function endStream(showSummary = true) {
   const dashboard = await getDashboard();
   dashboard.isLive = false;
   dashboard.lastUpdate = Date.now();
   await saveDashboard(dashboard);
+  
+  // Auto-show stream summary when stream ends
+  if (showSummary) {
+    // Small delay to let the UI update first
+    setTimeout(() => {
+      showStreamSummaryModal(true);
+    }, 500);
+  }
+  
   return dashboard;
 }
 
@@ -135,6 +148,10 @@ export async function recordMessage(message, username, timestamp = Date.now()) {
   
   dashboard.lastUpdate = Date.now();
   await saveDashboard(dashboard);
+  
+  // Track for stream summary - detect if it's a question
+  const isQuestion = /\?|how|what|when|where|why|can|do|does|is|are|will/i.test(message);
+  recordSessionMessage(username, message, isQuestion, false);
   
   return dashboard;
 }

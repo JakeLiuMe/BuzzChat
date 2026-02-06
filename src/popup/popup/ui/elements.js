@@ -229,7 +229,10 @@ export const elements = {
   translationInfo: null,
 
   // Demo Mode
-  demoModeBtn: null
+  demoModeBtn: null,
+
+  // Stream Summary
+  streamSummaryBtn: null
 };
 
 // Initialize all element references
@@ -461,4 +464,7 @@ export function initElements() {
 
   // Demo Mode
   elements.demoModeBtn = document.getElementById('demoModeBtn');
+
+  // Stream Summary
+  elements.streamSummaryBtn = document.getElementById('streamSummaryBtn');
 }

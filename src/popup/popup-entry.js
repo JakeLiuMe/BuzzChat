@@ -33,6 +33,7 @@ import { exportSettings, importSettings, validateSettingsSchema as _validateSett
 import { Onboarding as _Onboarding, checkOnboarding, initOnboardingListeners } from './popup/onboarding.js';
 import { initInventory } from './popup/features/inventory.js';
 import { initDashboard } from './popup/features/dashboard.js';
+import { showStreamSummaryModal, startSession as startSummarySession } from './popup/features/streamSummary.js';
 import { initExportBuyersButton } from './popup/features/exportBuyers.js';
 
 // Initialize on DOMContentLoaded
@@ -450,6 +451,13 @@ function initEventListeners() {
   // Close modals on backdrop click
   setupModalBackdropClose(elements.settingsModal);
   setupModalBackdropClose(elements.upgradeModal);
+
+  // Stream Summary Button
+  if (elements.streamSummaryBtn) {
+    elements.streamSummaryBtn.addEventListener('click', () => {
+      showStreamSummaryModal(false);
+    });
+  }
 }
 
 // Helper to show/hide translation options in UI

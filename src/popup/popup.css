@@ -5915,3 +5915,44 @@ body.dark-mode .translation-confidence-low {
 body.dark-mode .translated-message {
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.12), transparent);
 }
+
+
+/* Stream Summary Button */
+.stream-summary-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.stream-summary-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.stream-summary-btn:active {
+  transform: translateY(0);
+}
+
+.stream-summary-btn .summary-icon {
+  font-size: 14px;
+}
+
+/* Dark mode */
+body.dark-mode .stream-summary-btn {
+  background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%);
+  box-shadow: 0 2px 8px rgba(167, 139, 250, 0.3);
+}
+
+body.dark-mode .stream-summary-btn:hover {
+  box-shadow: 0 4px 12px rgba(167, 139, 250, 0.4);
+}
+
