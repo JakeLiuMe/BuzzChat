@@ -829,6 +829,9 @@
     // Update chat engagement metrics
     updateChatMetrics(username);
 
+    // Forward to live dashboard for tracking
+    forwardToDashboard(username, messageText);
+
     // Check for keyword alerts
     checkKeywordAlerts(messageText, username);
 
@@ -1098,6 +1101,20 @@
         }
       }).catch(err => console.warn('[BuzzChat] Metrics update failed:', err?.message || 'unknown'));
     }
+  }
+
+  // Forward chat message to live dashboard for real-time tracking
+  function forwardToDashboard(username, messageText) {
+    browserAPI.runtime.sendMessage({
+      type: 'DASHBOARD_CHAT_MESSAGE',
+      data: {
+        username,
+        message: messageText,
+        timestamp: Date.now()
+      }
+    }).catch(() => {
+      // Popup may not be open - this is expected, silently ignore
+    });
   }
 
   // Send welcome message

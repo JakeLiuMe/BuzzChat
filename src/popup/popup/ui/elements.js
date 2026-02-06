@@ -425,4 +425,18 @@ export function initElements() {
   elements.closeBuyerSearchBtn = document.getElementById('closeBuyerSearchBtn');
   elements.buyerSearchInput = document.getElementById('buyerSearchInput');
   elements.buyerSearchResults = document.getElementById('buyerSearchResults');
+
+  // Live Dashboard
+  elements.dashboardSection = document.getElementById('dashboardSection');
+  elements.dashboardAlertBadge = document.getElementById('dashboardAlertBadge');
+  elements.dashboardStartBtn = document.getElementById('dashboardStartBtn');
+  elements.dashboardEndBtn = document.getElementById('dashboardEndBtn');
+  elements.dashboardUptime = document.getElementById('dashboardUptime');
+  elements.dashboardViewers = document.getElementById('dashboardViewers');
+  elements.dashboardChatRate = document.getElementById('dashboardChatRate');
+  elements.dashboardEngagement = document.getElementById('dashboardEngagement');
+  elements.dashboardRevenue = document.getElementById('dashboardRevenue');
+  elements.dashboardHotItems = document.getElementById('dashboardHotItems');
+  elements.dashboardAlerts = document.getElementById('dashboardAlerts');
+  elements.dashboardClearAlertsBtn = document.getElementById('dashboardClearAlertsBtn');
 }

@@ -32,6 +32,7 @@ import {
 import { exportSettings, importSettings, validateSettingsSchema as _validateSettingsSchema } from './popup/settings/importExport.js';
 import { Onboarding as _Onboarding, checkOnboarding, initOnboardingListeners } from './popup/onboarding.js';
 import { initInventory } from './popup/features/inventory.js';
+import { initDashboard } from './popup/features/dashboard.js';
 
 // Initialize on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', async () => {
@@ -52,6 +53,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initialize inventory
   initInventory();
+
+  // Initialize live dashboard
+  initDashboard();
 
   // Check onboarding
   checkOnboarding();

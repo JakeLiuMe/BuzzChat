@@ -172,6 +172,30 @@ export async function markSold(productId, buyerUsername = null) {
   await saveProducts(products);
   await saveSession(session);
   
+  // Notify dashboard of sale
+  browserAPI.runtime.sendMessage({
+    type: 'DASHBOARD_SOLD',
+    data: {
+      productId: product.id,
+      productName: product.name,
+      price: product.price,
+      buyer: buyerUsername,
+      remainingQty: product.quantity
+    }
+  }).catch(() => {}); // Popup may not be open
+  
+  // Check for low stock alert
+  if (product.quantity > 0 && product.quantity <= 2) {
+    browserAPI.runtime.sendMessage({
+      type: 'DASHBOARD_LOW_STOCK',
+      data: {
+        productId: product.id,
+        productName: product.name,
+        quantity: product.quantity
+      }
+    }).catch(() => {});
+  }
+  
   Toast.success(`🛒 SOLD: ${product.name} - $${product.price.toFixed(2)}`);
   
   return { product, session };
@@ -350,6 +374,191 @@ export async function matchProductMention(message) {
   return null;
 }
 
+/**
+ * Render inventory list in popup
+ */
+export async function renderInventoryList() {
+  const container = document.getElementById('inventoryList');
+  if (!container) return;
+  
+  const products = await getProducts();
+  
+  // Clear container
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
+  
+  if (products.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state-inline';
+    empty.innerHTML = `
+      <span class="empty-icon">📦</span>
+      <p class="empty-entries">No products yet!</p>
+      <p class="empty-hint">Quick add: "Jordan 4, $180, 3"</p>
+    `;
+    container.appendChild(empty);
+    return;
+  }
+  
+  for (const product of products) {
+    const item = document.createElement('div');
+    const statusClass = product.quantity === 0 ? 'sold' : product.quantity <= 2 ? 'low' : 'ok';
+    item.className = `inventory-item status-${statusClass}`;
+    item.dataset.productId = product.id;
+    
+    const info = document.createElement('div');
+    info.className = 'inventory-info';
+    
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'inventory-name';
+    nameSpan.textContent = product.name;
+    
+    const priceSpan = document.createElement('span');
+    priceSpan.className = 'inventory-price';
+    priceSpan.textContent = `$${product.price.toFixed(2)}`;
+    
+    const qtySpan = document.createElement('span');
+    qtySpan.className = 'inventory-qty';
+    qtySpan.textContent = `× ${product.quantity}`;
+    
+    const badge = document.createElement('span');
+    const statusInfo = getStatusBadge(product);
+    badge.className = `inventory-badge badge-${statusClass}`;
+    badge.textContent = statusClass.toUpperCase();
+    
+    info.appendChild(nameSpan);
+    info.appendChild(priceSpan);
+    info.appendChild(qtySpan);
+    info.appendChild(badge);
+    
+    // Actions
+    const actions = document.createElement('div');
+    actions.className = 'inventory-actions';
+    
+    const minusBtn = document.createElement('button');
+    minusBtn.className = 'btn btn-sm btn-secondary';
+    minusBtn.textContent = '−';
+    minusBtn.title = 'Decrease quantity';
+    minusBtn.onclick = async () => {
+      await updateQuantity(product.id, -1);
+      renderInventoryList();
+      updateStreamSummary();
+    };
+    
+    const plusBtn = document.createElement('button');
+    plusBtn.className = 'btn btn-sm btn-secondary';
+    plusBtn.textContent = '+';
+    plusBtn.title = 'Increase quantity';
+    plusBtn.onclick = async () => {
+      await updateQuantity(product.id, 1);
+      renderInventoryList();
+      updateStreamSummary();
+    };
+    
+    const soldBtn = document.createElement('button');
+    soldBtn.className = 'btn btn-sm btn-primary';
+    soldBtn.textContent = 'SOLD';
+    soldBtn.title = 'Mark as sold';
+    soldBtn.disabled = product.quantity === 0;
+    soldBtn.onclick = async () => {
+      await markSold(product.id);
+      renderInventoryList();
+      updateStreamSummary();
+    };
+    
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'btn btn-sm btn-danger';
+    deleteBtn.textContent = '🗑️';
+    deleteBtn.title = 'Delete product';
+    deleteBtn.onclick = async () => {
+      if (confirm(`Delete "${product.name}"?`)) {
+        await deleteProduct(product.id);
+        renderInventoryList();
+        updateStreamSummary();
+      }
+    };
+    
+    actions.appendChild(minusBtn);
+    actions.appendChild(plusBtn);
+    actions.appendChild(soldBtn);
+    actions.appendChild(deleteBtn);
+    
+    item.appendChild(info);
+    item.appendChild(actions);
+    container.appendChild(item);
+  }
+}
+
+/**
+ * Update stream summary display
+ */
+export async function updateStreamSummary() {
+  const summary = document.getElementById('inventoryStreamSummary');
+  if (!summary) return;
+  
+  const data = await getSalesSummary();
+  summary.textContent = `This stream: ${data.totalSold} sold • $${data.totalRevenue.toFixed(2)} estimated`;
+}
+
+/**
+ * Initialize inventory UI and event handlers
+ */
+export async function initInventory() {
+  // Render initial list
+  await renderInventoryList();
+  await updateStreamSummary();
+  
+  // Quick-add handler
+  const quickAddInput = document.getElementById('inventoryQuickAdd');
+  const quickAddBtn = document.getElementById('inventoryQuickAddBtn');
+  
+  if (quickAddInput && quickAddBtn) {
+    const handleQuickAdd = async () => {
+      const input = quickAddInput.value.trim();
+      if (!input) return;
+      
+      const parsed = parseQuickAdd(input);
+      if (parsed) {
+        await addProduct(parsed.name, parsed.price, parsed.quantity);
+        quickAddInput.value = '';
+        await renderInventoryList();
+        await updateStreamSummary();
+        Toast.success(`Added: ${parsed.name}`);
+      } else {
+        Toast.warning('Format: "Product name, $price, qty"');
+      }
+    };
+    
+    quickAddBtn.addEventListener('click', handleQuickAdd);
+    quickAddInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleQuickAdd();
+      }
+    });
+  }
+  
+  // Export button
+  const exportBtn = document.getElementById('inventoryExportBtn');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', async () => {
+      const csv = await exportToCSV();
+      const date = new Date().toISOString().split('T')[0];
+      downloadCSV(csv, `buzzchat-inventory-${date}.csv`);
+      Toast.success('Inventory exported!');
+    });
+  }
+  
+  // Reset session button
+  const resetBtn = document.getElementById('inventoryResetSessionBtn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', async () => {
+      await resetSession();
+      await updateStreamSummary();
+    });
+  }
+}
+
 // Export for use in other modules
 export default {
   parseQuickAdd,
@@ -368,5 +577,8 @@ export default {
   getStatusBadge,
   detectPurchaseIntent,
   matchProductMention,
-  getSession
+  getSession,
+  renderInventoryList,
+  updateStreamSummary,
+  initInventory
 };
