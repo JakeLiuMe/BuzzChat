@@ -81,6 +81,16 @@ export const DEFAULT_SETTINGS = {
     autoWaitlistOffer: true, // Auto-offer waitlist for sold-out items
     fomoAnnouncements: false // Auto-announce when items sell out
   },
+  soldOutAnnouncer: {
+    enabled: false,
+    selectedTemplates: ['fire', 'lightning', 'rocket'], // Template IDs to use
+    rotateTemplates: true, // Rotate vs random selection
+    customTemplates: [], // User-created templates
+    showWaitlistCount: true, // Include waitlist count in announcements
+    showMissedCount: true, // Include "X people missed out" messaging
+    announcementDelay: 2, // Seconds to wait after sellout before announcing
+    cooldown: 10 // Minimum seconds between announcements
+  },
   translation: {
     enabled: false,
     showOriginal: true,
