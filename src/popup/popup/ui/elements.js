@@ -218,7 +218,10 @@ export const elements = {
   dashboardRevenue: null,
   dashboardHotItems: null,
   dashboardAlerts: null,
-  dashboardClearAlertsBtn: null
+  dashboardClearAlertsBtn: null,
+
+  // Demo Mode
+  demoModeBtn: null
 };
 
 // Initialize all element references
@@ -439,4 +442,7 @@ export function initElements() {
   elements.dashboardHotItems = document.getElementById('dashboardHotItems');
   elements.dashboardAlerts = document.getElementById('dashboardAlerts');
   elements.dashboardClearAlertsBtn = document.getElementById('dashboardClearAlertsBtn');
+
+  // Demo Mode
+  elements.demoModeBtn = document.getElementById('demoModeBtn');
 }

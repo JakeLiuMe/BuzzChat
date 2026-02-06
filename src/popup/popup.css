@@ -5556,3 +5556,108 @@ body {
     text-align: center;
   }
 }
+
+/* ============================================
+   Demo Mode Styles
+   ============================================ */
+
+/* Demo Mode Button in Dashboard Controls */
+.demo-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.demo-mode-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.demo-mode-btn:active {
+  transform: translateY(0);
+}
+
+.demo-mode-btn .demo-icon {
+  font-size: 14px;
+}
+
+/* Demo Banner */
+.demo-banner {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  margin: var(--space-sm) var(--space-md);
+  animation: demoPulse 2s ease-in-out infinite;
+}
+
+.demo-banner.visible {
+  display: flex;
+}
+
+.demo-banner-icon {
+  font-size: 16px;
+}
+
+.demo-banner-text {
+  flex: 1;
+}
+
+.demo-banner-stop {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: white !important;
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.demo-banner-stop:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+@keyframes demoPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+/* Demo message indicator for Smart Queue */
+.demo-message-indicator {
+  display: inline-block;
+  padding: 2px 6px;
+  background: rgba(102, 126, 234, 0.15);
+  color: #667eea;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  margin-left: 6px;
+  text-transform: uppercase;
+}
+
+/* Dark mode support for demo elements */
+body.dark-mode .demo-banner {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .demo-message-indicator {
+  background: rgba(102, 126, 234, 0.25);
+  color: #a5b4fc;
+}

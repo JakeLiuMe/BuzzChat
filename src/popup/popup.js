@@ -1316,6 +1316,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   init10x10Features(); // 10/10 Features initialization
   initReferral();
   initBuyerProfiles(); // Buyer profiles feature
+  initDemoMode(); // Demo mode feature
   checkOnboarding();
   ConfirmDialog.init(); // Initialize confirmation dialog
 
@@ -5609,4 +5610,617 @@ function formatAccountDate(timestamp) {
   if (diff < 604800000) return `${Math.floor(diff / 86400000)} days ago`;
 
   return date.toLocaleDateString();
+}
+
+// ============================================
+// Demo Mode - Interactive demo without live stream
+// ============================================
+
+const DemoMode = {
+  active: false,
+  messageIntervalId: null,
+  viewerIntervalId: null,
+  viewerCount: 0,
+  
+  // Demo Message Pool
+  MESSAGES: [
+    // Greetings
+    { user: 'sneaker_fan_22', text: 'Hey everyone! First time here 👋', type: 'greeting' },
+    { user: 'repeat_buyer', text: 'Back again! Love this store', type: 'greeting' },
+    { user: 'live_shopper', text: 'Just got here, what did I miss?', type: 'greeting' },
+    { user: 'collector_joe', text: 'Yo! Hyped for tonight 🔥', type: 'greeting' },
+    { user: 'newbie_viewer', text: 'Hi everyone, first live sale for me!', type: 'greeting' },
+    { user: 'night_owl_23', text: 'Late night crew checking in 🦉', type: 'greeting' },
+    
+    // Questions about products
+    { user: 'collector_mike', text: 'How much for the Jordans?', type: 'question', triggers: ['price', 'how much'] },
+    { user: 'newbie_123', text: 'Do you ship to Canada?', type: 'question', triggers: ['shipping', 'ship'] },
+    { user: 'curious_cat', text: 'What size are those?', type: 'question', triggers: ['size'] },
+    { user: 'first_timer', text: 'How do I pay?', type: 'question', triggers: ['payment', 'pay'] },
+    { user: 'savvy_shopper', text: 'Any bundle deals?', type: 'question', triggers: ['bundle', 'deal'] },
+    { user: 'detail_queen', text: 'Is that authentic?', type: 'question', triggers: ['authentic', 'real'] },
+    { user: 'careful_buyer', text: 'Can I see more pics?', type: 'question', triggers: ['pics', 'photos'] },
+    { user: 'practical_paul', text: 'How long is shipping?', type: 'question', triggers: ['shipping', 'ship'] },
+    { user: 'returnsCheckr', text: 'What\'s your return policy?', type: 'question', triggers: ['returns', 'refund'] },
+    { user: 'condition_checker', text: 'Any flaws on this one?', type: 'question', triggers: ['condition', 'flaws'] },
+    
+    // Purchase Intent (SOLD signals)
+    { user: 'sarah_buys', text: 'SOLD on the dunks! 🔥', type: 'sold' },
+    { user: 'fast_bidder', text: 'I\'ll take it!', type: 'sold' },
+    { user: 'impulse_buyer', text: 'Mine! Claiming this one', type: 'sold' },
+    { user: 'serious_collector', text: 'SOLD! Don\'t skip me!', type: 'sold' },
+    { user: 'quick_draw', text: 'Sold sold sold!!!', type: 'sold' },
+    { user: 'sneaker_addict', text: 'claiming the 11s!', type: 'sold' },
+    { user: 'must_have_it', text: 'I need those, SOLD!', type: 'sold' },
+    { user: 'no_hesitation', text: 'Take my money! 💵', type: 'sold' },
+    
+    // Hype & Reactions
+    { user: 'hype_beast', text: 'These are fire 🔥🔥🔥', type: 'hype' },
+    { user: 'excitedFan', text: '🔥🔥🔥🔥🔥', type: 'hype' },
+    { user: 'energy_emma', text: 'LET\'S GOOO!!!', type: 'hype' },
+    { user: 'vibes_only', text: 'The energy tonight is crazy!', type: 'hype' },
+    { user: 'real_recognize', text: 'This stream is 🔥', type: 'hype' },
+    { user: 'hype_train', text: 'W STREAM 🏆', type: 'hype' },
+    { user: 'excited_eric', text: 'Best stream of the week!', type: 'hype' },
+    { user: 'love_this', text: '❤️❤️❤️ amazing!', type: 'hype' },
+    
+    // Price & Deal Focused
+    { user: 'bargain_hunter', text: 'Any deals today?', type: 'question', triggers: ['deals'] },
+    { user: 'deal_seeker', text: 'Can you do $50?', type: 'question' },
+    { user: 'budget_buyer', text: 'That\'s a steal!', type: 'hype' },
+    { user: 'value_queen', text: 'Great price 👏', type: 'hype' },
+    { user: 'penny_pincher', text: 'Any discount for multiple?', type: 'question', triggers: ['discount'] },
+    
+    // Specific Product Mentions
+    { user: 'jordans_lover', text: 'Need those Jordans in my life!', type: 'mention', product: 'Jordan' },
+    { user: 'dunk_collector', text: 'Those dunks are clean!', type: 'mention', product: 'Dunk' },
+    { user: 'vintage_vince', text: 'The vintage tee is sick', type: 'mention', product: 'Vintage' },
+    { user: 'hoodie_hunter', text: 'That hoodie goes hard', type: 'mention', product: 'Hoodie' },
+    
+    // Social / Engagement
+    { user: 'social_butterfly', text: 'Just shared this to my story!', type: 'social' },
+    { user: 'supporter', text: 'Keep up the great streams!', type: 'social' },
+    { user: 'regular_ray', text: 'Always here for these drops', type: 'social' },
+    { user: 'community_carl', text: 'Love this community ❤️', type: 'social' },
+    
+    // Giveaway Interest
+    { user: 'giveaway_greg', text: 'entered!', type: 'giveaway' },
+    { user: 'lucky_lucy', text: 'ENTERED 🍀', type: 'giveaway' },
+    { user: 'hopeful_hannah', text: 'entry please!', type: 'giveaway' },
+    { user: 'contest_king', text: 'Entering for the giveaway!', type: 'giveaway' },
+  ],
+  
+  // Demo Products
+  PRODUCTS: [
+    { name: 'Jordan 4 Retro', price: 220, quantity: 3 },
+    { name: 'Nike Dunk Low', price: 130, quantity: 5 },
+    { name: 'Vintage Band Tee', price: 45, quantity: 8 },
+    { name: 'Supreme Hoodie', price: 180, quantity: 2 },
+    { name: 'Yeezy 350', price: 280, quantity: 1 },
+  ],
+  
+  isActive() {
+    return this.active;
+  },
+  
+  async start() {
+    if (this.active) {
+      Toast.warning('Demo mode is already running!');
+      return;
+    }
+    
+    this.active = true;
+    this.viewerCount = Math.floor(Math.random() * 50) + 25; // 25-75 initial viewers
+    
+    // Show demo banner
+    this.showBanner();
+    
+    // Load demo products if inventory is empty
+    await this.loadProducts();
+    
+    // Start simulated message stream
+    this.startMessageSimulation();
+    
+    // Start viewer count fluctuation
+    this.startViewerSimulation();
+    
+    // Update dashboard viewer count
+    if (elements.dashboardViewers) {
+      elements.dashboardViewers.textContent = this.viewerCount.toLocaleString();
+    }
+    
+    Toast.success('🎮 Demo Mode Started! Watch the magic happen.');
+    console.log('[BuzzChat Demo] Demo mode started');
+  },
+  
+  async stop() {
+    if (!this.active) return;
+    
+    this.active = false;
+    
+    // Clear intervals
+    if (this.messageIntervalId) {
+      clearTimeout(this.messageIntervalId);
+      this.messageIntervalId = null;
+    }
+    
+    if (this.viewerIntervalId) {
+      clearInterval(this.viewerIntervalId);
+      this.viewerIntervalId = null;
+    }
+    
+    // Hide demo banner
+    this.hideBanner();
+    
+    // Reset viewer count
+    if (elements.dashboardViewers) {
+      elements.dashboardViewers.textContent = '0';
+    }
+    
+    Toast.info('Demo mode ended. Try it on a real stream!');
+    console.log('[BuzzChat Demo] Demo mode stopped');
+  },
+  
+  async toggle() {
+    if (this.active) {
+      await this.stop();
+    } else {
+      await this.start();
+    }
+  },
+  
+  startMessageSimulation() {
+    // Send first message quickly
+    setTimeout(() => this.simulateMessage(), 1000);
+    
+    // Schedule more messages
+    this.scheduleNextMessage();
+  },
+  
+  scheduleNextMessage() {
+    if (!this.active) return;
+    
+    // Random interval between 2-5 seconds
+    const delay = Math.floor(Math.random() * 3000) + 2000;
+    
+    this.messageIntervalId = setTimeout(() => {
+      if (this.active) {
+        this.simulateMessage();
+        this.scheduleNextMessage();
+      }
+    }, delay);
+  },
+  
+  async simulateMessage() {
+    if (!this.active) return;
+    
+    // Pick a random message
+    const message = this.getRandomMessage();
+    const timestamp = Date.now();
+    
+    console.log(`[BuzzChat Demo] ${message.user}: ${message.text}`);
+    
+    // Dispatch event for listeners (dashboard, analytics, etc.)
+    this.dispatchMessage(message, timestamp);
+    
+    // Update chat rate display
+    this.updateChatRate();
+    
+    // Handle SOLD messages
+    if (message.type === 'sold') {
+      await this.handleSold(message);
+    }
+    
+    // Handle FAQ triggers
+    if (message.triggers && settings.faq?.enabled) {
+      this.handleFaqTrigger(message);
+    }
+    
+    // Handle giveaway entries
+    if (message.type === 'giveaway' && settings.giveaway?.enabled) {
+      this.handleGiveawayEntry(message);
+    }
+    
+    // Handle product mentions
+    if (message.product) {
+      this.handleProductMention(message.product);
+    }
+    
+    // Occasionally trigger special events (10% chance)
+    if (Math.random() < 0.1) {
+      this.triggerRandomEvent(message);
+    }
+  },
+  
+  getRandomMessage() {
+    // Weighted distribution for more realistic chat
+    const weights = {
+      question: 0.30,
+      hype: 0.25,
+      sold: 0.20,
+      greeting: 0.15,
+      mention: 0.05,
+      social: 0.03,
+      giveaway: 0.02
+    };
+    
+    const roll = Math.random();
+    let cumulative = 0;
+    let selectedType = 'hype';
+    
+    for (const [type, weight] of Object.entries(weights)) {
+      cumulative += weight;
+      if (roll < cumulative) {
+        selectedType = type;
+        break;
+      }
+    }
+    
+    const typeMessages = this.MESSAGES.filter(m => m.type === selectedType);
+    
+    if (typeMessages.length === 0) {
+      return this.MESSAGES[Math.floor(Math.random() * this.MESSAGES.length)];
+    }
+    
+    return typeMessages[Math.floor(Math.random() * typeMessages.length)];
+  },
+  
+  async handleSold(message) {
+    // Try to mark a product as sold
+    const products = this.demoProducts || [];
+    const availableProducts = products.filter(p => p.quantity > 0);
+    
+    if (availableProducts.length > 0) {
+      const product = availableProducts[Math.floor(Math.random() * availableProducts.length)];
+      product.quantity--;
+      
+      Toast.success(`🛒 SOLD: ${product.name} - $${product.price.toFixed(2)} to ${message.user}`);
+      
+      // Update revenue display
+      this.updateRevenue(product.price);
+      
+      // Check for low stock
+      if (product.quantity > 0 && product.quantity <= 2) {
+        Toast.warning(`⚠️ Low stock: "${product.name}" (${product.quantity} left)`);
+      }
+      
+      // Refresh inventory display if it exists
+      const inventoryList = document.getElementById('inventoryList');
+      if (inventoryList) {
+        this.renderInventory();
+      }
+    }
+  },
+  
+  handleFaqTrigger(message) {
+    const rules = settings.faq?.rules || [];
+    
+    for (const rule of rules) {
+      if (!rule.triggers || !rule.reply) continue;
+      
+      const messageLower = message.text.toLowerCase();
+      const matched = rule.triggers.some(trigger => 
+        messageLower.includes(trigger.toLowerCase())
+      );
+      
+      if (matched) {
+        console.log(`[BuzzChat Demo] FAQ Auto-reply: "${rule.reply}"`);
+        Toast.info(`📝 FAQ replied to @${message.user}`);
+        break;
+      }
+    }
+  },
+  
+  handleGiveawayEntry(message) {
+    console.log(`[BuzzChat Demo] Giveaway entry: ${message.user}`);
+    
+    // Update entry count if element exists
+    if (elements.giveawayEntryCount) {
+      const current = parseInt(elements.giveawayEntryCount.textContent) || 0;
+      elements.giveawayEntryCount.textContent = (current + 1).toString();
+    }
+  },
+  
+  handleProductMention(productName) {
+    console.log(`[BuzzChat Demo] Product mentioned: ${productName}`);
+    
+    // Update hot items display
+    const hotItems = document.getElementById('dashboardHotItems');
+    if (hotItems) {
+      const emptyState = hotItems.querySelector('.empty-state-inline');
+      if (emptyState) {
+        hotItems.innerHTML = '';
+      }
+      
+      // Add or update product mention
+      let itemEl = hotItems.querySelector(`[data-product="${productName}"]`);
+      if (!itemEl) {
+        itemEl = document.createElement('div');
+        itemEl.className = 'hot-item';
+        itemEl.dataset.product = productName;
+        itemEl.innerHTML = `
+          <span class="hot-item-rank">#1</span>
+          <span class="hot-item-name">${productName}</span>
+          <span class="hot-item-count">1 mentions</span>
+        `;
+        hotItems.appendChild(itemEl);
+      } else {
+        const countEl = itemEl.querySelector('.hot-item-count');
+        const count = parseInt(countEl.textContent) + 1;
+        countEl.textContent = `${count} mentions`;
+      }
+    }
+  },
+  
+  triggerRandomEvent(message) {
+    const events = [
+      () => Toast.info(`🌟 VIP ${message.user} joined the stream!`),
+      () => Toast.info(`🔥 Chat is heating up!`),
+      () => Toast.info(`📈 Engagement level: HIGH`)
+    ];
+    
+    const event = events[Math.floor(Math.random() * events.length)];
+    event();
+  },
+  
+  startViewerSimulation() {
+    this.viewerIntervalId = setInterval(() => {
+      if (!this.active) return;
+      
+      // Fluctuate viewer count by -5 to +10
+      const change = Math.floor(Math.random() * 16) - 5;
+      this.viewerCount = Math.max(10, this.viewerCount + change);
+      
+      if (elements.dashboardViewers) {
+        elements.dashboardViewers.textContent = this.viewerCount.toLocaleString();
+      }
+    }, 8000);
+  },
+  
+  dispatchMessage(message, timestamp) {
+    // Dispatch DOM event for listeners
+    const event = new CustomEvent('buzzchat:demo-message', {
+      detail: {
+        username: message.user,
+        message: message.text,
+        timestamp,
+        type: message.type
+      }
+    });
+    document.dispatchEvent(event);
+    
+    // Also try runtime message for background
+    try {
+      browserAPI.runtime.sendMessage({
+        type: 'DEMO_CHAT_MESSAGE',
+        data: {
+          username: message.user,
+          message: message.text,
+          timestamp,
+          isDemo: true,
+          messageType: message.type
+        }
+      }).catch(() => {});
+    } catch (e) {}
+  },
+  
+  updateChatRate() {
+    if (elements.dashboardChatRate) {
+      // Simulate chat rate between 2-15 messages per minute
+      const rate = (Math.random() * 13 + 2).toFixed(1);
+      elements.dashboardChatRate.textContent = rate;
+      
+      // Update engagement indicator
+      if (elements.dashboardEngagement) {
+        const rateNum = parseFloat(rate);
+        if (rateNum > 10) {
+          elements.dashboardEngagement.textContent = '🔥';
+          elements.dashboardEngagement.className = 'engagement-indicator engagement-high';
+        } else if (rateNum > 5) {
+          elements.dashboardEngagement.textContent = '⚡';
+          elements.dashboardEngagement.className = 'engagement-indicator engagement-medium';
+        } else {
+          elements.dashboardEngagement.textContent = '📊';
+          elements.dashboardEngagement.className = 'engagement-indicator engagement-low';
+        }
+      }
+    }
+  },
+  
+  updateRevenue(amount) {
+    if (elements.dashboardRevenue) {
+      const currentText = elements.dashboardRevenue.textContent || '$0.00';
+      const current = parseFloat(currentText.replace('$', '')) || 0;
+      elements.dashboardRevenue.textContent = `$${(current + amount).toFixed(2)}`;
+    }
+  },
+  
+  async loadProducts() {
+    // Check if inventory list exists and is empty
+    const inventoryList = document.getElementById('inventoryList');
+    if (inventoryList) {
+      const isEmpty = inventoryList.querySelector('.empty-state-inline') !== null;
+      
+      if (isEmpty) {
+        this.demoProducts = this.PRODUCTS.map(p => ({ ...p }));
+        this.renderInventory();
+        Toast.info('📦 Demo products loaded!');
+      } else {
+        // Use existing products from display
+        this.demoProducts = this.PRODUCTS.map(p => ({ ...p }));
+      }
+    } else {
+      this.demoProducts = this.PRODUCTS.map(p => ({ ...p }));
+    }
+  },
+  
+  renderInventory() {
+    const container = document.getElementById('inventoryList');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    for (const product of this.demoProducts) {
+      const statusClass = product.quantity === 0 ? 'sold' : product.quantity <= 2 ? 'low' : 'ok';
+      const item = document.createElement('div');
+      item.className = `inventory-item status-${statusClass}`;
+      item.innerHTML = `
+        <div class="inventory-info">
+          <span class="inventory-name">${product.name}</span>
+          <span class="inventory-price">$${product.price.toFixed(2)}</span>
+          <span class="inventory-qty">× ${product.quantity}</span>
+          <span class="inventory-badge badge-${statusClass}">${statusClass.toUpperCase()}</span>
+        </div>
+        <div class="inventory-actions">
+          <button class="btn btn-sm btn-secondary" disabled>−</button>
+          <button class="btn btn-sm btn-secondary" disabled>+</button>
+          <button class="btn btn-sm btn-primary" disabled>SOLD</button>
+          <button class="btn btn-sm btn-danger" disabled>🗑️</button>
+        </div>
+      `;
+      container.appendChild(item);
+    }
+    
+    // Update stream summary
+    const summary = document.getElementById('inventoryStreamSummary');
+    if (summary) {
+      const totalSold = this.PRODUCTS.reduce((sum, p) => sum + p.quantity, 0) - 
+                       this.demoProducts.reduce((sum, p) => sum + p.quantity, 0);
+      const revenue = this.PRODUCTS.reduce((sum, p, i) => {
+        const sold = p.quantity - this.demoProducts[i].quantity;
+        return sum + (sold * p.price);
+      }, 0);
+      summary.textContent = `This stream: ${totalSold} sold • $${revenue.toFixed(2)} estimated`;
+    }
+  },
+  
+  showBanner() {
+    let banner = document.getElementById('demoBanner');
+    
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'demoBanner';
+      banner.className = 'demo-banner';
+      banner.innerHTML = `
+        <span class="demo-banner-icon">🎮</span>
+        <span class="demo-banner-text">Demo Mode Active</span>
+        <button id="stopDemoBtn" class="btn btn-sm btn-secondary demo-banner-stop">Stop</button>
+      `;
+      
+      // Insert after header
+      const header = document.querySelector('.header');
+      if (header && header.nextSibling) {
+        header.parentNode.insertBefore(banner, header.nextSibling);
+      } else {
+        const container = document.querySelector('.container');
+        if (container) {
+          container.insertBefore(banner, container.firstChild);
+        }
+      }
+      
+      // Add stop button listener
+      document.getElementById('stopDemoBtn')?.addEventListener('click', () => this.stop());
+    }
+    
+    banner.classList.add('visible');
+    
+    // Inject styles if not present
+    this.injectStyles();
+  },
+  
+  hideBanner() {
+    const banner = document.getElementById('demoBanner');
+    if (banner) {
+      banner.classList.remove('visible');
+      setTimeout(() => banner.remove(), 300);
+    }
+  },
+  
+  injectStyles() {
+    if (document.getElementById('demoModeStyles')) return;
+    
+    const styles = document.createElement('style');
+    styles.id = 'demoModeStyles';
+    styles.textContent = `
+      .demo-banner {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 8px;
+        margin: 8px 12px;
+        animation: demoPulse 2s ease-in-out infinite;
+      }
+      
+      .demo-banner.visible {
+        display: flex;
+      }
+      
+      .demo-banner-icon {
+        font-size: 16px;
+      }
+      
+      .demo-banner-text {
+        flex: 1;
+      }
+      
+      .demo-banner-stop {
+        background: rgba(255, 255, 255, 0.2) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: white !important;
+        padding: 4px 12px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+      
+      .demo-banner-stop:hover {
+        background: rgba(255, 255, 255, 0.3) !important;
+      }
+      
+      @keyframes demoPulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.85; }
+      }
+      
+      .demo-mode-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        border: none !important;
+      }
+      
+      .demo-mode-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+    `;
+    
+    document.head.appendChild(styles);
+  }
+};
+
+// Initialize demo mode
+function initDemoMode() {
+  // Add click listener to demo button
+  const demoBtn = document.getElementById('demoModeBtn');
+  if (demoBtn) {
+    demoBtn.addEventListener('click', () => DemoMode.toggle());
+  }
+  
+  // Keyboard shortcut: Ctrl+Shift+D
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+      e.preventDefault();
+      DemoMode.toggle();
+    }
+  });
+  
+  // Inject styles
+  DemoMode.injectStyles();
+  
+  console.log('[BuzzChat] Demo mode initialized');
 }
