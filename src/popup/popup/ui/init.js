@@ -12,6 +12,7 @@ import { renderQuickReplyButtons, initQuickReplyPosition } from '../features/qui
 import { loadGiveawayData, loadChatMetrics } from '../features/giveaway.js';
 import { initAnalytics } from '../features/analytics.js';
 import { initBusinessFeatures } from './businessUI.js';
+import { initTemplatePacks } from '../features/templatePacks.js';
 
 // Initialize UI with current settings
 export function initUI() {
@@ -34,6 +35,9 @@ export function initUI() {
   // FAQ
   elements.faqToggle.checked = settings.faq.enabled;
   renderFaqRules();
+
+  // Template Packs (add button to FAQ tab)
+  initTemplatePacks();
 
   // Templates
   renderTemplates();
