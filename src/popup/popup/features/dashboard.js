@@ -2,6 +2,9 @@
 // Real-time stream intelligence and metrics
 
 import { browserAPI } from '../core/config.js';
+import { elements } from '../ui/elements.js';
+import { Toast } from '../ui/toast.js';
+import { getProducts, getSalesSummary } from './inventory.js';
 
 // Storage keys
 const STORAGE_KEYS = {
@@ -353,6 +356,305 @@ export function formatChatRate(rate) {
 // Alert type helpers
 export { ALERT_TYPES };
 
+// ============================================
+// UI Initialization & Message Listener
+// ============================================
+
+let updateIntervalId = null;
+
+/**
+ * Render dashboard stats to UI
+ */
+async function renderDashboardStats() {
+  const stats = await getDashboardStats();
+  
+  // Update viewers
+  if (elements.dashboardViewers) {
+    elements.dashboardViewers.textContent = stats.viewers.toLocaleString();
+  }
+  
+  // Update chat rate
+  if (elements.dashboardChatRate) {
+    elements.dashboardChatRate.textContent = stats.chatRate.toFixed(1);
+  }
+  
+  // Update engagement
+  if (elements.dashboardEngagement) {
+    elements.dashboardEngagement.textContent = getEngagementEmoji(stats.engagement);
+    elements.dashboardEngagement.className = `engagement-indicator engagement-${stats.engagement}`;
+    elements.dashboardEngagement.title = `Engagement: ${stats.engagement}`;
+  }
+  
+  // Update revenue
+  if (elements.dashboardRevenue) {
+    elements.dashboardRevenue.textContent = `$${stats.estimatedSales.toFixed(2)}`;
+  }
+  
+  // Update uptime
+  if (elements.dashboardUptime && stats.isLive) {
+    const mins = Math.floor(stats.streamDuration / 60000);
+    const hrs = Math.floor(mins / 60);
+    const m = mins % 60;
+    elements.dashboardUptime.textContent = hrs > 0 ? `${hrs}h ${m}m` : `${m}m`;
+  }
+  
+  // Update alert badge
+  if (elements.dashboardAlertBadge) {
+    elements.dashboardAlertBadge.textContent = stats.alertCount.toString();
+    elements.dashboardAlertBadge.style.display = stats.alertCount > 0 ? 'inline-flex' : 'none';
+  }
+}
+
+/**
+ * Render hot items section
+ */
+async function renderHotItems() {
+  const container = elements.dashboardHotItems;
+  if (!container) return;
+  
+  // Clear container
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
+  
+  const hotItems = await getHotItems(5);
+  
+  if (hotItems.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state-inline';
+    empty.innerHTML = `
+      <span class="empty-icon">🔥</span>
+      <p class="empty-entries">No trending items yet</p>
+    `;
+    container.appendChild(empty);
+    return;
+  }
+  
+  hotItems.forEach((item, index) => {
+    const itemEl = document.createElement('div');
+    itemEl.className = 'hot-item';
+    
+    const rank = document.createElement('span');
+    rank.className = 'hot-item-rank';
+    rank.textContent = `#${index + 1}`;
+    
+    const name = document.createElement('span');
+    name.className = 'hot-item-name';
+    name.textContent = item.name;
+    
+    const count = document.createElement('span');
+    count.className = 'hot-item-count';
+    count.textContent = `${item.count} mentions`;
+    
+    itemEl.appendChild(rank);
+    itemEl.appendChild(name);
+    itemEl.appendChild(count);
+    container.appendChild(itemEl);
+  });
+}
+
+/**
+ * Render alerts section
+ */
+async function renderAlerts() {
+  const container = elements.dashboardAlerts;
+  if (!container) return;
+  
+  // Clear container
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
+  
+  const alerts = await getAlerts();
+  const unreadAlerts = alerts.filter(a => !a.read);
+  
+  if (alerts.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state-inline';
+    empty.innerHTML = `
+      <span class="empty-icon">🔔</span>
+      <p class="empty-entries">No alerts</p>
+    `;
+    container.appendChild(empty);
+    return;
+  }
+  
+  // Show last 5 alerts
+  alerts.slice(0, 5).forEach(alert => {
+    const alertEl = document.createElement('div');
+    alertEl.className = `dashboard-alert alert-${alert.type} ${alert.read ? 'read' : 'unread'}`;
+    alertEl.dataset.alertId = alert.id;
+    
+    const message = document.createElement('span');
+    message.className = 'alert-message';
+    message.textContent = alert.message;
+    
+    const time = document.createElement('span');
+    time.className = 'alert-time';
+    const ago = Math.floor((Date.now() - alert.timestamp) / 1000 / 60);
+    time.textContent = ago < 1 ? 'now' : `${ago}m ago`;
+    
+    const dismissBtn = document.createElement('button');
+    dismissBtn.className = 'btn btn-sm btn-ghost alert-dismiss';
+    dismissBtn.textContent = '×';
+    dismissBtn.title = 'Dismiss';
+    dismissBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await dismissAlert(alert.id);
+      renderAlerts();
+      renderDashboardStats();
+    });
+    
+    alertEl.appendChild(message);
+    alertEl.appendChild(time);
+    alertEl.appendChild(dismissBtn);
+    
+    // Click to mark as read
+    alertEl.addEventListener('click', async () => {
+      await markAlertRead(alert.id);
+      renderAlerts();
+      renderDashboardStats();
+    });
+    
+    container.appendChild(alertEl);
+  });
+  
+  // Add clear all button
+  if (alerts.length > 0) {
+    const clearBtn = document.createElement('button');
+    clearBtn.className = 'btn btn-sm btn-secondary dashboard-clear-alerts';
+    clearBtn.textContent = 'Clear All';
+    clearBtn.addEventListener('click', async () => {
+      await clearAlerts();
+      renderAlerts();
+      renderDashboardStats();
+    });
+    container.appendChild(clearBtn);
+  }
+}
+
+/**
+ * Render full dashboard
+ */
+export async function renderDashboard() {
+  await renderDashboardStats();
+  await renderHotItems();
+  await renderAlerts();
+}
+
+/**
+ * Check if products are mentioned in a message
+ */
+async function checkProductMentions(message) {
+  const products = await getProducts();
+  const lowerMessage = message.toLowerCase();
+  
+  for (const product of products) {
+    const productName = product.name.toLowerCase();
+    if (lowerMessage.includes(productName)) {
+      await trackMention(product.name);
+    }
+  }
+}
+
+/**
+ * Keywords that indicate upset buyers
+ */
+const UPSET_KEYWORDS = [
+  'scam', 'fake', 'rip off', 'ripoff', 'disappointed',
+  'refund', 'return', 'broken', 'damaged', 'wrong item',
+  'never received', 'still waiting', 'where is my', 'bad quality'
+];
+
+/**
+ * Check for upset buyer keywords
+ */
+function checkUpsetBuyer(message, username) {
+  const lowerMessage = message.toLowerCase();
+  
+  for (const keyword of UPSET_KEYWORDS) {
+    if (lowerMessage.includes(keyword)) {
+      addAlert(ALERT_TYPES.UPSET_BUYER, `⚠️ @${username} might be upset: "${message.slice(0, 50)}..."`, {
+        username,
+        message,
+        keyword
+      });
+      break;
+    }
+  }
+}
+
+/**
+ * Initialize dashboard
+ */
+export async function initDashboard() {
+  // Initial render
+  await renderDashboard();
+  
+  // Start update loop
+  updateIntervalId = setInterval(async () => {
+    await renderDashboard();
+  }, 5000);
+  
+  // Start stream button
+  if (elements.dashboardStartBtn) {
+    elements.dashboardStartBtn.addEventListener('click', async () => {
+      await startStream();
+      Toast.success('Stream session started!');
+      await renderDashboard();
+    });
+  }
+  
+  // End stream button
+  if (elements.dashboardEndBtn) {
+    elements.dashboardEndBtn.addEventListener('click', async () => {
+      await endStream();
+      Toast.info('Stream session ended');
+      await renderDashboard();
+    });
+  }
+  
+  // Listen for messages from content script
+  browserAPI.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+    if (message.type === 'DASHBOARD_CHAT_MESSAGE') {
+      const { username, message: text, timestamp } = message.data;
+      await recordMessage(text, username, timestamp);
+      await checkProductMentions(text);
+      checkUpsetBuyer(text, username);
+      await renderDashboard();
+      sendResponse({ success: true });
+    }
+    
+    if (message.type === 'DASHBOARD_VIEWER_COUNT') {
+      await updateViewers(message.data.viewers);
+      await renderDashboard();
+      sendResponse({ success: true });
+    }
+    
+    if (message.type === 'DASHBOARD_LOW_STOCK') {
+      await addAlert(ALERT_TYPES.LOW_STOCK, `📦 Low stock: "${message.data.productName}" (${message.data.quantity} left)`, message.data);
+      await renderDashboard();
+      sendResponse({ success: true });
+    }
+    
+    if (message.type === 'DASHBOARD_SOLD') {
+      const { productName, price, remainingQty } = message.data;
+      await recordSale(price, productName);
+      await renderDashboard();
+      sendResponse({ success: true });
+    }
+  });
+}
+
+// Cleanup on unload
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeunload', () => {
+    if (updateIntervalId) {
+      clearInterval(updateIntervalId);
+    }
+  });
+}
+
 // Export for use in other modules
 export default {
   getDashboard,
@@ -374,5 +676,7 @@ export default {
   resetDashboard,
   getEngagementEmoji,
   formatChatRate,
+  initDashboard,
+  renderDashboard,
   ALERT_TYPES
 };
