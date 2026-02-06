@@ -3,6 +3,12 @@
 
 import { browserAPI } from '../core/config.js';
 import { Toast } from '../ui/toast.js';
+import { 
+  getWaitlistCount, 
+  showWaitlistModal, 
+  generateSoldOutAnnouncement,
+  renderWaitlistStats
+} from './waitlist.js';
 
 // Storage keys
 const STORAGE_KEYS = {
@@ -192,6 +198,19 @@ export async function markSold(productId, buyerUsername = null) {
         productId: product.id,
         productName: product.name,
         quantity: product.quantity
+      }
+    }).catch(() => {});
+  }
+  
+  // Check for sold-out FOMO announcement
+  if (product.quantity === 0) {
+    const fomoAnnouncement = await generateSoldOutAnnouncement(product);
+    browserAPI.runtime.sendMessage({
+      type: 'INVENTORY_SOLD_OUT',
+      data: {
+        productId: product.id,
+        productName: product.name,
+        announcement: fomoAnnouncement
       }
     }).catch(() => {});
   }
@@ -406,6 +425,9 @@ export async function renderInventoryList() {
     item.className = `inventory-item status-${statusClass}`;
     item.dataset.productId = product.id;
     
+    // Get waitlist count for sold-out items
+    const waitlistCount = product.quantity === 0 ? await getWaitlistCount(product.id) : 0;
+    
     const info = document.createElement('div');
     info.className = 'inventory-info';
     
@@ -424,7 +446,14 @@ export async function renderInventoryList() {
     const badge = document.createElement('span');
     const statusInfo = getStatusBadge(product);
     badge.className = `inventory-badge badge-${statusClass}`;
-    badge.textContent = statusClass.toUpperCase();
+    
+    // Enhanced badge for sold-out items with waitlist
+    if (product.quantity === 0 && waitlistCount > 0) {
+      badge.textContent = `❌ SOLD (${waitlistCount} waiting)`;
+      badge.classList.add('badge-waitlist');
+    } else {
+      badge.textContent = statusClass.toUpperCase();
+    }
     
     info.appendChild(nameSpan);
     info.appendChild(priceSpan);
@@ -466,6 +495,16 @@ export async function renderInventoryList() {
       updateStreamSummary();
     };
     
+    // Waitlist button for sold-out items
+    const waitlistBtn = document.createElement('button');
+    waitlistBtn.className = 'btn btn-sm btn-secondary';
+    waitlistBtn.textContent = waitlistCount > 0 ? `📝 ${waitlistCount}` : '📝';
+    waitlistBtn.title = waitlistCount > 0 ? `View ${waitlistCount} waiting` : 'View waitlist';
+    waitlistBtn.style.display = product.quantity === 0 ? 'inline-block' : 'none';
+    waitlistBtn.onclick = async () => {
+      await showWaitlistModal(product.id);
+    };
+    
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'btn btn-sm btn-danger';
     deleteBtn.textContent = '🗑️';
@@ -481,6 +520,7 @@ export async function renderInventoryList() {
     actions.appendChild(minusBtn);
     actions.appendChild(plusBtn);
     actions.appendChild(soldBtn);
+    actions.appendChild(waitlistBtn);
     actions.appendChild(deleteBtn);
     
     item.appendChild(info);
@@ -507,6 +547,7 @@ export async function initInventory() {
   // Render initial list
   await renderInventoryList();
   await updateStreamSummary();
+  await renderWaitlistStats();
   
   // Quick-add handler
   const quickAddInput = document.getElementById('inventoryQuickAdd');

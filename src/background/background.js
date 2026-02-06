@@ -630,6 +630,162 @@ function getPriorityLevel(priority) {
   return levels[priority] ?? 2;
 }
 
+// =============================================================================
+// TRANSLATION HANDLER
+// =============================================================================
+// AI-powered translation using Claude Haiku for speed and cost efficiency
+
+const TRANSLATION_TIMEOUT_MS = 8000;
+
+/**
+ * Handle translation requests from content scripts
+ * Actions: 'detect' (language detection) or 'translate' (translation)
+ */
+async function handleTranslationRequest(payload) {
+  const { action, text, fromLang, toLang } = payload;
+
+  if (!text) {
+    return { error: 'No text provided' };
+  }
+
+  // Get API key from settings
+  const apiKey = await getStoredApiKey();
+  if (!apiKey) {
+    return { error: 'API key not configured' };
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), TRANSLATION_TIMEOUT_MS);
+
+  try {
+    if (action === 'detect') {
+      // Language detection
+      const systemPrompt = `You are a language detection expert. Analyze the given text and respond with ONLY a JSON object in this exact format:
+{"language": "ISO 639-1 code", "confidence": 0.0-1.0}
+
+Common codes: en=English, es=Spanish, fr=French, de=German, zh=Chinese, ja=Japanese, ko=Korean, pt=Portuguese, it=Italian, ru=Russian, ar=Arabic, hi=Hindi, vi=Vietnamese, th=Thai, nl=Dutch, pl=Polish, tr=Turkish, id=Indonesian, ms=Malay, tl=Tagalog
+
+Rules:
+- If text is emojis only, numbers only, or too short to detect, use "unknown" with confidence 0
+- If text mixes languages, detect the primary/dominant language
+- Be conservative with confidence - only use >0.9 if very certain`;
+
+      const response = await fetch(ANTHROPIC_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: HAIKU_MODEL,
+          max_tokens: 50,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: text.substring(0, 500) }]
+        }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        if (response.status === 401) return { error: 'Invalid API key' };
+        if (response.status === 429) return { error: 'Rate limited' };
+        return { error: `API error: ${response.status}` };
+      }
+
+      const data = await response.json();
+      const responseText = data.content?.[0]?.text || '';
+
+      // Parse JSON response
+      try {
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          return {
+            language: parsed.language || 'unknown',
+            confidence: Math.min(1, Math.max(0, parsed.confidence || 0)),
+            usage: data.usage
+          };
+        }
+      } catch (parseErr) {
+        console.warn('[BuzzChat] Failed to parse language detection:', parseErr);
+      }
+
+      return { language: 'unknown', confidence: 0 };
+
+    } else if (action === 'translate') {
+      // Translation
+      if (!fromLang || !toLang) {
+        return { error: 'Source and target language required' };
+      }
+
+      const systemPrompt = `You are a professional translator. Translate the following text from ${fromLang} to ${toLang}.
+
+Rules:
+- Preserve the original tone and intent (casual chat, not formal)
+- Keep emojis, usernames (@mentions), and prices ($XX) unchanged
+- Keep it natural and conversational for live chat context
+- Respond with ONLY the translated text, nothing else
+- Do not add quotes or explanations`;
+
+      const response = await fetch(ANTHROPIC_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: HAIKU_MODEL,
+          max_tokens: 200,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: text.substring(0, 500) }]
+        }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        if (response.status === 401) return { error: 'Invalid API key' };
+        if (response.status === 429) return { error: 'Rate limited' };
+        return { error: `API error: ${response.status}` };
+      }
+
+      const data = await response.json();
+      const translatedText = (data.content?.[0]?.text || '').trim();
+
+      return {
+        translated: translatedText || text,
+        fromLang,
+        toLang,
+        usage: data.usage
+      };
+    }
+
+    return { error: 'Invalid action' };
+
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') return { error: 'Request timed out' };
+    return { error: error.message || 'Translation failed' };
+  }
+}
+
+/**
+ * Get stored API key from settings
+ */
+async function getStoredApiKey() {
+  return new Promise((resolve) => {
+    browserAPI.storage.sync.get(['buzzchatSettings'], (result) => {
+      const settings = result.buzzchatSettings || {};
+      // API key might be stored in different places depending on setup
+      resolve(settings.apiKey || settings.anthropicApiKey || null);
+    });
+  });
+}
+
 /**
  * Get statistics about analyzed messages
  */
@@ -1018,6 +1174,15 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const results = batchAnalyzeMessages(message.payload?.messages || []);
         sendResponse({ messages: results, method: 'local' });
       }
+      return true;
+
+    case 'TRANSLATE_MESSAGE':
+      // AI-powered translation for chat messages
+      handleTranslationRequest(message.payload).then(result => {
+        sendResponse(result);
+      }).catch(err => {
+        sendResponse({ error: err.message });
+      });
       return true;
 
     default:
